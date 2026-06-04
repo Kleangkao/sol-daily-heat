@@ -21,6 +21,32 @@ function solscanTokenUrl(mint: string): string {
   return `https://solscan.io/token/${mint}`;
 }
 
+type TopicRankingRow = {
+  ranking_date: string;
+  section: RankingSection;
+  heat_score: number;
+  rank_position: number | null;
+  score_breakdown_json: ScoreBreakdown;
+  confidence_score: number;
+};
+
+/** Prefer Top Heat row for the snapshot date; else highest heat_score that day (never confidence). */
+function pickHeatRankingRow(rows: TopicRankingRow[], date: string): TopicRankingRow | null {
+  const forDate = rows.filter((r) => r.ranking_date === date);
+  if (forDate.length === 0) return null;
+  const topHeat = forDate.find((r) => r.section === "top_heat");
+  if (topHeat) return topHeat;
+  return forDate.reduce((best, row) =>
+    Number(row.heat_score) > Number(best.heat_score) ? row : best
+  );
+}
+
+function parseRuleBasedHeatScore(value: unknown): number | null {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return null;
+  return Math.round(n);
+}
+
 function buildBuilderNoteFromMeta(
   sectionAppearances: RankingSection[],
   category: string,
@@ -96,19 +122,17 @@ export async function getTopicDetail(
     .order("ranking_date", { ascending: false })
     .order("heat_score", { ascending: false });
 
-  const rankingRows = rankings ?? [];
+  const rankingRows = (rankings ?? []) as TopicRankingRow[];
   const todayRows = rankingRows.filter((r) => r.ranking_date === date);
-  const primaryRanking =
-    todayRows[0] ?? rankingRows.find((r) => r.ranking_date === date) ?? rankingRows[0];
+  const heatRankingRow = pickHeatRankingRow(rankingRows, date);
 
   const meta = (topic.metadata_json ?? {}) as Record<string, unknown>;
   const evidence = parseStoredEvidence(meta.evidence) ?? null;
 
-  const scoreBreakdown = (primaryRanking?.score_breakdown_json ??
-    {}) as ScoreBreakdown;
-  const heatScore = primaryRanking
-    ? Number(primaryRanking.heat_score)
-    : Number(topic.confidence_score ?? 0);
+  const scoreBreakdown = (heatRankingRow?.score_breakdown_json ?? {}) as ScoreBreakdown;
+  const heatScore = heatRankingRow
+    ? parseRuleBasedHeatScore(heatRankingRow.heat_score)
+    : null;
 
   const sectionAppearancesToday = todayRows.map((r) => ({
     section: r.section as RankingSection,
@@ -196,7 +220,7 @@ export async function getTopicDetail(
     riskNote: topic.risk_note ?? "Context only — not investment advice.",
     interpretationType: topic.interpretation_type,
     confidence: Number(
-      primaryRanking?.confidence_score ?? topic.confidence_score ?? 0
+      heatRankingRow?.confidence_score ?? topic.confidence_score ?? 0
     ),
     firstSeenAt: topic.first_seen_at,
     lastUpdatedAt: topic.last_updated_at,

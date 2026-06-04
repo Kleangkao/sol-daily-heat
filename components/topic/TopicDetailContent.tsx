@@ -97,7 +97,16 @@ export default function TopicDetailContent({ topic }: Props) {
                 {topic.title}
               </h1>
             </div>
-            <HeatScoreBadge score={topic.heatScore} size="md" />
+            {topic.heatScore != null ? (
+              <HeatScoreBadge score={topic.heatScore} size="md" />
+            ) : (
+              <span
+                className="inline-flex items-center rounded-full border border-border bg-bg-secondary px-2.5 py-1 text-[13px] font-semibold text-text-muted"
+                title="No published ranking for this snapshot date"
+              >
+                Heat unavailable
+              </span>
+            )}
           </div>
           <div className="mt-4 flex flex-wrap gap-2">
             <span className="inline-flex rounded-full bg-bg-secondary px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-accent">
@@ -232,15 +241,30 @@ export default function TopicDetailContent({ topic }: Props) {
             Heat score breakdown
           </h2>
           <p className="mt-1 text-[13px] text-text-secondary">
-            Rule-based heat {topic.heatScore} for {topic.rankingDate}. Components only appear when
-            they affected the score.
+            {topic.heatScore != null ? (
+              <>
+                Rule-based heat {topic.heatScore} for {topic.rankingDate}. Components only appear
+                when they affected the score.
+              </>
+            ) : (
+              <>
+                No published heat ranking for {topic.rankingDate}.
+                {topic.confidence > 0 ? (
+                  <span className="block mt-1 text-[12px] text-text-muted">
+                    Cluster confidence (not heat): {topic.confidence.toFixed(2)}
+                  </span>
+                ) : null}
+              </>
+            )}
           </p>
-          <div className="mt-3">
-            <ScoreBreakdown
-              breakdown={topic.scoreBreakdown as Record<string, number>}
-              score={topic.heatScore}
-            />
-          </div>
+          {topic.heatScore != null ? (
+            <div className="mt-3">
+              <ScoreBreakdown
+                breakdown={topic.scoreBreakdown as Record<string, number>}
+                score={topic.heatScore}
+              />
+            </div>
+          ) : null}
           {scoreRows.length > 0 ? (
             <ul className="mt-4 space-y-3">
               {scoreRows.map((row) => (

@@ -53,7 +53,8 @@ export type TopicDetailView = {
   confidence: number;
   firstSeenAt: string;
   lastUpdatedAt: string;
-  heatScore: number;
+  /** Rule-based heat for rankingDate from daily_rankings; null when no published row that day. */
+  heatScore: number | null;
   scoreBreakdown: ScoreBreakdown;
   evidence: TopicEvidence | null;
   creatorAngle: string | null;
