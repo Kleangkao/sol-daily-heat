@@ -1,0 +1,37 @@
+{
+  "name": "sol-daily-heat",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "ingest:local": "npx tsx scripts/run-ingest.ts",
+    "pipeline:local": "npx tsx scripts/run-pipeline.ts",
+    "repair:token-mints": "npx tsx scripts/repair-token-mints.ts",
+    "cleanup:local": "npx tsx scripts/run-cleanup.ts",
+    "audit:local": "npx tsx scripts/run-audit.ts",
+    "pulse:local": "npx tsx scripts/run-pulse.ts"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.49.1",
+    "next": "14.2.5",
+    "react": "^18",
+    "react-dom": "^18",
+    "rss-parser": "^3.13.0",
+    "swr": "^2.3.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.5",
+    "postcss": "^8",
+    "tailwindcss": "^3.4.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5"
+  }
+}

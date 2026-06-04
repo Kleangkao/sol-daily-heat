@@ -1,0 +1,124 @@
+[
+  {
+    "slug": "solana-blog",
+    "name": "Solana Foundation Blog",
+    "feed_url": "https://solana.com/news/rss.xml",
+    "reliability": 0.9
+  },
+  {
+    "slug": "helius-blog",
+    "name": "Helius Blog",
+    "feed_url": "https://www.helius.dev/blog/rss.xml",
+    "reliability": 0.88,
+    "max_items_per_run": 25
+  },
+  {
+    "slug": "raydium-medium",
+    "name": "Raydium — Medium",
+    "feed_url": "https://medium.com/feed/@raydium",
+    "reliability": 0.84
+  },
+  {
+    "slug": "the-block-news",
+    "name": "The Block — News",
+    "feed_url": "https://www.theblock.co/rss.xml",
+    "reliability": 0.85,
+    "requires_solana_filter": true,
+    "max_items_per_run": 15
+  },
+  {
+    "slug": "solana-status",
+    "name": "Solana Status",
+    "feed_url": "https://status.solana.com/history.rss",
+    "reliability": 0.92
+  },
+  {
+    "slug": "marinade-blog",
+    "name": "Marinade Blog",
+    "feed_url": "https://marinade.finance/blog/rss.xml",
+    "reliability": 0.86,
+    "max_items_per_run": 15
+  },
+  {
+    "slug": "orca-medium",
+    "name": "Orca — Medium",
+    "feed_url": "https://orca-so.medium.com/feed",
+    "reliability": 0.85,
+    "max_items_per_run": 10
+  },
+  {
+    "slug": "pyth-status",
+    "name": "Pyth Network Status",
+    "feed_url": "https://status.pyth.network/history.rss",
+    "reliability": 0.9,
+    "max_items_per_run": 10
+  },
+  {
+    "slug": "sanctum-medium",
+    "name": "Sanctum — Medium",
+    "feed_url": "https://medium.com/feed/@sanctumso",
+    "reliability": 0.82,
+    "max_items_per_run": 5
+  },
+  {
+    "slug": "drift-medium",
+    "name": "Drift — Medium",
+    "feed_url": "https://medium.com/feed/@driftprotocol",
+    "reliability": 0.84,
+    "max_items_per_run": 10
+  },
+  {
+    "slug": "metaplex-medium",
+    "name": "Metaplex — Medium",
+    "feed_url": "https://medium.com/feed/@metaplex",
+    "reliability": 0.84,
+    "max_items_per_run": 10
+  },
+  {
+    "slug": "magiceden-status",
+    "name": "Magic Eden — Status",
+    "feed_url": "https://status.magiceden.io/history.rss",
+    "reliability": 0.9,
+    "max_items_per_run": 10
+  },
+  {
+    "slug": "dlnews-rss",
+    "name": "DL News — RSS",
+    "feed_url": "https://www.dlnews.com/arc/outboundfeeds/rss/",
+    "reliability": 0.78,
+    "requires_solana_filter": true,
+    "max_items_per_run": 10
+  },
+  {
+    "slug": "decrypt-rss",
+    "name": "Decrypt — RSS",
+    "feed_url": "https://decrypt.co/feed",
+    "reliability": 0.76,
+    "requires_solana_filter": true,
+    "max_items_per_run": 10
+  },
+  {
+    "slug": "agave-releases",
+    "name": "Agave — GitHub Releases",
+    "feed_url": "https://github.com/anza-xyz/agave/releases.atom",
+    "reliability": 0.88,
+    "feed_format": "atom",
+    "max_items_per_run": 5
+  },
+  {
+    "slug": "firedancer-releases",
+    "name": "Firedancer — GitHub Releases",
+    "feed_url": "https://github.com/firedancer-io/firedancer/releases.atom",
+    "reliability": 0.86,
+    "feed_format": "atom",
+    "max_items_per_run": 5
+  },
+  {
+    "slug": "jito-solana-releases",
+    "name": "Jito Solana — GitHub Releases",
+    "feed_url": "https://github.com/jito-foundation/jito-solana/releases.atom",
+    "reliability": 0.86,
+    "feed_format": "atom",
+    "max_items_per_run": 5
+  }
+]
