@@ -153,6 +153,22 @@ curl -sS -X POST "https://YOUR_DOMAIN/api/cron/cleanup?dry_run=1" \
 
 ## Cron setup
 
+### GitHub Actions (production)
+
+This repo includes [`.github/workflows/cron.yml`](../.github/workflows/cron.yml) to call production cron routes on schedule (UTC):
+
+| Job | Schedule (UTC) | Endpoint |
+|-----|----------------|----------|
+| Market Pulse | `*/30 * * * *` (every 30 min) | `POST https://sol-daily-heat.vercel.app/api/cron/pulse` |
+| Pipeline | `0 */3 * * *` (every 3 hours) | `POST https://sol-daily-heat.vercel.app/api/cron/pipeline` |
+| Cleanup (dry-run) | `0 3 * * *` (daily 03:00) | `POST https://sol-daily-heat.vercel.app/api/cron/cleanup?dry_run=1` |
+
+**Repository secret (required):** In GitHub → **Settings** → **Secrets and variables** → **Actions** → **New repository secret**, add `CRON_SECRET` with the **same value** as Vercel Production `CRON_SECRET`. The workflow uses `Authorization: Bearer` via `${{ secrets.CRON_SECRET }}` — never commit the secret.
+
+**Manual run:** **Actions** → **Production cron** → **Run workflow** (`workflow_dispatch`) runs all three jobs once (useful after deploy or secret rotation).
+
+Cleanup is **dry-run only** in this workflow until you change the workflow URL (remove `?dry_run=1`) after reviewing `wouldDelete` from dry-run responses.
+
 ### Recommended schedule (soft launch)
 
 | Job | Cadence | Cron expression | Route |
