@@ -1,13 +1,7 @@
+import { utcAvailableDates } from "@/lib/heat/snapshot-date";
 import type { HeatCardView, HeatDashboardData } from "@/lib/types/heat";
 
-const today = new Date();
-const iso = (d: Date) => d.toISOString().slice(0, 10);
-
-const dates = Array.from({ length: 7 }, (_, i) => {
-  const d = new Date(today);
-  d.setDate(d.getDate() - i);
-  return iso(d);
-});
+const dates = utcAvailableDates();
 
 function card(partial: HeatCardView): HeatCardView {
   return partial;

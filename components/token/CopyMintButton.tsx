@@ -27,7 +27,13 @@ export default function CopyMintButton({ mint }: Props) {
       title="Click to copy mint address"
     >
       <code className="block break-all text-[11px] leading-relaxed text-text-secondary">{mint}</code>
-      <span className="mt-1 inline-block text-[10px] font-semibold text-accent">
+      <span
+        role="status"
+        aria-live="polite"
+        className={`mt-1 inline-block text-[10px] font-semibold ${
+          copied ? "text-emerald-400" : "text-accent"
+        }`}
+      >
         {copied ? "Copied" : "Copy mint"}
       </span>
     </button>

@@ -11,16 +11,21 @@ const COPY: Record<DashboardDataSource, string> = {
 
 type Props = {
   dataSource?: DashboardDataSource;
+  isLoading?: boolean;
 };
 
-export default function DisclaimerBar({ dataSource = "mock" }: Props) {
+export default function DisclaimerBar({ dataSource, isLoading }: Props) {
+  const text = isLoading
+    ? "Loading live scanner data from Supabase — rankings will appear when the fetch completes. Not investment advice."
+    : COPY[dataSource ?? "mock"];
+
   return (
     <div
       role="note"
       className="border-b border-border bg-bg-primary/80 px-4 py-2.5 sm:px-6 lg:px-8"
     >
       <p className="mx-auto max-w-6xl text-center text-[11px] leading-relaxed text-text-muted">
-        {COPY[dataSource]}
+        {text}
       </p>
     </div>
   );

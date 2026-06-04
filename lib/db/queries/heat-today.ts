@@ -4,6 +4,7 @@ import type { DailyRanking, Topic, Token, Protocol, RankingSection } from "@/lib
 import { SECTION_LABELS } from "@/lib/types/heat";
 import { parseStoredEvidence } from "@/lib/process/build-evidence";
 import { DASHBOARD_SECTIONS } from "@/lib/db/dashboard-sections";
+import { utcAvailableDates, utcTodayIso } from "@/lib/heat/snapshot-date";
 import { SECTION_LIMITS } from "@/lib/process/section-limits";
 
 type RankingRow = DailyRanking & {
@@ -133,16 +134,6 @@ function rankingToCard(row: RankingRow): HeatCardView {
   };
 }
 
-function availableDates(): string[] {
-  const dates: string[] = [];
-  for (let i = 0; i < 7; i++) {
-    const d = new Date();
-    d.setDate(d.getDate() - i);
-    dates.push(d.toISOString().slice(0, 10));
-  }
-  return dates;
-}
-
 function rowsForSection(rows: RankingRow[], section: RankingSection): HeatCardView[] {
   return rows
     .filter((r) => r.section === section)
@@ -159,7 +150,7 @@ export async function fetchHeatDashboard(
   db: SupabaseClient,
   date?: string
 ): Promise<HeatDashboardData | null> {
-  const rankingDate = date ?? new Date().toISOString().slice(0, 10);
+  const rankingDate = date ?? utcTodayIso();
 
   const { data, error } = await db
     .from("daily_rankings")
@@ -202,7 +193,7 @@ export async function fetchHeatDashboard(
 
   return {
     date: rankingDate,
-    availableDates: availableDates(),
+    availableDates: utcAvailableDates(),
     topHeat,
     newTokens,
     defiSignals,

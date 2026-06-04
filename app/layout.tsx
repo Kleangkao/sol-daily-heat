@@ -14,10 +14,16 @@ const dm = DM_Sans({
   variable: "--font-dm",
 });
 
+const SITE_URL = "https://sol-daily-heat.vercel.app";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: "Solana Daily Heat",
   description:
     "Daily intelligence dashboard for the Solana ecosystem — what is hot, why, and what to watch.",
+  alternates: {
+    canonical: "/",
+  },
 };
 
 export default function RootLayout({

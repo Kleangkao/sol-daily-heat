@@ -37,6 +37,7 @@ export default function CategoryFilter({ value, onChange }: Props) {
             key={cat}
             type="button"
             onClick={() => onChange(cat)}
+            aria-pressed={active}
             className={`rounded-full border px-3 py-1 text-[12px] font-medium transition-colors ${
               active
                 ? "border-accent bg-accent/10 text-accent"

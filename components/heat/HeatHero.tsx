@@ -1,7 +1,7 @@
 "use client";
 
 import DateSelector from "./DateSelector";
-
+import { formatSnapshotHeroLine } from "@/lib/heat/snapshot-date";
 import type { DashboardDataSource } from "@/lib/types/heat";
 
 type Props = {
@@ -15,7 +15,8 @@ type Props = {
 function dataSourceLabel(dataSource?: DashboardDataSource): string {
   if (dataSource === "live") return "Live data";
   if (dataSource === "mixed") return "Mixed — some sections use demo data";
-  return "Demo mock data";
+  if (dataSource === "mock") return "Demo mock data";
+  return "";
 }
 
 export default function HeatHero({ date, dates, onDateChange, dataSource, isLoading }: Props) {
@@ -29,13 +30,22 @@ export default function HeatHero({ date, dates, onDateChange, dataSource, isLoad
           Solana Daily Heat
         </h1>
         <p className="mt-3 max-w-2xl text-balance text-[15px] leading-relaxed text-text-secondary">
-          Find what is hot on Solana today before it becomes obvious.
+          Find what is hot on Solana for the selected UTC snapshot before it becomes obvious.
         </p>
-        <div className="mt-6 flex flex-wrap items-center gap-4">
+        <div className="mt-6 flex flex-wrap items-end gap-4">
           <DateSelector value={date} dates={dates} onChange={onDateChange} />
-          <span className="text-[11px] text-text-muted">
-            {isLoading ? "Loading…" : dataSourceLabel(dataSource)} · Not investment advice
-          </span>
+          <div className="flex flex-col gap-0.5">
+            <span className="text-[11px] text-text-muted">
+              {isLoading
+                ? "Loading live scanner data…"
+                : dataSourceLabel(dataSource)
+                  ? `${dataSourceLabel(dataSource)} · Not investment advice`
+                  : "Not investment advice"}
+            </span>
+            <span className="text-[11px] font-medium text-text-secondary">
+              Snapshot date uses UTC. {formatSnapshotHeroLine(date)}
+            </span>
+          </div>
         </div>
       </div>
     </header>
