@@ -156,6 +156,8 @@ Open [http://localhost:3000](http://localhost:3000). Without Supabase, the UI us
 
 **Soft launch (Vercel):** [docs/SOFT_LAUNCH_DEPLOYMENT_CHECKLIST.md](docs/SOFT_LAUNCH_DEPLOYMENT_CHECKLIST.md) — exact Vercel build/env/cron/post-deploy curl and smoke tests (manual deploy).
 
+**Soft launch verification (complete):** [docs/SOFT_LAUNCH_VERIFICATION.md](docs/SOFT_LAUNCH_VERIFICATION.md) — production URL, commits, cron, endpoints/tables checked, monitoring, known observations.
+
 **Primary runbook:** [docs/PRIVATE_BETA_LAUNCH_CHECKLIST.md](docs/PRIVATE_BETA_LAUNCH_CHECKLIST.md) — go/no-go criteria, migrations **001–010**, env vars, Vercel cron, curl/SQL smoke tests, rollback, and daily monitoring.
 
 Use this section as a short summary; follow the linked checklist for a controlled private beta. **Do not deploy without migrations 001–010 on the production Supabase project.**
