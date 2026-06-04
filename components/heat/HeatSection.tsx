@@ -1,4 +1,5 @@
 import HeatCard from "./HeatCard";
+import { alsoInSections } from "@/lib/heat/topic-section-appearances";
 import type {
   HeatCardPersonaHighlight,
   HeatCardView,
@@ -7,11 +8,15 @@ import type {
 
 type Props = {
   title: string;
+  sectionId: string;
   description?: string;
   items: HeatCardView[];
   emptyMessage?: string;
   /** When "mock", section title shows a demo label */
   sectionDataSource?: SectionDataSource;
+  /** Current section label for cross-section "Also in" chips */
+  sectionLabel?: string;
+  topicSections?: Map<string, string[]>;
   /** Shown when the section has fewer cards than its cap (curated sparse) */
   sparseNote?: string;
   /** Neutral disclaimer below the section header */
@@ -22,16 +27,19 @@ type Props = {
 
 export default function HeatSection({
   title,
+  sectionId,
   description,
   items,
   emptyMessage = "No signals for this filter today.",
   sectionDataSource,
+  sectionLabel,
+  topicSections,
   sparseNote,
   sectionDisclaimer,
   personaHighlight,
 }: Props) {
   return (
-    <section className="mt-10">
+    <section id={sectionId} className="mt-10 scroll-mt-24">
       <div className="mb-4">
         <h2 className="font-heading text-[22px] font-bold uppercase tracking-wide text-text-primary">
           {title}
@@ -65,6 +73,11 @@ export default function HeatSection({
               item={item}
               detailEnabled={sectionDataSource === "live"}
               personaHighlight={personaHighlight}
+              alsoIn={
+                sectionLabel && topicSections
+                  ? alsoInSections(topicSections, item.id, sectionLabel)
+                  : undefined
+              }
             />
           ))}
         </div>

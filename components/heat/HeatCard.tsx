@@ -22,6 +22,8 @@ type Props = {
   /** When true, live UUID topics link to /topics/[id] */
   detailEnabled?: boolean;
   personaHighlight?: HeatCardPersonaHighlight;
+  /** Other homepage sections featuring this topic (client-derived) */
+  alsoIn?: string[];
 };
 
 function PersonaHighlightBlock({ label, text }: { label: string; text: string }) {
@@ -47,6 +49,7 @@ export default function HeatCard({
   variant = "default",
   detailEnabled = false,
   personaHighlight,
+  alsoIn,
 }: Props) {
   const titleSize = variant === "compact" ? "text-[16px]" : "text-[18px]";
   const showDetailLink = detailEnabled && isLiveTopicId(item.id);
@@ -113,6 +116,12 @@ export default function HeatCard({
       ) : null}
 
       <SignalQualityBadges badges={display.badges} />
+
+      {alsoIn && alsoIn.length > 0 ? (
+        <p className="mt-2 text-[10px] text-text-muted">
+          Also in {alsoIn.join(", ")}
+        </p>
+      ) : null}
 
       {personaHighlight === "creator" && item.creatorAngle ? (
         <PersonaHighlightBlock label="Creator angle" text={item.creatorAngle} />

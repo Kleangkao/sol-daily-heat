@@ -1,14 +1,23 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import useSWR from "swr";
 import { filterByCategory } from "@/lib/mock/demo-data";
+import {
+  buildDashboardQueryString,
+  isValidDateParam,
+  parseCategoryParam,
+  resolveDateParam,
+} from "@/lib/heat/dashboard-url-state";
+import { buildTopicSectionLabels } from "@/lib/heat/topic-section-appearances";
 import { utcAvailableDates, utcTodayIso } from "@/lib/heat/snapshot-date";
 import type {
   HeatCategoryFilter,
   HeatDashboardData,
   DashboardSectionKey,
 } from "@/lib/types/heat";
+import { CATEGORY_LABELS } from "@/lib/types/heat";
 import { SECTION_LIMITS } from "@/lib/process/section-limits";
 import { sectionItemsMetricHeavy } from "@/lib/heat/card-display";
 import CategoryFilter from "./CategoryFilter";
@@ -18,12 +27,21 @@ import DisclaimerBar from "./DisclaimerBar";
 import HeatHero from "./HeatHero";
 import HeatSection from "./HeatSection";
 import MarketPulse from "./MarketPulse";
+import SectionJumpNav from "./SectionJumpNav";
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
 export default function HeatDashboard() {
-  const [date, setDate] = useState<string | undefined>(undefined);
-  const [category, setCategory] = useState<HeatCategoryFilter>("all");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const initialCategory = parseCategoryParam(searchParams.get("category"));
+  const initialDateRaw = searchParams.get("date");
+
+  const [date, setDate] = useState<string | undefined>(() =>
+    isValidDateParam(initialDateRaw) ? initialDateRaw! : undefined
+  );
+  const [category, setCategory] = useState<HeatCategoryFilter>(initialCategory);
 
   const heroDate = date ?? utcTodayIso();
   const heroDates = useMemo(() => utcAvailableDates(), []);
@@ -37,10 +55,61 @@ export default function HeatDashboard() {
   const awaitingData = data == null && (isLoading || isValidating);
   const dashboard = data ?? null;
 
+  const syncUrl = useCallback(
+    (nextDate: string | undefined, nextCategory: HeatCategoryFilter) => {
+      const effectiveDate = nextDate ?? dashboard?.date ?? utcTodayIso();
+      const qs = buildDashboardQueryString(effectiveDate, nextCategory);
+      router.replace(`/${qs}`, { scroll: false });
+    },
+    [router, dashboard?.date]
+  );
+
+  useEffect(() => {
+    if (!dashboard?.availableDates?.length) return;
+    const raw = searchParams.get("date");
+    if (!raw || !isValidDateParam(raw)) return;
+    const resolved = resolveDateParam(raw, dashboard.availableDates);
+    if (resolved && resolved !== raw) {
+      setDate(resolved);
+      syncUrl(resolved, category);
+    }
+  }, [dashboard, searchParams, category, syncUrl]);
+
+  const onDateChange = useCallback(
+    (d: string) => {
+      setDate(d);
+      syncUrl(d, category);
+    },
+    [category, syncUrl]
+  );
+
+  const onCategoryChange = useCallback(
+    (c: HeatCategoryFilter) => {
+      setCategory(c);
+      syncUrl(date ?? dashboard?.date, c);
+    },
+    [date, dashboard?.date, syncUrl]
+  );
+
   const topFiltered = useMemo(
     () => (dashboard ? filterByCategory(dashboard.topHeat, category) : []),
     [dashboard, category]
   );
+
+  const topicSections = useMemo(
+    () => (dashboard ? buildTopicSectionLabels(dashboard) : undefined),
+    [dashboard]
+  );
+
+  const topHeatEmptyMessage = useMemo(() => {
+    if (!dashboard) return "No topics match this category filter.";
+    const snapshot = dashboard.date;
+    if (category === "all") {
+      return `No Top Heat topics for snapshot ${snapshot} UTC.`;
+    }
+    const label = CATEGORY_LABELS[category];
+    return `No Top Heat topics matched ${label} for snapshot ${snapshot} UTC.`;
+  }, [dashboard, category]);
 
   const sectionSource = (key: DashboardSectionKey) => dashboard?.sectionSources?.[key];
 
@@ -69,7 +138,7 @@ export default function HeatDashboard() {
       <HeatHero
         date={dashboard?.date ?? heroDate}
         dates={dashboard?.availableDates ?? heroDates}
-        onDateChange={(d) => setDate(d)}
+        onDateChange={onDateChange}
         dataSource={dashboard?.dataSource}
         isLoading={awaitingData}
       />
@@ -86,26 +155,38 @@ export default function HeatDashboard() {
         <DashboardLoadingShell />
       ) : dashboard ? (
         <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
-          <div className="mb-6">
+          <div className="mb-4">
             <p className="mb-2 text-[12px] font-medium text-text-secondary">
               Top Heat category filter
             </p>
-            <CategoryFilter value={category} onChange={setCategory} />
+            <CategoryFilter value={category} onChange={onCategoryChange} />
             <p className="mt-1.5 text-[11px] text-text-muted">
               Other sections are curated separately.
             </p>
           </div>
 
+          <SectionJumpNav />
+
+          <p className="mb-6 text-[12px] text-text-muted">
+            A topic may appear in multiple sections when it matters to different audiences.
+          </p>
+
           <HeatSection
             title="Top Heat"
+            sectionId="top-heat"
+            sectionLabel="Top Heat"
+            topicSections={topicSections}
             description="Highest rule-based heat scores for the selected UTC snapshot — deduplicated for that day."
             items={topFiltered}
-            emptyMessage="No topics match this category filter."
+            emptyMessage={topHeatEmptyMessage}
             sectionDataSource={sectionSource("topHeat")}
           />
 
           <HeatSection
             title="New Solana Tokens"
+            sectionId="new-tokens"
+            sectionLabel="New Tokens"
+            topicSections={topicSections}
             description="New pair and mint signals from DexScreener-style adapters (24h window, UTC snapshot day)."
             items={dashboard.newTokens}
             sectionDataSource={sectionSource("newTokens")}
@@ -113,6 +194,9 @@ export default function HeatDashboard() {
 
           <HeatSection
             title="DeFi / Protocol Signals"
+            sectionId="defi"
+            sectionLabel="DeFi"
+            topicSections={topicSections}
             description="Protocol TVL, volume, and stake-flow context from free DeFi adapters."
             items={dashboard.defiSignals}
             sectionDataSource={sectionSource("defiSignals")}
@@ -120,6 +204,9 @@ export default function HeatDashboard() {
 
           <HeatSection
             title="Builder / Infra Watch"
+            sectionId="builder"
+            sectionLabel="Builder"
+            topicSections={topicSections}
             description="Infrastructure, developer tooling, protocol plumbing, and status signals for Solana builders."
             items={dashboard.builderWatch}
             sectionDataSource={sectionSource("builderWatch")}
@@ -133,6 +220,9 @@ export default function HeatDashboard() {
 
           <HeatSection
             title="Creator Angles"
+            sectionId="creator"
+            sectionLabel="Creator"
+            topicSections={topicSections}
             description="Thread and clip starting points derived from the UTC snapshot — add your own verification."
             items={dashboard.creatorAngles}
             sectionDataSource={sectionSource("creatorAngles")}
@@ -146,6 +236,9 @@ export default function HeatDashboard() {
 
           <HeatSection
             title="Investor Watchlist"
+            sectionId="investor"
+            sectionLabel="Investor"
+            topicSections={topicSections}
             description="Neutral watch context for builders and investors."
             items={dashboard.investorWatchlist}
             sectionDataSource={sectionSource("investorWatchlist")}

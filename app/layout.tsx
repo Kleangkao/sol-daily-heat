@@ -14,7 +14,7 @@ const dm = DM_Sans({
   variable: "--font-dm",
 });
 
-const SITE_URL = "https://sol-daily-heat.vercel.app";
+import { SITE_URL } from "@/lib/site";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
