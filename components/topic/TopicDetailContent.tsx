@@ -12,6 +12,7 @@ import {
   buildTopicMetricEvidence,
   type TopicMetricEvidence,
 } from "@/lib/heat/topic-metric-evidence";
+import { buildTopicMixedMetrics } from "@/lib/heat/topic-mixed-metrics";
 import {
   buildPersonaDisplayNote,
   personaInputFromTopic,
@@ -98,6 +99,7 @@ type Props = {
 export default function TopicDetailContent({ topic }: Props) {
   const brief = buildTopicNarrativeBrief(topic);
   const metricEvidence = buildTopicMetricEvidence(topic);
+  const mixedMetrics = buildTopicMixedMetrics(topic);
   const sectionCount = topic.sectionAppearancesToday.length;
   const personaInput = personaInputFromTopic(topic);
   const creatorPersona = buildPersonaDisplayNote(
@@ -189,6 +191,42 @@ export default function TopicDetailContent({ topic }: Props) {
       </header>
 
       <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+        {mixedMetrics ? (
+          <section className="mb-6 rounded-[10px] border border-accent/25 bg-accent/5 p-5">
+            <h2 className="font-heading text-[16px] font-bold uppercase tracking-wide text-text-primary">
+              Signals in this topic
+            </h2>
+            <p className="mt-2 text-[13px] leading-relaxed text-text-secondary">
+              {mixedMetrics.contextNote}
+            </p>
+            <div className="mt-4 space-y-3">
+              {mixedMetrics.signals.map((signal) => (
+                <div
+                  key={signal.kind}
+                  className="rounded-[8px] border border-border/60 bg-bg-card/80 px-4 py-3"
+                >
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-accent">
+                    {signal.label}
+                  </p>
+                  <p className="mt-1 text-[13px] font-medium text-text-primary">{signal.title}</p>
+                  <div className="mt-2 space-y-1.5">
+                    {signal.currentValueLabel ? (
+                      <MetricEvidenceRow label="Current" value={signal.currentValueLabel} />
+                    ) : null}
+                    {signal.changePctLabel ? (
+                      <MetricEvidenceRow label="Change" value={signal.changePctLabel} />
+                    ) : null}
+                    <MetricEvidenceRow label="Source" value={signal.sourceName} />
+                    {signal.snapshotLabel ? (
+                      <MetricEvidenceRow label="Snapshot" value={signal.snapshotLabel} />
+                    ) : null}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        ) : null}
+
         <section className="rounded-[10px] border border-border bg-bg-card p-5">
           <h2 className="font-heading text-[18px] font-bold uppercase tracking-wide text-text-primary">
             {brief.heading}

@@ -7,6 +7,10 @@ import {
   readerCopyInputFromTopic,
   type ReaderSignalKind,
 } from "@/lib/heat/reader-signal-copy";
+import {
+  canonicalMetricKind,
+  mixedMetricBriefNote,
+} from "@/lib/heat/topic-mixed-metrics";
 
 export type TopicNarrativeBrief = {
   mode: "signal_brief" | "narrative_brief";
@@ -238,7 +242,18 @@ export function buildTopicNarrativeBrief(topic: TopicDetailView): TopicNarrative
   let paragraphs: string[];
   let watchNext: string[];
 
-  if (kind === "metric_fee") {
+  const mixedNote = mixedMetricBriefNote(topic);
+  const canonicalMetric = canonicalMetricKind(topic);
+  const metricParagraphKind =
+    canonicalMetric ?? (kind === "metric_tvl" ? "tvl" : kind === "metric_fee" ? "fee" : null);
+
+  if (metricParagraphKind === "fee") {
+    paragraphs = metricFeeParagraphs(topic);
+    watchNext = defaultMetricWatchNext();
+  } else if (metricParagraphKind === "tvl") {
+    paragraphs = metricTvlParagraphs(topic);
+    watchNext = defaultMetricWatchNext();
+  } else if (kind === "metric_fee") {
     paragraphs = metricFeeParagraphs(topic);
     watchNext = defaultMetricWatchNext();
   } else if (kind === "metric_tvl") {
@@ -268,6 +283,10 @@ export function buildTopicNarrativeBrief(topic: TopicDetailView): TopicNarrative
     if (tvlLine) {
       watchNext = uniqueBullets([...watchNext, tvlLine]);
     }
+  }
+
+  if (mixedNote) {
+    paragraphs = [mixedNote, ...paragraphs];
   }
 
   return {

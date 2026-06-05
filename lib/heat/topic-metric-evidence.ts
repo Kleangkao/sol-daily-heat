@@ -5,6 +5,11 @@ import {
   readerCopyInputFromTopic,
   type ReaderSignalKind,
 } from "@/lib/heat/reader-signal-copy";
+import {
+  canonicalMetricKind,
+  resolveMetricSourceName,
+  type TopicMetricSignalKind,
+} from "@/lib/heat/topic-mixed-metrics";
 
 export type MetricEvidenceDepth = "single_source" | "multi_source" | "unknown";
 
@@ -107,19 +112,30 @@ function parseTvlMetric(title: string, summary?: string): ParsedMetricMove | nul
 
 function parseMetricMove(
   topic: TopicDetailView,
-  kind: ReaderSignalKind
+  primaryKind: TopicMetricSignalKind
 ): ParsedMetricMove | null {
-  if (kind === "metric_fee") {
+  if (primaryKind === "fee") {
     const fee = parseFeeMetric(topic.title, topic.summary);
-    if (!fee) return null;
+    if (fee) {
+      return {
+        kind: "fee",
+        metricLabel: "24h fees",
+        direction: fee.direction,
+        pct: fee.pct,
+      };
+    }
+    return null;
+  }
+  const tvl = parseTvlMetric(topic.title, topic.summary);
+  if (tvl) {
     return {
-      kind: "fee",
-      metricLabel: "24h fees",
-      direction: fee.direction,
-      pct: fee.pct,
+      kind: "tvl",
+      metricLabel: "24h TVL",
+      direction: tvl.direction,
+      pct: tvl.pct,
     };
   }
-  return parseTvlMetric(topic.title, topic.summary);
+  return null;
 }
 
 function collectEvidenceTexts(topic: TopicDetailView): string[] {
@@ -197,12 +213,11 @@ function formatChangeLabel(move: ParsedMetricMove): string {
   return `${sign}${move.pct.toFixed(1)}% (24h)`;
 }
 
-function resolveSourceName(topic: TopicDetailView): string | undefined {
-  const primary = topic.timeline.find((t) => t.isPrimary);
-  if (primary?.sourceName) return primary.sourceName;
-  if (topic.timeline[0]?.sourceName) return topic.timeline[0].sourceName;
-  if (topic.evidence?.sourceLinks[0]?.label) return topic.evidence.sourceLinks[0].label;
-  return undefined;
+function resolveSourceName(
+  topic: TopicDetailView,
+  metricKind: TopicMetricSignalKind
+): string | undefined {
+  return resolveMetricSourceName(topic, metricKind);
 }
 
 function resolveSnapshotLabel(topic: TopicDetailView): string | undefined {
@@ -292,9 +307,10 @@ export function buildTopicMetricEvidence(
   const kind = classifyReaderSignal(input);
   if (!isMetricEvidenceKind(kind)) return null;
 
-  const move = parseMetricMove(topic, kind);
+  const metricKind =
+    canonicalMetricKind(topic) ?? (kind === "metric_tvl" ? "tvl" : "fee");
+  const move = parseMetricMove(topic, metricKind);
   const texts = collectEvidenceTexts(topic);
-  const metricKind = move?.kind ?? (kind === "metric_tvl" ? "tvl" : "fee");
   const current = extractCurrentValue(texts, metricKind);
 
   const derivedFields: string[] = [];
@@ -313,7 +329,7 @@ export function buildTopicMetricEvidence(
     currentValueLabel: current?.label,
     previousValueLabel,
     changePctLabel: move ? formatChangeLabel(move) : undefined,
-    sourceName: resolveSourceName(topic),
+    sourceName: resolveSourceName(topic, metricKind),
     snapshotLabel: resolveSnapshotLabel(topic),
     evidenceDepth: resolveEvidenceDepth(topic),
     derivedFields: derivedFields.length > 0 ? derivedFields : undefined,
