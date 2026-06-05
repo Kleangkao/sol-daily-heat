@@ -174,46 +174,32 @@ export default function HeatDashboard() {
 
           <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_252px] lg:items-start lg:gap-8">
             <div className="min-w-0">
-              <div className="mb-5 space-y-4 rounded-[10px] border border-border/60 bg-bg-card/40 p-4">
-                <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-wide text-text-muted">
-                    Categories
-                  </p>
-                  <p className="mt-0.5 mb-2 text-[11px] leading-relaxed text-text-muted">
-                    Filters Top Heat by topic. Persona sections below stay curated separately.
-                  </p>
-                  <CategoryFilter value={category} onChange={onCategoryChange} />
-                </div>
-
-                <div className="border-t border-border/60 pt-4">
-                  <p className="text-[11px] font-semibold uppercase tracking-wide text-text-muted">
-                    Sections
-                  </p>
-                  <p className="mt-0.5 mb-2 text-[11px] text-text-muted">
-                    Jump to a dashboard section.
-                  </p>
-                  <SectionJumpNav onNavigate={navigateToSection} />
-                </div>
+              <div className="mb-2">
+                <SectionJumpNav onNavigate={navigateToSection} />
               </div>
 
-              <p className="mb-6 text-[12px] text-text-muted">
-                A topic may appear in multiple sections when it matters to different audiences.
-              </p>
+              <HeatSection
+                title="Top Heat"
+                sectionId="top-heat"
+                sectionLabel="Top Heat"
+                topicSections={topicSections}
+                description="Highest rule-based heat scores for the selected UTC snapshot — deduplicated for that day."
+                items={topFiltered}
+                emptyMessage={topHeatEmptyMessage}
+                sectionDataSource={sectionSource("topHeat")}
+                isOpen={sectionOpen["top-heat"]}
+                onToggle={() => toggleSection("top-heat")}
+                toolbar={
+                  <div>
+                    <p className="mb-1.5 text-[11px] text-text-muted">
+                      Filter this section by category — other sections stay curated separately.
+                    </p>
+                    <CategoryFilter value={category} onChange={onCategoryChange} />
+                  </div>
+                }
+              />
 
               <HeatSection
-            title="Top Heat"
-            sectionId="top-heat"
-            sectionLabel="Top Heat"
-            topicSections={topicSections}
-            description="Highest rule-based heat scores for the selected UTC snapshot — deduplicated for that day."
-            items={topFiltered}
-            emptyMessage={topHeatEmptyMessage}
-            sectionDataSource={sectionSource("topHeat")}
-            isOpen={sectionOpen["top-heat"]}
-            onToggle={() => toggleSection("top-heat")}
-          />
-
-          <HeatSection
             title="New Solana Tokens"
             sectionId="new-tokens"
             sectionLabel="New Tokens"
@@ -222,11 +208,11 @@ export default function HeatDashboard() {
             items={dashboard.newTokens}
             sectionDataSource={sectionSource("newTokens")}
             isOpen={sectionOpen["new-tokens"]}
-            onToggle={() => toggleSection("new-tokens")}
-          />
+                onToggle={() => toggleSection("new-tokens")}
+              />
 
-          <HeatSection
-            title="DeFi / Protocol Signals"
+              <HeatSection
+                title="DeFi / Protocol Signals"
             sectionId="defi"
             sectionLabel="DeFi"
             topicSections={topicSections}
@@ -234,11 +220,11 @@ export default function HeatDashboard() {
             items={dashboard.defiSignals}
             sectionDataSource={sectionSource("defiSignals")}
             isOpen={sectionOpen.defi}
-            onToggle={() => toggleSection("defi")}
-          />
+                onToggle={() => toggleSection("defi")}
+              />
 
-          <HeatSection
-            title="Builder / Infra Watch"
+              <HeatSection
+                title="Builder / Infra Watch"
             sectionId="builder"
             sectionLabel="Builder"
             topicSections={topicSections}
@@ -252,11 +238,11 @@ export default function HeatDashboard() {
             }
             sectionDisclaimer="Operational and ecosystem context — not investment advice."
             isOpen={sectionOpen.builder}
-            onToggle={() => toggleSection("builder")}
-          />
+                onToggle={() => toggleSection("builder")}
+              />
 
-          <HeatSection
-            title="Creator Angles"
+              <HeatSection
+                title="Creator Angles"
             sectionId="creator"
             sectionLabel="Creator"
             topicSections={topicSections}
@@ -270,11 +256,11 @@ export default function HeatDashboard() {
                 : undefined
             }
             isOpen={sectionOpen.creator}
-            onToggle={() => toggleSection("creator")}
-          />
+                onToggle={() => toggleSection("creator")}
+              />
 
-          <HeatSection
-            title="Investor Watchlist"
+              <HeatSection
+                title="Investor Watchlist"
             sectionId="investor"
             sectionLabel="Investor"
             topicSections={topicSections}
@@ -288,8 +274,8 @@ export default function HeatDashboard() {
                 : undefined
             }
             isOpen={sectionOpen.investor}
-            onToggle={() => toggleSection("investor")}
-          />
+                onToggle={() => toggleSection("investor")}
+              />
 
               <footer className="mt-16 border-t border-border py-8 text-center text-[12px] text-text-muted">
                 {footerLabel} · <code className="text-accent">not investment advice</code>

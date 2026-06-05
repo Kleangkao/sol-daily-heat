@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import HeatCard from "./HeatCard";
 import { alsoInSections } from "@/lib/heat/topic-section-appearances";
 import type {
@@ -40,6 +41,7 @@ export default function HeatSection({
   personaHighlight,
   isOpen = true,
   onToggle,
+  toolbar,
 }: Props) {
   const panelId = `${sectionId}-panel`;
   const collapsible = Boolean(onToggle);
@@ -93,6 +95,7 @@ export default function HeatSection({
 
       {isOpen ? (
         <div id={panelId}>
+          {toolbar ? <div className="mb-4">{toolbar}</div> : null}
           {description ? (
             <p className="mb-3 max-w-2xl text-[13px] text-text-secondary">{description}</p>
           ) : null}

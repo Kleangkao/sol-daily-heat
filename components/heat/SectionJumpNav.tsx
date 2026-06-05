@@ -3,7 +3,7 @@ import type { DashboardSectionDomId } from "@/lib/heat/section-collapse";
 const SECTION_LINKS: { id: DashboardSectionDomId; label: string }[] = [
   { id: "top-heat", label: "Top Heat" },
   { id: "new-tokens", label: "New Tokens" },
-  { id: "defi", label: "DeFi" },
+  { id: "defi", label: "DeFi Signals" },
   { id: "builder", label: "Builder" },
   { id: "creator", label: "Creator" },
   { id: "investor", label: "Investor" },
@@ -16,8 +16,8 @@ type Props = {
 export default function SectionJumpNav({ onNavigate }: Props) {
   return (
     <nav
-      className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1"
-      aria-label="Sections — jump to dashboard section"
+      className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-0.5"
+      aria-label="Jump to dashboard section"
     >
       {SECTION_LINKS.map((s) => (
         <button
