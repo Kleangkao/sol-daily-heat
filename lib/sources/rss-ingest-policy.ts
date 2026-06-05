@@ -27,6 +27,7 @@ export const RSS_INGEST_ITEM_CAPS: Record<string, number> = {
   "dlnews-rss": 10,
 
   "decrypt-rss": 10,
+  "coindesk-rss": 5,
   "agave-releases": 5,
   "firedancer-releases": 5,
   "jito-solana-releases": 5,
@@ -137,6 +138,7 @@ export const PROJECT_RSS_STALE_GUARD_SLUGS = new Set([
 export const FILTERED_BROAD_RSS_STALE_GUARD_SLUGS = new Set([
   "dlnews-rss",
   "decrypt-rss",
+  "coindesk-rss",
 ]);
 
 export function rssIngestUsesStaleGuard(slug: string): boolean {

@@ -73,6 +73,7 @@ Open [http://localhost:3000](http://localhost:3000). Without Supabase, the UI us
    | 008 | `supabase/migrations/008_topic_detail_raw_items_read.sql` | Anon read `raw_items` via `topic_sources` (topic detail) |
    | 009 | `supabase/migrations/009_public_beta_sources_wave1.sql` | Public beta Wave 1 RSS (Drift, Metaplex, Magic Eden status, DL News, Decrypt) |
    | 010 | `supabase/migrations/010_builder_github_release_sources.sql` | Wave 2 builder GitHub release Atom feeds (Agave, Firedancer, Jito Solana) |
+   | 011 | `supabase/migrations/011_broad_rss_wave3_coindesk.sql` | Wave 3 CoinDesk RSS trial (Solana-filtered, 5/run) |
 
 
 
@@ -101,6 +102,7 @@ Open [http://localhost:3000](http://localhost:3000). Without Supabase, the UI us
    psql $DATABASE_URL -f supabase/migrations/008_topic_detail_raw_items_read.sql
    psql $DATABASE_URL -f supabase/migrations/009_public_beta_sources_wave1.sql
    psql $DATABASE_URL -f supabase/migrations/010_builder_github_release_sources.sql
+   psql $DATABASE_URL -f supabase/migrations/011_broad_rss_wave3_coindesk.sql
 
    ```
 
@@ -168,7 +170,7 @@ Use this section as a short summary; follow the linked checklist for a controlle
 
 
 
-- [ ] **Migrations:** Apply `001` → `010` in order on production Supabase (SQL Editor or `psql`); run `seed.sql` on a fresh DB — see [launch checklist](docs/PRIVATE_BETA_LAUNCH_CHECKLIST.md)
+- [ ] **Migrations:** Apply `001` → `011` in order on production Supabase (SQL Editor or `psql`); run `seed.sql` on a fresh DB — see [launch checklist](docs/PRIVATE_BETA_LAUNCH_CHECKLIST.md)
 
 - [ ] **Verify SQL:** `sources.source_type` includes `sitemap`; `daily_rankings.section` includes `builder_watch`; table `market_pulse_snapshots` exists; policy `anon_read_raw_items_via_topic_sources` on `raw_items`
 
@@ -194,7 +196,7 @@ Use this section as a short summary; follow the linked checklist for a controlle
 
 - **Never expose `SUPABASE_SERVICE_ROLE_KEY` to the browser** — server-only (cron routes, server-side token detail Dex reads). Only `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` belong in client bundles.
 
-- **Do not skip migrations 005–010** — production needs sitemap source type, Market Pulse table, `builder_watch` section, topic-detail `raw_items` read policy, and Wave 1/2 sources.
+- **Do not skip migrations 005–011** — production needs sitemap source type, Market Pulse table, `builder_watch` section, topic-detail `raw_items` read policy, and Wave 1/2/3 sources.
 
 - **`CRON_SECRET` is required in production** — without it, all `POST /api/cron/*` routes return **401** when `NODE_ENV=production`.
 

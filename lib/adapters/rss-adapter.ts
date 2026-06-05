@@ -36,7 +36,12 @@ const parser = new Parser({ timeout: 15000 });
 
 
 
-const FILTER_LOG_SLUGS = new Set(["the-block-news", "dlnews-rss", "decrypt-rss"]);
+const FILTER_LOG_SLUGS = new Set([
+  "the-block-news",
+  "dlnews-rss",
+  "decrypt-rss",
+  "coindesk-rss",
+]);
 
 
 

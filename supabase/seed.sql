@@ -243,6 +243,18 @@ VALUES
     '{"purpose": "ecosystem / NFT / gaming news (Solana-filtered at ingest)", "requires_solana_filter": true, "max_items_per_run": 10, "coverage": "ecosystem_editorial"}'::jsonb
   ),
   (
+    'coindesk-rss',
+    'CoinDesk — RSS',
+    'rss',
+    'https://www.coindesk.com',
+    'https://www.coindesk.com/arc/outboundfeeds/rss/',
+    0.78,
+    true,
+    false,
+    'active',
+    '{"purpose": "Broad crypto editorial (Solana-filtered at ingest) — Wave 3 trial", "requires_solana_filter": true, "max_items_per_run": 5, "coverage": "ecosystem_editorial", "broad_rss_trial": true, "official_source": false}'::jsonb
+  ),
+  (
     'agave-releases',
     'Agave — GitHub Releases',
     'rss',

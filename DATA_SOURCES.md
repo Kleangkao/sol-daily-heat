@@ -18,6 +18,7 @@ Solana Daily Heat Scanner uses **free-first** adapters. Missing API keys never b
 | Magic Eden — Status | `magiceden-status` | RSS | Free | No | **Enabled** | NFT marketplace incidents (10/run, status rules) | — |
 | DL News — RSS | `dlnews-rss` | RSS | Free | No | **Enabled** | DeFi / ecosystem news, **Solana-filtered at ingest** (10/run) | — |
 | Decrypt — RSS | `decrypt-rss` | RSS | Free | No | **Enabled** | Ecosystem / NFT / gaming news, **Solana-filtered at ingest** (10/run) | — |
+| CoinDesk — RSS | `coindesk-rss` | RSS | Free | No | **Enabled (trial)** | Broad crypto editorial, **Solana-filtered at ingest** (5/run, Wave 3 trial) | — |
 | Agave — GitHub Releases | `agave-releases` | RSS (Atom) | Free | No | **Enabled** | Anza/Agave validator client releases (5/run, 30d ingest) | — |
 | Firedancer — GitHub Releases | `firedancer-releases` | RSS (Atom) | Free | No | **Enabled** | Firedancer/Frankendancer releases (5/run, 30d ingest) | — |
 | Jito Solana — GitHub Releases | `jito-solana-releases` | RSS (Atom) | Free | No | **Enabled** | Jito validator/MEV client releases (5/run, 30d ingest) | — |
@@ -101,13 +102,23 @@ Public **Atom only** (`releases.atom`) — no GitHub API, no release HTML scrapi
 - **Coverage:** ecosystem, NFT, gaming, AI when Solana-related. Logs same filter stats as DL News.
 - **Risk:** high global volume — strict allowlist only; broad non-Solana stories rejected.
 
+### CoinDesk — RSS (`coindesk-rss`) — Wave 3 trial
+
+- Feed: `https://www.coindesk.com/arc/outboundfeeds/rss/` (Arc outbound; same pattern as DL News).
+- **Free / no API key.** Broad crypto editorial with **Solana keyword filter** at ingest.
+- **Trial caps:** **5** items/run; reliability **0.78**; 30d ingest stale guard (filtered broad RSS).
+- **Not official:** excluded from `OFFICIAL_SOURCE_SLUGS` — no official-source heat bonus.
+- Ingest logs: `[rss:coindesk-rss] fetched=… passed_filter=… rejected=… stored=…`.
+- **Impact audit:** `npx tsx scripts/audit-source-impact.ts coindesk-rss`.
+- **Risk:** single broad RSS trial — do not enable other shadow candidates simultaneously.
+
 ### Solana relevance filter (general news)
 
-Used for `the-block-news`, `dlnews-rss`, `decrypt-rss`, and any source with `metadata_json.requires_solana_filter: true`.
+Used for `the-block-news`, `dlnews-rss`, `decrypt-rss`, `coindesk-rss`, and any source with `metadata_json.requires_solana_filter: true`.
 
 Keywords (title + snippet): ecosystem phrases and word-boundary matches for short tickers (`sol`, `spl`, `wif`, `bonk`, `pump.fun` / `pump fun` / `$PUMP` — not bare `pump` inside unrelated words, and not `spl` inside words like “splashy”). Named projects: Jupiter, Jito, Kamino, Drift, Phantom, Metaplex, etc.
 
-`dlnews-rss` and `decrypt-rss` also skip RSS items with `published_at` older than **30 days** at ingest (ingest-only stale guard).
+`dlnews-rss`, `decrypt-rss`, and `coindesk-rss` also skip RSS items with `published_at` older than **30 days** at ingest (ingest-only stale guard).
 
 Broad BTC/ETH-only stories are dropped unless they mention Solana or a listed ecosystem entity.
 

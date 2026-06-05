@@ -98,6 +98,14 @@
     "max_items_per_run": 10
   },
   {
+    "slug": "coindesk-rss",
+    "name": "CoinDesk — RSS",
+    "feed_url": "https://www.coindesk.com/arc/outboundfeeds/rss/",
+    "reliability": 0.78,
+    "requires_solana_filter": true,
+    "max_items_per_run": 5
+  },
+  {
     "slug": "agave-releases",
     "name": "Agave — GitHub Releases",
     "feed_url": "https://github.com/anza-xyz/agave/releases.atom",

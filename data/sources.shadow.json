@@ -39,11 +39,11 @@
   },
   {
     "slug": "coindesk-rss",
-    "name": "CoinDesk — RSS",
+    "name": "CoinDesk — RSS (shadow bench copy)",
     "source_type": "rss",
     "base_url": "https://www.coindesk.com",
     "feed_url": "https://www.coindesk.com/arc/outboundfeeds/rss/",
-    "reliability": 0.8,
+    "reliability": 0.78,
     "is_enabled": false,
     "requires_api_key": false,
     "status": "inactive",
@@ -51,9 +51,10 @@
     "candidate_category": "broad_rss",
     "shadow_only": true,
     "metadata_json": {
-      "purpose": "CoinDesk Arc outbound RSS (shadow bench)",
-      "max_items_per_run": 10,
-      "feed_verified": "2026-06-05"
+      "purpose": "CoinDesk Arc outbound RSS (shadow bench only — production trial in sources.rss.json / migration 011)",
+      "max_items_per_run": 5,
+      "feed_verified": "2026-06-05",
+      "production_trial": true
     }
   },
   {
