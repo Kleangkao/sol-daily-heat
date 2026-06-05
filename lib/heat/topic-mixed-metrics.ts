@@ -1,5 +1,14 @@
 import type { TopicDetailView, TopicTimelineEntry } from "@/lib/types/topic-detail";
-import { parseFeeMetric, parseTvlMetric } from "@/lib/heat/reader-signal-copy";
+import {
+  classifyReaderSignal,
+  parseFeeMetric,
+  parseTvlMetric,
+  type ReaderCopyInput,
+} from "@/lib/heat/reader-signal-copy";
+import {
+  GITHUB_RELEASE_SOURCE_SLUGS,
+  STATUS_SOURCE_SLUGS,
+} from "@/lib/sources/rss-ingest-policy";
 
 export type TopicMetricSignalKind = "fee" | "tvl";
 
@@ -238,4 +247,121 @@ export function resolveMetricSourceName(
   const entry = pickLatestEntry(topic.timeline, kind);
   if (entry) return resolveSourceName(entry, kind);
   return kind === "fee" ? "DefiLlama — Solana Fees" : "DefiLlama — Solana TVL";
+}
+
+const NON_MIXED_CARD_KINDS = new Set([
+  "single_editorial",
+  "multi_editorial",
+  "headline_only",
+  "promoted_boost",
+  "pump_style",
+  "status_incident",
+  "github_release",
+]);
+
+function cardHasFeeSignal(input: ReaderCopyInput): boolean {
+  const signals = input.rankingSignals ?? [];
+  if (signals.some((s) => FEE_SIGNALS.has(s))) return true;
+
+  const slugs = input.sourceSlugs ?? [];
+  if (slugs.includes("defillama-fees-solana")) return true;
+
+  if (titleSignalsFee(input.title) || titleSignalsFee(input.summary ?? "")) return true;
+  if (parseFeeMetric(input.title, input.summary)) return true;
+
+  return (
+    input.evidence?.evidenceItems?.some(
+      (e) =>
+        e.kind === "protocol_signal" &&
+        (/fee|revenue/i.test(`${e.label} ${e.text}`) || /fees?\s+(up|down)/i.test(e.text))
+    ) ?? false
+  );
+}
+
+function cardHasTvlSignal(input: ReaderCopyInput): boolean {
+  const signals = input.rankingSignals ?? [];
+  if (signals.some((s) => TVL_SIGNALS.has(s))) return true;
+
+  if (titleSignalsTvl(input.title) || titleSignalsTvl(input.summary ?? "")) return true;
+  if (parseTvlMetric(input.title, input.summary)) return true;
+
+  const slugs = input.sourceSlugs ?? [];
+  const combined = `${input.title} ${input.summary ?? ""}`;
+  if (slugs.includes("defillama-solana") && /\bTVL\b/i.test(combined)) return true;
+  if (slugs.includes("defillama-solana") && slugs.includes("defillama-fees-solana")) {
+    return true;
+  }
+
+  return (
+    input.evidence?.evidenceItems?.some(
+      (e) => e.kind === "protocol_signal" && /\bTVL\b/i.test(`${e.label} ${e.text}`)
+    ) ?? false
+  );
+}
+
+function isBoostOnlyCard(input: ReaderCopyInput): boolean {
+  if (input.title.startsWith("DexScreener boost")) return true;
+  const signals = input.rankingSignals ?? [];
+  const slugs = input.sourceSlugs ?? [];
+  const itemTypes = input.itemTypes ?? [];
+  if (signals.length > 0 && signals.every((s) => s === "boost")) {
+    const hasEditorial = itemTypes.some((t) => t === "news" || t === "manual");
+    const hasEditorialSlug = slugs.some(
+      (s) =>
+        s === "solana-blog" ||
+        s === "the-block-news" ||
+        s === "decrypt-rss" ||
+        s === "dlnews-rss"
+    );
+    return !hasEditorial && !hasEditorialSlug;
+  }
+  return false;
+}
+
+function isStatusOrGithubCard(input: ReaderCopyInput): boolean {
+  const slugs = input.sourceSlugs ?? [];
+  return (
+    slugs.some((s) => STATUS_SOURCE_SLUGS.has(s) || GITHUB_RELEASE_SOURCE_SLUGS.has(s)) &&
+    !slugs.some((s) => s.includes("defillama"))
+  );
+}
+
+/** Card-safe mixed metric detection using homepage ranking fields only. */
+export function detectCardMetricSignalKinds(input: ReaderCopyInput): TopicMetricSignalKind[] {
+  const kinds: TopicMetricSignalKind[] = [];
+  if (cardHasFeeSignal(input)) kinds.push("fee");
+  if (cardHasTvlSignal(input)) kinds.push("tvl");
+  return kinds;
+}
+
+export function hasMixedMetricSignalsOnCard(input: ReaderCopyInput): boolean {
+  if (isBoostOnlyCard(input) || isStatusOrGithubCard(input)) return false;
+
+  const kind = classifyReaderSignal(input);
+  if (NON_MIXED_CARD_KINDS.has(kind)) return false;
+
+  const kinds = detectCardMetricSignalKinds(input);
+  if (kinds.length < 2) return false;
+
+  const signals = input.rankingSignals ?? [];
+  const slugs = input.sourceSlugs ?? [];
+  const hasRankingProof =
+    signals.some((s) => FEE_SIGNALS.has(s)) && signals.some((s) => TVL_SIGNALS.has(s));
+  const hasSlugProof =
+    slugs.includes("defillama-fees-solana") && slugs.includes("defillama-solana");
+  const hasTextProof = Boolean(
+    (titleSignalsFee(input.title) || parseFeeMetric(input.title, input.summary)) &&
+      (titleSignalsTvl(input.title) ||
+        titleSignalsTvl(input.summary ?? "") ||
+        parseTvlMetric(input.title, input.summary))
+  );
+
+  return hasRankingProof || hasSlugProof || hasTextProof;
+}
+
+export function buildHomepageMixedMetricHint(input: ReaderCopyInput): string | null {
+  if (!hasMixedMetricSignalsOnCard(input)) return null;
+  const kinds = detectCardMetricSignalKinds(input);
+  const labels = kinds.map((k) => (k === "fee" ? "fees" : "TVL")).join(" + ");
+  return `Grouped metric signals: ${labels}`;
 }

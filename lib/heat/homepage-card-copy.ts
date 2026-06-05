@@ -7,11 +7,13 @@ import {
   type ReaderCopyInput,
   type ReaderSignalKind,
 } from "@/lib/heat/reader-signal-copy";
+import { buildHomepageMixedMetricHint } from "@/lib/heat/topic-mixed-metrics";
 
 export type HomepageCardCopy = {
   signalLabel: string;
   brief: string;
   caution?: string;
+  mixedMetricHint?: string;
 };
 
 function breakdownNum(
@@ -181,9 +183,11 @@ function briefForKind(kind: ReaderSignalKind, input: ReaderCopyInput): string {
 /** Compact reader-first preview copy for homepage cards (display only). */
 export function buildHomepageCardCopy(input: ReaderCopyInput): HomepageCardCopy {
   const kind = classifyReaderSignal(input);
+  const mixedMetricHint = buildHomepageMixedMetricHint(input) ?? undefined;
   return {
     signalLabel: signalLabelForKind(kind, input),
     brief: briefForKind(kind, input),
     caution: largePctCaution(input),
+    mixedMetricHint,
   };
 }

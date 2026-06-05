@@ -14,6 +14,7 @@ import {
   type HomepageCardCopy,
 } from "../lib/heat/homepage-card-copy";
 import { readerCopyInputFromCard } from "../lib/heat/reader-signal-copy";
+import { hasMixedMetricSignalsOnCard } from "../lib/heat/topic-mixed-metrics";
 
 type FlaggedCard = {
   section: string;
@@ -108,21 +109,70 @@ async function main() {
   }
 
   const flagged: FlaggedCard[] = [];
+  const mixedHintCards: Array<{
+    section: string;
+    title: string;
+    hint: string;
+    signalLabel: string;
+  }> = [];
   let totalCards = 0;
 
   for (const { dataKey } of DASHBOARD_SECTIONS) {
     const items = dashboard[dataKey] as HeatCardView[];
     items.forEach((card, i) => {
       totalCards += 1;
+      const input = readerCopyInputFromCard(card);
+      const copy = buildHomepageCardCopy(input);
       const row = auditCard(dataKey, card, i);
       if (row) flagged.push(row);
+
+      if (hasMixedMetricSignalsOnCard(input)) {
+        if (copy.mixedMetricHint) {
+          mixedHintCards.push({
+            section: dataKey,
+            title: card.title,
+            hint: copy.mixedMetricHint,
+            signalLabel: copy.signalLabel,
+          });
+        } else {
+          flagged.push({
+            section: dataKey,
+            rank: card.rankPosition ?? i + 1,
+            title: card.title,
+            sourceSlugs: (card.sourceSlugs ?? []).join(", ") || "—",
+            signalLabel: copy.signalLabel,
+            brief: copy.brief,
+            reasons: ["mixedMetricHint: missing on mixed metric card"],
+          });
+        }
+      } else if (copy.mixedMetricHint) {
+        flagged.push({
+          section: dataKey,
+          rank: card.rankPosition ?? i + 1,
+          title: card.title,
+          sourceSlugs: (card.sourceSlugs ?? []).join(", ") || "—",
+          signalLabel: copy.signalLabel,
+          brief: copy.brief,
+          reasons: ["mixedMetricHint: shown on single-metric card"],
+        });
+      }
     });
   }
 
   console.log(`\nReader copy coverage audit — ${dashboard.date}`);
   console.log(`dataSource: ${dashboard.dataSource ?? "unknown"}`);
   console.log(`cards scanned: ${totalCards}`);
+  console.log(`mixed metric hints: ${mixedHintCards.length}`);
   console.log(`flagged: ${flagged.length}\n`);
+
+  if (mixedHintCards.length > 0) {
+    console.log("Mixed metric cards:");
+    mixedHintCards.forEach((c) => {
+      console.log(` • [${c.section}] ${c.title.slice(0, 55)}`);
+      console.log(`   hint: ${c.hint} | label: ${c.signalLabel}`);
+    });
+    console.log("");
+  }
 
   if (flagged.length === 0) {
     console.log("PASS — no card-level internal/debug copy issues.\n");

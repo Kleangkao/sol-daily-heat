@@ -72,6 +72,7 @@ export default function HeatCard({
       signalLabel: preview.signalLabel,
       brief: preview.brief,
       caution: preview.caution,
+      mixedMetricHint: preview.mixedMetricHint,
       headline: fee.headline,
       creatorPersona: buildCardPersonaDisplay("creator", item),
       investorPersona: buildCardPersonaDisplay("investor", item),
@@ -118,6 +119,10 @@ export default function HeatCard({
       <p className="mt-2 text-[11px] font-semibold uppercase tracking-wide text-accent/90">
         {display.signalLabel}
       </p>
+
+      {display.mixedMetricHint ? (
+        <p className="mt-1 text-[10px] leading-snug text-text-muted">{display.mixedMetricHint}</p>
+      ) : null}
 
       <p
         className="mt-2 text-[13px] leading-[1.45] text-text-secondary"

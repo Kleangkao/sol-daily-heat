@@ -13,6 +13,7 @@ function printHomepageExample(label: string, input: ReaderCopyInput) {
   const copy = buildHomepageCardCopy(input);
   console.log(`\n=== Homepage: ${label} ===`);
   console.log("Signal label:", copy.signalLabel);
+  if (copy.mixedMetricHint) console.log("Mixed metric hint:", copy.mixedMetricHint);
   console.log("Brief:", copy.brief);
   if (copy.caution) console.log("Caution:", copy.caution);
   const creator = buildPersonaDisplayNote("creator", input, "Creator angle (defi): Break down \"test\"");
@@ -52,6 +53,17 @@ printHomepageExample("TVL metric topic", {
   itemTypes: ["protocol"],
   rankingSignals: ["tvl_move"],
   sourceCount: 1,
+});
+
+printHomepageExample("Mixed metric topic (fees + TVL)", {
+  title: "Meteora DAMM V2: TVL down 25.0% (24h)",
+  summary:
+    "Meteora DAMM V2 · fees up 158.7% (24h) · 24h fees ~$216K · TVL down 25.0%",
+  scoreBreakdown: { fee_threshold_passed: 12, volume_signal: 8 },
+  sourceSlugs: ["defillama-fees-solana", "defillama-solana"],
+  itemTypes: ["protocol"],
+  rankingSignals: ["fees_move", "tvl_move"],
+  sourceCount: 2,
 });
 
 printHomepageExample("Promoted boost", {
