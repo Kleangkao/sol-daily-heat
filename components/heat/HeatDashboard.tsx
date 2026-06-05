@@ -28,6 +28,7 @@ import HeatHero from "./HeatHero";
 import HeatSection from "./HeatSection";
 import MarketPulse from "./MarketPulse";
 import SectionJumpNav from "./SectionJumpNav";
+import { useSectionOpenState } from "./useSectionOpenState";
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
@@ -42,6 +43,7 @@ export default function HeatDashboard() {
     isValidDateParam(initialDateRaw) ? initialDateRaw! : undefined
   );
   const [category, setCategory] = useState<HeatCategoryFilter>(initialCategory);
+  const { open: sectionOpen, toggleSection, navigateToSection } = useSectionOpenState();
 
   const heroDate = date ?? utcTodayIso();
   const heroDates = useMemo(() => utcAvailableDates(), []);
@@ -165,7 +167,7 @@ export default function HeatDashboard() {
             </p>
           </div>
 
-          <SectionJumpNav />
+          <SectionJumpNav onNavigate={navigateToSection} />
 
           <p className="mb-6 text-[12px] text-text-muted">
             A topic may appear in multiple sections when it matters to different audiences.
@@ -180,6 +182,8 @@ export default function HeatDashboard() {
             items={topFiltered}
             emptyMessage={topHeatEmptyMessage}
             sectionDataSource={sectionSource("topHeat")}
+            isOpen={sectionOpen["top-heat"]}
+            onToggle={() => toggleSection("top-heat")}
           />
 
           <HeatSection
@@ -190,6 +194,8 @@ export default function HeatDashboard() {
             description="New pair and mint signals from DexScreener-style adapters (24h window, UTC snapshot day)."
             items={dashboard.newTokens}
             sectionDataSource={sectionSource("newTokens")}
+            isOpen={sectionOpen["new-tokens"]}
+            onToggle={() => toggleSection("new-tokens")}
           />
 
           <HeatSection
@@ -200,6 +206,8 @@ export default function HeatDashboard() {
             description="Protocol TVL, volume, and stake-flow context from free DeFi adapters."
             items={dashboard.defiSignals}
             sectionDataSource={sectionSource("defiSignals")}
+            isOpen={sectionOpen.defi}
+            onToggle={() => toggleSection("defi")}
           />
 
           <HeatSection
@@ -216,6 +224,8 @@ export default function HeatDashboard() {
                 : undefined
             }
             sectionDisclaimer="Operational and ecosystem context — not investment advice."
+            isOpen={sectionOpen.builder}
+            onToggle={() => toggleSection("builder")}
           />
 
           <HeatSection
@@ -232,6 +242,8 @@ export default function HeatDashboard() {
                 ? "Only high-confidence narrative angles are shown."
                 : undefined
             }
+            isOpen={sectionOpen.creator}
+            onToggle={() => toggleSection("creator")}
           />
 
           <HeatSection
@@ -248,6 +260,8 @@ export default function HeatDashboard() {
                 ? "Watchlist items are signals, not recommendations."
                 : undefined
             }
+            isOpen={sectionOpen.investor}
+            onToggle={() => toggleSection("investor")}
           />
 
           <footer className="mt-16 border-t border-border py-8 text-center text-[12px] text-text-muted">
