@@ -136,15 +136,18 @@ Homepage empty state uses production-safe copy (no CLI commands) per UX Polish S
 
 ---
 
-## Known limitations (unchanged at RC 1)
+## Known limitations (updated — reader-first product polish)
 
-- Long homepage scroll (~43 cards max + Market Pulse)  
+- Long homepage scroll (~43 cards max + Market Pulse); homepage cards are **previews** — open topic detail for full brief/evidence  
 - Same topic may appear in multiple sections **by design**  
-- Topic detail is analyst-oriented (score breakdown, evidence taxonomy)  
+- **Topic detail:** reader-first Signal/Narrative brief, metric evidence, confirmed vs possible interpretations; scoring details **collapsed** at bottom  
+- **Heat score** = scanner interest (bucket: Very high / High / Moderate / Low) — not confidence or price direction  
 - Token detail is **context only** — stored Market Pulse snapshot, not live trading  
 - Source gaps: Jupiter, Phantom, Backpack, Gaming, Airdrops, DAO, DePIN (not in RC scope)  
-- Some enabled feeds show **0 items in 7d** (Medium archives, empty decrypt filter, etc.)  
+- Some enabled feeds show **0 items in 7d** — `npm run audit:source-health`  
+- **7d/30d metric averages** require future retention or schema — see `docs/METRIC_HISTORY_FEASIBILITY.md`  
 - Supabase Free: use 2–4h pipeline cadence, not hourly  
+- **GitHub Actions cron** for ingest/pipeline/pulse; cleanup still dry-run unless ops enables deletes  
 
 See also [PRIVATE_BETA_LAUNCH_CHECKLIST.md](./PRIVATE_BETA_LAUNCH_CHECKLIST.md) §10.
 

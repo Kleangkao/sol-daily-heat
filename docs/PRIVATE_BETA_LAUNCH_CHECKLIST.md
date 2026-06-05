@@ -320,15 +320,18 @@ After deploy + first pipeline + pulse:
 
 **Product / UX**
 
-- Long homepage scroll (up to ~43 cards + Market Pulse) — no section jump nav yet
-- Same topic may appear in multiple sections **by design** (different persona lenses); topic detail lists all appearances
-- Topic detail is **analyst-oriented** (score breakdown, evidence taxonomy)
+- Long homepage scroll (up to ~43 cards + Market Pulse) — section jump nav exists; cards are compact previews; full brief is on topic detail
+- Same topic may appear in multiple sections **by design** (different persona lenses); topic detail lists all appearances in a muted rank line
+- **Topic detail is reader-first:** Signal brief / Narrative brief, metric evidence (fee topics), confirmed facts vs possible interpretations, evidence & sources, timeline; **scoring details collapsed at bottom**
+- **Homepage cards** show compact signal label + brief + heat bucket (scanner interest, not confidence or price direction)
+- **Heat score** = scanner interest for the UTC snapshot — not confidence, validation, or price direction
 - Token detail is **context only** — stored Market Pulse snapshot, not live trading or buy/sell
+- **Metric 7d/30d averages** not shown unless future retention/schema supports them — see `docs/METRIC_HISTORY_FEASIBILITY.md`
 
 **Sources not in scope (gaps)**
 
 - Jupiter, Phantom, Backpack, Gaming, Airdrops, DAO, DePIN — not fully covered; see `DATA_SOURCES.md` for enabled list
-- Some Wave 1 feeds may show **zero stored items** in 7d (Medium/status archives) — audit `zeroItemsIn7d` is informational
+- Some Wave 1 feeds may show **zero stored items** in 7d (Medium/status archives) — run `npm run audit:source-health` and see `docs/SOURCE_HEALTH_REVIEW.md`
 - Jito blog / paid APIs intentionally not added
 
 **Ops**
@@ -359,9 +362,13 @@ After deploy + first pipeline + pulse:
 
 ```bash
 npm run audit:local -- --table
+npm run audit:source-health
+npm run smoke:local   # dev server must be running
 ```
 
 Watch for: `warnings` non-empty · `dataSource` not `live` · `zeroItemsIn7d` growing unexpectedly · `creator_angles` persistently under cap.
+
+**Cron:** GitHub Actions (or Vercel cron) for ingest/pipeline/pulse — schedules unchanged in polish sprints. **Cleanup** remains preview/dry-run unless explicitly enabled in ops.
 
 **HTTP**
 

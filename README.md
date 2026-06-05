@@ -617,6 +617,12 @@ curl -X POST https://YOUR_DOMAIN/api/cron/cleanup \
 
 | `npm run audit:local` | Read-only private-beta audit JSON |
 
+| `npm run audit:source-health` | Zero-volume enabled sources + recommended actions |
+
+| `npm run audit:metric-history` | 7d/30d metric average feasibility (read-only) |
+
+| `npm run smoke:local` | HTTP smoke test (homepage, health, topic/token if DB has samples) |
+
 | `npm run repair:token-mints` | Backfill `tokens.mint_address` from linked Dex raw_items |
 
 | `npm run cleanup:local -- --dry-run` | Preview retention deletes (no changes) |

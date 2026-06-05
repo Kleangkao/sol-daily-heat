@@ -79,7 +79,8 @@ No screenshot archive in repo; checks performed live in browser and via API/cron
 - **Market Pulse:** live anchor / hot tokens / tape; freshness copy where applicable.
 - **Creator / Investor** persona blocks on cards when metadata present.
 - **Builder / Infra:** badges on applicable cards.
-- **Topic detail:** analyst-oriented layout; flame badge shows rule-based heat (not confidence decimal); breakdown section shows integer heat and components.
+- **Topic detail:** reader-first brief + metric evidence; heat context clarifies scanner interest; scoring details collapsed at bottom.
+- **Homepage cards:** compact signal label + brief preview; heat badge shows bucket (High/Moderate/etc.).
 - **GitHub Actions:** `workflow_dispatch` run green for pulse, pipeline, cleanup dry-run.
 
 ---
@@ -88,8 +89,9 @@ No screenshot archive in repo; checks performed live in browser and via API/cron
 
 1. **Metric-only protocol movement** can rank high in Top Heat (rule-based scoring; no ranking change in soft launch).
 2. **Pump-style tokens** can appear in Market Pulse with **High risk** labels (market data + risk heuristics, not endorsement).
-3. **Topic detail** is **analyst-oriented** (evidence groups, breakdown, timeline) — denser than homepage cards.
-4. **Cleanup** remains **dry-run** in GitHub Actions until `wouldDelete` is reviewed and workflow URL is updated.
+3. **Homepage cards** are previews; **topic detail** holds full brief, metric evidence, and evidence/timeline (scoring collapsed).
+4. **7d/30d metric averages** not shown without future retention/schema — see `docs/METRIC_HISTORY_FEASIBILITY.md`.
+5. **Cleanup** remains **dry-run** in GitHub Actions until `wouldDelete` is reviewed and workflow URL is updated.
 
 ---
 

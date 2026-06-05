@@ -7,17 +7,14 @@ import { isLiveTopicId, topicDetailPath } from "@/lib/heat/topic-link";
 import { canLinkTokenDetail, tokenDetailPath } from "@/lib/heat/token-link";
 import SignalTypeBadge from "@/components/ui/SignalTypeBadge";
 import { CATEGORY_LABELS } from "@/lib/types/heat";
-import {
-  buildCardBadges,
-  parseFeeDisplay,
-} from "@/lib/heat/card-display";
-import {
-  buildReaderDisplayCopy,
-  readerCopyInputFromCard,
-} from "@/lib/heat/reader-signal-copy";
+import { buildCardBadges, parseFeeDisplay } from "@/lib/heat/card-display";
+import { buildHomepageCardCopy } from "@/lib/heat/homepage-card-copy";
+import { readerCopyInputFromCard } from "@/lib/heat/reader-signal-copy";
+import { buildCardPersonaDisplay } from "@/lib/heat/persona-display-copy";
 import { isGenericRiskNote } from "@/lib/heat/risk-note";
 import SignalQualityBadges from "./SignalQualityBadges";
 import HeatScoreBadge from "./HeatScoreBadge";
+
 type Props = {
   item: HeatCardView;
   variant?: "default" | "compact";
@@ -69,21 +66,24 @@ export default function HeatCard({
       rankingSignals: item.rankingSignals,
     };
     const fee = parseFeeDisplay(item.title, item.scoreBreakdown);
-    const reader = buildReaderDisplayCopy(readerInput);
+    const preview = buildHomepageCardCopy(readerInput);
     return {
       badges: buildCardBadges(badgeInput),
-      whyRanked: reader.whyRanked,
-      summary: reader.summary,
-      whyHot: reader.whyHot,
+      signalLabel: preview.signalLabel,
+      brief: preview.brief,
+      caution: preview.caution,
       headline: fee.headline,
-      feeCaution: reader.pctCaution ?? fee.feeCaution,
+      creatorPersona: buildCardPersonaDisplay("creator", item),
+      investorPersona: buildCardPersonaDisplay("investor", item),
     };
   }, [item]);
 
+  const specificCaution =
+    display.caution ??
+    (!isGenericRiskNote(item.riskNote) ? item.riskNote : undefined);
+
   return (
-    <article
-      className="group flex flex-col overflow-hidden rounded-[10px] border border-border bg-bg-card p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-accent hover:shadow-xl"
-    >
+    <article className="group flex flex-col overflow-hidden rounded-[10px] border border-border bg-bg-card p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-accent hover:shadow-xl">
       <div className="flex items-start justify-between gap-3">
         <div className="flex flex-wrap gap-2">
           <span className="inline-flex rounded-full bg-bg-secondary px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-accent">
@@ -95,7 +95,7 @@ export default function HeatCard({
             </span>
           ) : null}
         </div>
-        <HeatScoreBadge score={item.heatScore} size="sm" />
+        <HeatScoreBadge score={item.heatScore} size="sm" showBucket />
       </div>
 
       {detailHref ? (
@@ -115,50 +115,42 @@ export default function HeatCard({
         </h3>
       )}
 
-      {display.feeCaution ? (
-        <p className="mt-1.5 text-[11px] leading-[1.35] text-amber-200/90">
-          {display.feeCaution}
-        </p>
+      <p className="mt-2 text-[11px] font-semibold uppercase tracking-wide text-accent/90">
+        {display.signalLabel}
+      </p>
+
+      <p
+        className="mt-2 text-[13px] leading-[1.45] text-text-secondary"
+        style={
+          variant === "compact"
+            ? {
+                display: "-webkit-box",
+                WebkitLineClamp: 3,
+                WebkitBoxOrient: "vertical",
+                overflow: "hidden",
+              }
+            : undefined
+        }
+      >
+        {display.brief}
+      </p>
+
+      {specificCaution ? (
+        <p className="mt-2 text-[11px] leading-[1.35] text-amber-200/90">{specificCaution}</p>
       ) : null}
 
       <SignalQualityBadges badges={display.badges} />
 
       {alsoIn && alsoIn.length > 0 ? (
-        <p className="mt-2 text-[10px] text-text-muted">
-          Also in {alsoIn.join(", ")}
-        </p>
+        <p className="mt-2 text-[10px] text-text-muted">Also in {alsoIn.join(", ")}</p>
       ) : null}
 
-      {personaHighlight === "creator" && item.creatorAngle ? (
-        <PersonaHighlightBlock label="Creator angle" text={item.creatorAngle} />
+      {personaHighlight === "creator" && display.creatorPersona ? (
+        <PersonaHighlightBlock label="Creator angle" text={display.creatorPersona} />
       ) : null}
-      {personaHighlight === "investor" && item.investorWatchline ? (
-        <PersonaHighlightBlock label="Investor watch" text={item.investorWatchline} />
+      {personaHighlight === "investor" && display.investorPersona ? (
+        <PersonaHighlightBlock label="Investor watch" text={display.investorPersona} />
       ) : null}
-
-      <p className="mt-2 text-[12px] leading-[1.35] text-text-secondary">
-        <span className="font-semibold text-text-muted">Why ranked:</span>{" "}
-        {display.whyRanked}
-      </p>
-
-      <p
-        className="mt-2 text-[13px] leading-[1.45] text-text-secondary"
-        style={{
-          display: "-webkit-box",
-          WebkitLineClamp: variant === "compact" ? 2 : 3,
-          WebkitBoxOrient: "vertical",
-          overflow: "hidden",
-        }}
-      >
-        {display.summary}
-      </p>
-
-      <div className="mt-3 rounded-[8px] border border-border/60 bg-bg-secondary/50 px-3 py-2">
-        <p className="text-[11px] font-semibold uppercase tracking-wide text-text-muted">
-          Why hot
-        </p>
-        <p className="mt-1 text-[12px] leading-[1.4] text-text-primary">{display.whyHot}</p>
-      </div>
 
       {(item.relatedTokens.length > 0 || item.relatedProjects.length > 0) && (
         <div className="mt-3 flex flex-wrap gap-2">
@@ -201,26 +193,20 @@ export default function HeatCard({
             <span>·</span>
           </>
         ) : null}
-        <span>{item.sourceCount} source{item.sourceCount !== 1 ? "s" : ""}</span>
-        <span>·</span>
-        <span>First seen {formatTime(item.firstSeen)}</span>
+        <span>
+          {item.sourceCount} source{item.sourceCount !== 1 ? "s" : ""}
+        </span>
         <span>·</span>
         <span>Updated {formatTime(item.lastUpdated)}</span>
         <SignalTypeBadge type={item.interpretationType} />
       </div>
-
-      {!isGenericRiskNote(item.riskNote) ? (
-        <p className="mt-3 text-[11px] leading-[1.35] text-amber-200/90">
-          {item.riskNote}
-        </p>
-      ) : null}
 
       {detailHref ? (
         <Link
           href={detailHref}
           className="mt-3 inline-flex text-[12px] font-semibold text-accent hover:text-accent-hover"
         >
-          View topic details →
+          Open brief →
         </Link>
       ) : null}
     </article>

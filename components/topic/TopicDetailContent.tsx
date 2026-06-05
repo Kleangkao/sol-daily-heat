@@ -12,6 +12,10 @@ import {
   buildTopicMetricEvidence,
   type TopicMetricEvidence,
 } from "@/lib/heat/topic-metric-evidence";
+import {
+  buildPersonaDisplayNote,
+  personaInputFromTopic,
+} from "@/lib/heat/persona-display-copy";
 type DisplayEvidenceKind = EvidenceKind | "status_incident";
 
 function MetricEvidenceRow({
@@ -95,6 +99,22 @@ export default function TopicDetailContent({ topic }: Props) {
   const brief = buildTopicNarrativeBrief(topic);
   const metricEvidence = buildTopicMetricEvidence(topic);
   const sectionCount = topic.sectionAppearancesToday.length;
+  const personaInput = personaInputFromTopic(topic);
+  const creatorPersona = buildPersonaDisplayNote(
+    "creator",
+    personaInput,
+    topic.creatorAngle
+  );
+  const investorPersona = buildPersonaDisplayNote(
+    "investor",
+    personaInput,
+    topic.investorWatchline
+  );
+  const builderPersona = buildPersonaDisplayNote(
+    "builder",
+    personaInput,
+    topic.builderNote
+  );
   const scoreRows = explainScoreBreakdown(topic.scoreBreakdown, {
     uniqueSourceCount: topic.uniqueSourceCount,
   });
@@ -442,29 +462,29 @@ export default function TopicDetailContent({ topic }: Props) {
             Persona notes
           </h2>
           <div className="mt-3 space-y-3">
-            {topic.creatorAngle ? (
+            {creatorPersona ? (
               <div className="rounded-[8px] bg-bg-secondary/50 px-3 py-2.5">
                 <p className="text-[11px] font-semibold uppercase text-text-muted">Creator angle</p>
-                <p className="mt-1 text-[13px] text-text-primary">{topic.creatorAngle}</p>
+                <p className="mt-1 text-[13px] text-text-primary">{creatorPersona}</p>
               </div>
             ) : null}
-            {topic.investorWatchline ? (
+            {investorPersona ? (
               <div className="rounded-[8px] bg-bg-secondary/50 px-3 py-2.5">
                 <p className="text-[11px] font-semibold uppercase text-text-muted">
                   Investor watch context
                 </p>
-                <p className="mt-1 text-[13px] text-text-primary">{topic.investorWatchline}</p>
+                <p className="mt-1 text-[13px] text-text-primary">{investorPersona}</p>
               </div>
             ) : null}
-            {topic.builderNote ? (
+            {builderPersona ? (
               <div className="rounded-[8px] bg-bg-secondary/50 px-3 py-2.5">
                 <p className="text-[11px] font-semibold uppercase text-text-muted">
                   Builder / infra
                 </p>
-                <p className="mt-1 text-[13px] text-text-primary">{topic.builderNote}</p>
+                <p className="mt-1 text-[13px] text-text-primary">{builderPersona}</p>
               </div>
             ) : null}
-            {!topic.creatorAngle && !topic.investorWatchline && !topic.builderNote ? (
+            {!creatorPersona && !investorPersona && !builderPersona ? (
               <p className="text-[13px] text-text-muted">No persona-specific notes stored.</p>
             ) : null}
           </div>

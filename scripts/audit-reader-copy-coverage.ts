@@ -1,5 +1,5 @@
 /**
- * Audit reader-facing card copy across all homepage sections.
+ * Audit reader-facing homepage card copy across all sections.
  * Run: npx tsx scripts/audit-reader-copy-coverage.ts [--date YYYY-MM-DD]
  */
 import "./load-env-local";
@@ -10,77 +10,57 @@ import { getDemoDashboard } from "../lib/mock/demo-data";
 import { DASHBOARD_SECTIONS } from "../lib/db/dashboard-sections";
 import type { HeatCardView } from "../lib/types/heat";
 import {
-  buildReaderDisplayCopy,
-  readerCopyInputFromCard,
-} from "../lib/heat/reader-signal-copy";
+  buildHomepageCardCopy,
+  type HomepageCardCopy,
+} from "../lib/heat/homepage-card-copy";
+import { readerCopyInputFromCard } from "../lib/heat/reader-signal-copy";
 
 type FlaggedCard = {
   section: string;
   rank: number | string;
   title: string;
   sourceSlugs: string;
-  summary: string;
-  whyRanked: string;
-  whyHot: string;
+  signalLabel: string;
+  brief: string;
   reasons: string[];
 };
 
 const READER_FRIENDLY_MARKERS =
-  /scanner|evidence panel|protocol-activity signal|trigger the scanner|early narrative|market-discovery|DexScreener paid visibility/i;
+  /scanner|evidence panel|protocol-activity signal|trigger the scanner|early narrative|market-discovery|DexScreener paid visibility|verify the raw evidence/i;
 
-function looksLikeRawMetricSummary(summary: string): boolean {
-  if (READER_FRIENDLY_MARKERS.test(summary)) return false;
-  if (summary.includes("·") && /fees?\s+(up|down)|%\s*\(24h\)|24h fees/i.test(summary)) {
+function looksLikeRawMetricBrief(brief: string): boolean {
+  if (READER_FRIENDLY_MARKERS.test(brief)) return false;
+  if (brief.includes("·") && /fees?\s+(up|down)|%\s*\(24h\)|24h fees/i.test(brief)) {
     return true;
   }
-  if (/via DefiLlama/i.test(summary) && /fees?\s+(up|down)|24h fees/i.test(summary)) {
-    return true;
-  }
-  if (/fees\s+(up|down)\s+[\d,.]+%/i.test(summary) && summary.length > 60) {
+  if (/via DefiLlama/i.test(brief) && /fees?\s+(up|down)|24h fees/i.test(brief)) {
     return true;
   }
   return false;
 }
 
-function auditFields(copy: ReturnType<typeof buildReaderDisplayCopy>): string[] {
+function auditFields(copy: HomepageCardCopy): string[] {
   const reasons: string[] = [];
-  const { summary, whyRanked, whyHot } = copy;
+  const { signalLabel, brief } = copy;
 
-  if (/adapter signal/i.test(summary)) reasons.push("summary: adapter signal");
-  if (/adapter signal/i.test(whyRanked)) reasons.push("whyRanked: adapter signal");
-  if (/adapter signal/i.test(whyHot)) reasons.push("whyHot: adapter signal");
+  if (/adapter signal/i.test(brief)) reasons.push("brief: adapter signal");
+  if (/adapter signal/i.test(signalLabel)) reasons.push("signalLabel: adapter signal");
+  if (/passes fee threshold/i.test(brief)) reasons.push("brief: passes fee threshold");
+  if (/Why ranked/i.test(brief)) reasons.push("brief: Why ranked prefix");
+  if (/WHY HOT/i.test(brief)) reasons.push("brief: WHY HOT block");
 
-  if (/passes fee threshold/i.test(summary)) reasons.push("summary: passes fee threshold");
-  if (/passes fee threshold/i.test(whyRanked)) reasons.push("whyRanked: passes fee threshold");
-  if (/passes fee threshold/i.test(whyHot)) reasons.push("whyHot: passes fee threshold");
-
-  if (/^\s*1 adapter signal\s*\(fees move\)\s*$/i.test(whyHot)) {
-    reasons.push("whyHot: raw fees move label");
+  if (/^\s*1 adapter signal\s*\(fees move\)\s*$/i.test(brief)) {
+    reasons.push("brief: raw fees move label");
   }
-  if (/\bfees move\b/i.test(whyHot) && !READER_FRIENDLY_MARKERS.test(whyHot)) {
-    reasons.push("whyHot: internal fees move phrase");
-  }
-
-  if (/^metric signal only$/i.test(summary.trim())) {
-    reasons.push("summary: metric-only stub");
-  }
-  if (/^metric signal only$/i.test(whyHot.trim())) {
-    reasons.push("whyHot: metric-only stub");
-  }
-
-  if (looksLikeRawMetricSummary(summary)) {
-    reasons.push("summary: raw metric pipeline text");
-  }
-
-  if (/^1 editorial source$/i.test(whyHot.trim())) {
-    reasons.push("whyHot: editorial count only");
+  if (looksLikeRawMetricBrief(brief)) {
+    reasons.push("brief: raw metric pipeline text");
   }
 
   return reasons;
 }
 
 function auditCard(section: string, card: HeatCardView, index: number): FlaggedCard | null {
-  const copy = buildReaderDisplayCopy(readerCopyInputFromCard(card));
+  const copy = buildHomepageCardCopy(readerCopyInputFromCard(card));
   const reasons = auditFields(copy);
   if (reasons.length === 0) return null;
 
@@ -89,9 +69,8 @@ function auditCard(section: string, card: HeatCardView, index: number): FlaggedC
     rank: card.rankPosition ?? index + 1,
     title: card.title,
     sourceSlugs: (card.sourceSlugs ?? []).join(", ") || "—",
-    summary: copy.summary,
-    whyRanked: copy.whyRanked,
-    whyHot: copy.whyHot,
+    signalLabel: copy.signalLabel,
+    brief: copy.brief,
     reasons,
   };
 }
@@ -145,9 +124,8 @@ async function main() {
     for (const f of flagged) {
       console.log(`\n--- ${f.section} #${f.rank}: ${f.title} ---`);
       console.log("sourceSlugs:", f.sourceSlugs);
-      console.log("summary:", f.summary);
-      console.log("whyRanked:", f.whyRanked);
-      console.log("whyHot:", f.whyHot);
+      console.log("signalLabel:", f.signalLabel);
+      console.log("brief:", f.brief);
       console.log("reasons:", f.reasons.join(", "));
     }
     process.exitCode = 1;
