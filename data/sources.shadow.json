@@ -1,0 +1,21 @@
+[
+  {
+    "slug": "cointelegraph-solana-rss",
+    "name": "Cointelegraph — Solana tag",
+    "source_type": "rss",
+    "base_url": "https://cointelegraph.com/tags/solana",
+    "feed_url": "https://cointelegraph.com/rss/tag/solana",
+    "reliability": 0.75,
+    "is_enabled": false,
+    "requires_api_key": false,
+    "status": "inactive",
+    "metadata_json": {
+      "purpose": "Solana-tagged Cointelegraph editorial (shadow evaluation only)",
+      "requires_solana_filter": true,
+      "max_items_per_run": 10,
+      "coverage": "ecosystem_editorial",
+      "shadow_only": true,
+      "production_rankings": false
+    }
+  }
+]
