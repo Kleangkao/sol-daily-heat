@@ -39,6 +39,31 @@ printExample("Single-source editorial topic", {
   sourceCount: 1,
 });
 
+printExample("Solana chain fees (non-colon title)", {
+  title: "Solana chain fees +38.9% (24h)",
+  summary:
+    "Solana chain fees +38.9% (24h) · fees up 38.9% (24h) · 24h fees ~$7.7M · DeFi · via DefiLlama — Solana Fees",
+  whyHot: "1 adapter signal (fees move)",
+  scoreBreakdown: { fee_threshold_passed: 1 },
+  sourceSlugs: ["defillama-fees-solana"],
+  itemTypes: ["protocol"],
+  rankingSignals: ["chain_fees"],
+  sourceCount: 1,
+  category: "defi",
+});
+
+printExample("pump.fun fees down (colon title)", {
+  title: "pump.fun: fees down 17.0% (24h)",
+  summary:
+    "pump.fun · fees down 17.0% (24h) · 24h fees ~$1.2M · DeFi · via DefiLlama — Solana Fees",
+  whyHot: "1 adapter signal (fees move)",
+  sourceSlugs: ["defillama-fees-solana"],
+  itemTypes: ["protocol"],
+  rankingSignals: ["fees_move"],
+  sourceCount: 1,
+  category: "defi",
+});
+
 printExample("Promoted boost topic", {
   title: "DexScreener boost: Fuu6…pump",
   summary: "Fuu6…pump · on DexScreener paid boost leaderboard · via DexScreener",

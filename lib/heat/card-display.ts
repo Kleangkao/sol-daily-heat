@@ -1,4 +1,4 @@
-import { buildReaderDisplayCopy } from "@/lib/heat/reader-signal-copy";
+import { buildReaderDisplayCopy, parseFeeMetric } from "@/lib/heat/reader-signal-copy";
 import type { HeatCardView } from "@/lib/types/heat";
 import {
   GITHUB_RELEASE_SOURCE_SLUGS,
@@ -222,11 +222,11 @@ export function parseFeeDisplay(
   title: string,
   breakdown?: Record<string, number>
 ): { headline: string; feeCaution?: string; rawPct?: number } {
-  const m = title.match(/^(.+?):\s*fees\s+(up|down)\s+([\d,.]+)%\s*\(24h\)/i);
-  if (!m) return { headline: title };
+  const fee = parseFeeMetric(title);
+  if (!fee) return { headline: title };
 
-  const rawPct = parseFloat(m[3].replace(/,/g, ""));
-  const direction = m[2].toLowerCase();
+  const rawPct = fee.pct;
+  const direction = fee.direction;
   const smallBase = (breakdown?.fee_small_base_discount ?? 0) < 0;
   const showCaution = smallBase || (Number.isFinite(rawPct) && rawPct > FEE_DISPLAY_CAP_PCT);
 
@@ -234,13 +234,13 @@ export function parseFeeDisplay(
     return { headline: title, rawPct: Number.isFinite(rawPct) ? rawPct : undefined };
   }
 
-  const pctLabel =
-    Number.isFinite(rawPct) && rawPct >= FEE_DISPLAY_CAP_PCT
-      ? `${direction === "up" ? "+" : ""}200%+`
-      : `${direction === "up" ? "+" : ""}${rawPct.toFixed(0)}%`;
+  const headlineSuffix =
+    title.includes("chain fees") || /chain\s+fees/i.test(title)
+      ? "chain fees move (24h)"
+      : `fees ${direction} (24h)`;
 
   return {
-    headline: `${m[1]}: fees ${direction} (24h)`,
+    headline: `${fee.protocol}: ${headlineSuffix}`,
     feeCaution: "Large % move; baseline may be low. Check evidence for raw value.",
     rawPct: Number.isFinite(rawPct) ? rawPct : undefined,
   };

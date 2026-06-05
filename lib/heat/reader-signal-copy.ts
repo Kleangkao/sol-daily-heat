@@ -10,6 +10,9 @@ import { SITEMAP_DISCOVERY_SLUGS } from "@/lib/sources/sitemap-ingest-policy";
 
 const FEE_DISPLAY_CAP_PCT = 200;
 
+const METRIC_FEE_GENERIC_SUMMARY =
+  "A protocol fee signal moved sharply enough to trigger the scanner. Check the evidence panel for the raw source values before treating it as sustained momentum.";
+
 const EDITORIAL_SLUGS = new Set([
   "solana-blog",
   "helius-blog",
@@ -51,6 +54,7 @@ export type ReaderCopyInput = {
   rankingSignals?: string[];
   sourceCount?: number;
   headlineOnly?: boolean;
+  category?: string;
 };
 
 export type ReaderDisplayCopy = {
@@ -58,6 +62,12 @@ export type ReaderDisplayCopy = {
   whyRanked: string;
   whyHot: string;
   pctCaution?: string;
+};
+
+export type ParsedFeeMetric = {
+  protocol: string;
+  direction: "up" | "down";
+  pct: number;
 };
 
 function breakdownNum(
@@ -105,74 +115,207 @@ function isPumpStyle(title: string, category?: string): boolean {
   return category === "meme" && /pump/i.test(title);
 }
 
-export function classifyReaderSignal(input: ReaderCopyInput): ReaderSignalKind {
+function directionFromParts(dirWord?: string, sign?: string): "up" | "down" {
+  if (dirWord) return dirWord.toLowerCase() === "down" ? "down" : "up";
+  if (sign === "-") return "down";
+  return "up";
+}
+
+function parsePct(raw: string): number | null {
+  const pct = parseFloat(raw.replace(/,/g, ""));
+  return Number.isFinite(pct) ? pct : null;
+}
+
+/**
+ * Parse fee/revenue metric fields from title or summary across common pipeline formats.
+ */
+export function parseFeeMetric(title: string, summary?: string): ParsedFeeMetric | null {
+  const titlePatterns: Array<{
+    re: RegExp;
+    protocol: number;
+    dir?: number;
+    sign?: number;
+    pct: number;
+  }> = [
+    {
+      re: /^(.+?):\s*fees\s+(up|down)\s+([\d,.]+)%\s*\(24h\)/i,
+      protocol: 1,
+      dir: 2,
+      pct: 3,
+    },
+    {
+      re: /^(.+?)\s*·\s*fees\s+(up|down)\s+([\d,.]+)%\s*\(24h\)/i,
+      protocol: 1,
+      dir: 2,
+      pct: 3,
+    },
+    {
+      re: /^(.+?)\s+fees\s+(up|down)\s+([\d,.]+)%\s*\(24h\)/i,
+      protocol: 1,
+      dir: 2,
+      pct: 3,
+    },
+    {
+      re: /^(.+?)\s+chain\s+fees\s+([+-]?)([\d,.]+)%\s*\(24h\)/i,
+      protocol: 1,
+      sign: 2,
+      pct: 3,
+    },
+    {
+      re: /^(.+?)\s+fees\s+([+-])([\d,.]+)%\s*\(24h\)/i,
+      protocol: 1,
+      sign: 2,
+      pct: 3,
+    },
+    {
+      re: /^(.+?):\s*fees\s+(up|down)\s+([\d,.]+)%/i,
+      protocol: 1,
+      dir: 2,
+      pct: 3,
+    },
+    {
+      re: /^(.+?)\s+revenue\s+([+-])([\d,.]+)%\s*\(24h\)/i,
+      protocol: 1,
+      sign: 2,
+      pct: 3,
+    },
+    {
+      re: /^(.+?)\s+revenue\s+(up|down)\s+([\d,.]+)%\s*\(24h\)/i,
+      protocol: 1,
+      dir: 2,
+      pct: 3,
+    },
+  ];
+
+  for (const pattern of titlePatterns) {
+    const m = title.match(pattern.re);
+    if (!m) continue;
+    const pct = parsePct(m[pattern.pct]);
+    if (pct == null) continue;
+    return {
+      protocol: m[pattern.protocol].trim(),
+      direction: directionFromParts(
+        pattern.dir != null ? m[pattern.dir] : undefined,
+        pattern.sign != null ? m[pattern.sign] : undefined
+      ),
+      pct,
+    };
+  }
+
+  const sources = [summary, title].filter((s): s is string => Boolean(s?.trim()));
+  const embeddedPatterns: Array<{
+    re: RegExp;
+    protocol: number;
+    dir?: number;
+    sign?: number;
+    pct: number;
+  }> = [
+    {
+      re: /(.+?)\s*·\s*fees\s+(up|down)\s+([\d,.]+)%/i,
+      protocol: 1,
+      dir: 2,
+      pct: 3,
+    },
+    {
+      re: /(.+?)\s+fees\s+([+-])([\d,.]+)%\s*\(24h\)/i,
+      protocol: 1,
+      sign: 2,
+      pct: 3,
+    },
+    {
+      re: /fees\s+(up|down)\s+([\d,.]+)%\s*\(24h\)/i,
+      protocol: 0,
+      dir: 1,
+      pct: 2,
+    },
+  ];
+
+  for (const source of sources) {
+    for (const pattern of embeddedPatterns) {
+      const m = source.match(pattern.re);
+      if (!m) continue;
+      const pct = parsePct(m[pattern.pct]);
+      if (pct == null) continue;
+      const protocol =
+        pattern.protocol > 0 ? m[pattern.protocol].trim().split(":")[0]?.trim() : "";
+      return {
+        protocol: protocol || title.split(":")[0]?.trim() || title.split("·")[0]?.trim() || "Protocol",
+        direction: directionFromParts(
+          pattern.dir != null ? m[pattern.dir] : undefined,
+          pattern.sign != null ? m[pattern.sign] : undefined
+        ),
+        pct,
+      };
+    }
+  }
+
+  return null;
+}
+
+/** @deprecated Use parseFeeMetric */
+export function parseFeeFromTitle(title: string): ParsedFeeMetric | null {
+  return parseFeeMetric(title);
+}
+
+export function isMetricFeeSignal(input: ReaderCopyInput): boolean {
   const slugs = input.sourceSlugs ?? [];
   const itemTypes = input.itemTypes ?? [];
   const signals = input.rankingSignals ?? [];
   const title = input.title;
+  const summary = input.summary ?? "";
+  const combined = `${title} ${summary}`;
 
-  if (input.headlineOnly || slugs.some((s) => SITEMAP_DISCOVERY_SLUGS.has(s))) {
-    return "headline_only";
+  if (slugs.some((s) => s === "defillama-fees-solana" || s.includes("defillama-fees"))) {
+    return true;
   }
-  if (slugs.some((s) => STATUS_SOURCE_SLUGS.has(s))) {
-    return "status_incident";
+  if (breakdownNum(input.scoreBreakdown, "fee_threshold_passed") > 0) {
+    return true;
   }
-  if (slugs.some((s) => GITHUB_RELEASE_SOURCE_SLUGS.has(s))) {
-    return "github_release";
+  if (signals.some((s) => s === "fees_move" || s === "chain_fees")) {
+    return true;
   }
-  if (isBoostOnly(title, signals, itemTypes, slugs)) {
-    return "promoted_boost";
-  }
-  if (isPumpStyle(title) && itemTypes.includes("market")) {
-    return "pump_style";
-  }
-
-  const editorialConf = breakdownNum(input.scoreBreakdown, "editorial_confirmation") > 0;
-  const editorialCount = input.sourceCount ?? 0;
-  const hasEditorial = hasEditorialType(itemTypes, slugs);
-
-  if (hasEditorial && (editorialConf || editorialCount > 1)) {
-    return "multi_editorial";
-  }
-  if (hasEditorial && !isMetricOnly(itemTypes, slugs)) {
-    return "single_editorial";
+  if (
+    input.evidence?.evidenceItems?.some(
+      (e) => e.kind === "protocol_signal" && /fee|revenue/i.test(e.label + e.text)
+    )
+  ) {
+    return true;
   }
 
-  if (/fees?\s+(up|down)/i.test(title) || signals.some((s) => s === "fees_move" || s === "chain_fees")) {
-    return "metric_fee";
-  }
-  if (/tvl/i.test(title) || signals.some((s) => s === "tvl_move" || s === "chain_tvl")) {
-    return "metric_tvl";
+  const hasFeeMetricText =
+    /(?:\bfee|\bfees|revenue)\b/i.test(combined) &&
+    (/(?:24h|\(24h\))/i.test(combined) ||
+      /fees?\s+(up|down|[+-])/i.test(combined) ||
+      /chain\s+fees/i.test(combined));
+
+  if (hasFeeMetricText) {
+    if (isMetricOnly(itemTypes, slugs)) return true;
+    if (slugs.some((s) => s.includes("defillama"))) return true;
+    if (input.category === "defi" && slugs.some((s) => s.includes("defillama"))) {
+      return true;
+    }
   }
 
-  if (isMetricOnly(itemTypes, slugs)) {
-    return /tvl/i.test(title) ? "metric_tvl" : "metric_fee";
+  if (/fees?\s+(up|down)/i.test(title) || /chain\s+fees/i.test(title)) {
+    return true;
   }
 
-  return "generic";
+  return false;
 }
 
-type ParsedFee = {
-  protocol: string;
-  direction: "up" | "down";
-  pct: number;
-};
-
-export function parseFeeFromTitle(title: string): ParsedFee | null {
-  const m = title.match(/^(.+?):\s*fees\s+(up|down)\s+([\d,.]+)%\s*\(24h\)/i);
-  if (!m) return null;
-  const pct = parseFloat(m[3].replace(/,/g, ""));
-  if (!Number.isFinite(pct)) return null;
-  return {
-    protocol: m[1].trim(),
-    direction: m[2].toLowerCase() as "up" | "down",
-    pct,
-  };
-}
-
-function extractFeeAmount(summary: string): string | null {
-  const m = summary.match(/24h fees\s*~?\$?([\d,.]+[KMB]?)/i);
-  return m ? m[1] : null;
+function extractFeeAmount(...texts: Array<string | undefined>): string | null {
+  for (const text of texts) {
+    if (!text) continue;
+    const patterns = [
+      /24h fees\s*~?\s*\$?([\d,.]+[KMB]?)/i,
+      /fees\s*~?\s*\$?([\d,.]+[KMB]?)/i,
+    ];
+    for (const re of patterns) {
+      const m = text.match(re);
+      if (m) return m[1];
+    }
+  }
+  return null;
 }
 
 function largePctCaution(
@@ -189,7 +332,7 @@ function largePctCaution(
   return undefined;
 }
 
-function readerWhyRanked(kind: ReaderSignalKind, input: ReaderCopyInput): string {
+function readerWhyRanked(kind: ReaderSignalKind, _input: ReaderCopyInput): string {
   switch (kind) {
     case "metric_fee":
       return "Fee activity crossed the scanner threshold after a sharp 24h move.";
@@ -213,7 +356,7 @@ function readerWhyRanked(kind: ReaderSignalKind, input: ReaderCopyInput): string
   }
 }
 
-function readerWhyHot(kind: ReaderSignalKind, input: ReaderCopyInput): string {
+function readerWhyHot(kind: ReaderSignalKind, _input: ReaderCopyInput): string {
   switch (kind) {
     case "metric_fee":
       return "A sudden fee spike can point to unusual protocol usage, incentives, routing changes, or a one-off event. Verify the raw source before treating it as sustained momentum.";
@@ -237,25 +380,32 @@ function readerWhyHot(kind: ReaderSignalKind, input: ReaderCopyInput): string {
   }
 }
 
+function metricFeeSummary(input: ReaderCopyInput): string {
+  const fee = parseFeeMetric(input.title, input.summary);
+  const amount = extractFeeAmount(input.summary, input.title);
+
+  if (fee?.protocol && (amount || fee.pct != null)) {
+    const amountPhrase = amount ? `about $${amount.replace(/^\$/, "")}` : "a notable level";
+    const dir = fee.direction === "up" ? "sharply" : "sharply lower to";
+    return `${fee.protocol} saw 24h fees move ${dir} ${amountPhrase}. The scanner flags it as a protocol-activity signal, but large percentage moves can be exaggerated when the previous baseline was low.`;
+  }
+
+  if (fee?.protocol) {
+    return `${fee.protocol} saw an unusual 24h fee move. The scanner flags it as a protocol-activity signal, but large percentage moves can be exaggerated when the previous baseline was low.`;
+  }
+
+  return METRIC_FEE_GENERIC_SUMMARY;
+}
+
 function readerSummary(kind: ReaderSignalKind, input: ReaderCopyInput): string {
   const stored = input.summary?.trim();
-  const fee = parseFeeFromTitle(input.title);
 
   switch (kind) {
-    case "metric_fee": {
-      const amount = stored ? extractFeeAmount(stored) : null;
-      const amountPhrase = amount ? `about $${amount.replace(/^\$/, "")}` : "a notable level";
-      if (fee) {
-        const dir = fee.direction === "up" ? "sharply" : "sharply lower to";
-        return `${fee.protocol} saw 24h fees move ${dir} ${amountPhrase}. The scanner flags it as a protocol-activity signal, but large percentage moves can be exaggerated when the previous baseline was low.`;
-      }
-      return stored && !stored.includes("adapter signal")
-        ? stored
-        : `${input.title.split(":")[0]?.trim() || "This protocol"} showed unusual 24h fee activity. Open evidence for the exact metric values.`;
-    }
+    case "metric_fee":
+      return metricFeeSummary(input);
     case "metric_tvl": {
       const name = input.title.split(":")[0]?.trim() || "This protocol";
-      if (stored && /tvl/i.test(stored)) {
+      if (stored && /tvl/i.test(stored) && !/adapter signal/i.test(stored)) {
         return `${name} registered a notable TVL move in the last 24h. The scanner treats it as protocol-activity context — verify magnitude and drivers in evidence.`;
       }
       return `${name} registered a notable TVL move in the last 24h. Check evidence for the underlying DefiLlama values.`;
@@ -294,9 +444,56 @@ function readerSummary(kind: ReaderSignalKind, input: ReaderCopyInput): string {
   }
 }
 
+export function classifyReaderSignal(input: ReaderCopyInput): ReaderSignalKind {
+  const slugs = input.sourceSlugs ?? [];
+  const itemTypes = input.itemTypes ?? [];
+  const signals = input.rankingSignals ?? [];
+  const title = input.title;
+
+  if (input.headlineOnly || slugs.some((s) => SITEMAP_DISCOVERY_SLUGS.has(s))) {
+    return "headline_only";
+  }
+  if (slugs.some((s) => STATUS_SOURCE_SLUGS.has(s))) {
+    return "status_incident";
+  }
+  if (slugs.some((s) => GITHUB_RELEASE_SOURCE_SLUGS.has(s))) {
+    return "github_release";
+  }
+  if (isBoostOnly(title, signals, itemTypes, slugs)) {
+    return "promoted_boost";
+  }
+  if (isPumpStyle(title, input.category) && itemTypes.includes("market")) {
+    return "pump_style";
+  }
+
+  const editorialConf = breakdownNum(input.scoreBreakdown, "editorial_confirmation") > 0;
+  const editorialCount = input.sourceCount ?? 0;
+  const hasEditorial = hasEditorialType(itemTypes, slugs);
+
+  if (hasEditorial && (editorialConf || editorialCount > 1)) {
+    return "multi_editorial";
+  }
+  if (hasEditorial && !isMetricOnly(itemTypes, slugs)) {
+    return "single_editorial";
+  }
+
+  if (isMetricFeeSignal(input)) {
+    return "metric_fee";
+  }
+  if (/tvl/i.test(title) || signals.some((s) => s === "tvl_move" || s === "chain_tvl")) {
+    return "metric_tvl";
+  }
+
+  if (isMetricOnly(itemTypes, slugs)) {
+    return /tvl/i.test(title) ? "metric_tvl" : "metric_fee";
+  }
+
+  return "generic";
+}
+
 export function buildReaderDisplayCopy(input: ReaderCopyInput): ReaderDisplayCopy {
   const kind = classifyReaderSignal(input);
-  const fee = parseFeeFromTitle(input.title);
+  const fee = parseFeeMetric(input.title, input.summary);
   const pctCaution = largePctCaution(fee?.pct, input.scoreBreakdown);
 
   return {
@@ -319,6 +516,7 @@ export function readerCopyInputFromCard(item: HeatCardView): ReaderCopyInput {
     itemTypes: item.itemTypes,
     rankingSignals: item.rankingSignals,
     sourceCount: item.sourceCount,
+    category: item.category,
   };
 }
 
@@ -341,5 +539,6 @@ export function readerCopyInputFromTopic(topic: TopicDetailView): ReaderCopyInpu
     rankingSignals,
     sourceCount: topic.uniqueSourceCount,
     headlineOnly: topic.headlineOnlySources,
+    category: topic.category,
   };
 }
