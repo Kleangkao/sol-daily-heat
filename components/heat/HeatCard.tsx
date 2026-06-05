@@ -15,10 +15,9 @@ import {
   buildReaderDisplayCopy,
   readerCopyInputFromCard,
 } from "@/lib/heat/reader-signal-copy";
+import { isGenericRiskNote } from "@/lib/heat/risk-note";
 import SignalQualityBadges from "./SignalQualityBadges";
 import HeatScoreBadge from "./HeatScoreBadge";
-import EvidencePanel from "./EvidencePanel";
-import ScoreBreakdown from "./ScoreBreakdown";
 type Props = {
   item: HeatCardView;
   variant?: "default" | "compact";
@@ -210,13 +209,11 @@ export default function HeatCard({
         <SignalTypeBadge type={item.interpretationType} />
       </div>
 
-      <ScoreBreakdown breakdown={item.scoreBreakdown} score={item.heatScore} />
-
-      {item.evidence ? <EvidencePanel evidence={item.evidence} /> : null}
-
-      <p className="mt-3 border-t border-border pt-3 text-[11px] leading-[1.35] text-text-muted">
-        <span className="font-semibold text-danger">Risk:</span> {item.riskNote}
-      </p>
+      {!isGenericRiskNote(item.riskNote) ? (
+        <p className="mt-3 text-[11px] leading-[1.35] text-amber-200/90">
+          {item.riskNote}
+        </p>
+      ) : null}
 
       {detailHref ? (
         <Link
