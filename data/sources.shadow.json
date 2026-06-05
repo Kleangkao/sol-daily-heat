@@ -9,13 +9,187 @@
     "is_enabled": false,
     "requires_api_key": false,
     "status": "inactive",
+    "requires_solana_filter": true,
+    "candidate_category": "solana_tag",
+    "shadow_only": true,
     "metadata_json": {
-      "purpose": "Solana-tagged Cointelegraph editorial (shadow evaluation only)",
-      "requires_solana_filter": true,
+      "purpose": "Solana-tagged Cointelegraph editorial (shadow bench)",
       "max_items_per_run": 10,
-      "coverage": "ecosystem_editorial",
-      "shadow_only": true,
-      "production_rankings": false
+      "feed_verified": "2026-06-05"
+    }
+  },
+  {
+    "slug": "cointelegraph-global-rss",
+    "name": "Cointelegraph — global",
+    "source_type": "rss",
+    "base_url": "https://cointelegraph.com",
+    "feed_url": "https://cointelegraph.com/rss",
+    "reliability": 0.72,
+    "is_enabled": false,
+    "requires_api_key": false,
+    "status": "inactive",
+    "requires_solana_filter": true,
+    "candidate_category": "broad_rss",
+    "shadow_only": true,
+    "metadata_json": {
+      "purpose": "Global Cointelegraph feed with Solana filter (shadow bench)",
+      "max_items_per_run": 10,
+      "feed_verified": "2026-06-05"
+    }
+  },
+  {
+    "slug": "coindesk-rss",
+    "name": "CoinDesk — RSS",
+    "source_type": "rss",
+    "base_url": "https://www.coindesk.com",
+    "feed_url": "https://www.coindesk.com/arc/outboundfeeds/rss/",
+    "reliability": 0.8,
+    "is_enabled": false,
+    "requires_api_key": false,
+    "status": "inactive",
+    "requires_solana_filter": true,
+    "candidate_category": "broad_rss",
+    "shadow_only": true,
+    "metadata_json": {
+      "purpose": "CoinDesk Arc outbound RSS (shadow bench)",
+      "max_items_per_run": 10,
+      "feed_verified": "2026-06-05"
+    }
+  },
+  {
+    "slug": "blockworks-rss",
+    "name": "Blockworks — RSS",
+    "source_type": "rss",
+    "base_url": "https://blockworks.co",
+    "feed_url": "https://blockworks.co/feed",
+    "reliability": 0.77,
+    "is_enabled": false,
+    "requires_api_key": false,
+    "status": "inactive",
+    "requires_solana_filter": true,
+    "candidate_category": "broad_rss",
+    "shadow_only": true,
+    "metadata_json": {
+      "purpose": "Blockworks Atom feed (shadow bench)",
+      "feed_format": "atom",
+      "max_items_per_run": 10,
+      "feed_verified": "2026-06-05"
+    }
+  },
+  {
+    "slug": "cryptoslate-rss",
+    "name": "CryptoSlate — RSS",
+    "source_type": "rss",
+    "base_url": "https://cryptoslate.com",
+    "feed_url": "https://cryptoslate.com/feed/",
+    "reliability": 0.74,
+    "is_enabled": false,
+    "requires_api_key": false,
+    "status": "inactive",
+    "requires_solana_filter": true,
+    "candidate_category": "broad_rss",
+    "shadow_only": true,
+    "metadata_json": {
+      "purpose": "CryptoSlate RSS (shadow bench)",
+      "max_items_per_run": 10,
+      "feed_verified": "2026-06-05"
+    }
+  },
+  {
+    "slug": "cryptobriefing-rss",
+    "name": "CryptoBriefing — RSS",
+    "source_type": "rss",
+    "base_url": "https://cryptobriefing.com",
+    "feed_url": "https://cryptobriefing.com/feed/",
+    "reliability": 0.73,
+    "is_enabled": false,
+    "requires_api_key": false,
+    "status": "inactive",
+    "requires_solana_filter": true,
+    "candidate_category": "broad_rss",
+    "shadow_only": true,
+    "metadata_json": {
+      "purpose": "CryptoBriefing RSS (shadow bench)",
+      "max_items_per_run": 10,
+      "feed_verified": "2026-06-05"
+    }
+  },
+  {
+    "slug": "beincrypto-rss",
+    "name": "BeInCrypto — RSS",
+    "source_type": "rss",
+    "base_url": "https://beincrypto.com",
+    "feed_url": "https://beincrypto.com/feed/",
+    "reliability": 0.7,
+    "is_enabled": false,
+    "requires_api_key": false,
+    "status": "inactive",
+    "requires_solana_filter": true,
+    "candidate_category": "broad_rss",
+    "shadow_only": true,
+    "metadata_json": {
+      "purpose": "BeInCrypto RSS (shadow bench)",
+      "max_items_per_run": 10,
+      "feed_verified": "2026-06-05"
+    }
+  },
+  {
+    "slug": "thedefiant-rss",
+    "name": "The Defiant — RSS",
+    "source_type": "rss",
+    "base_url": "https://thedefiant.io",
+    "feed_url": "https://thedefiant.io/feed",
+    "reliability": 0.76,
+    "is_enabled": false,
+    "requires_api_key": false,
+    "status": "inactive",
+    "requires_solana_filter": true,
+    "candidate_category": "defi_editorial",
+    "shadow_only": true,
+    "metadata_json": {
+      "purpose": "The Defiant DeFi editorial RSS (shadow bench)",
+      "max_items_per_run": 10,
+      "feed_verified": "2026-06-05",
+      "note": "/rss returns 403; /feed works"
+    }
+  },
+  {
+    "slug": "newsbtc-rss",
+    "name": "NewsBTC — RSS",
+    "source_type": "rss",
+    "base_url": "https://www.newsbtc.com",
+    "feed_url": "https://www.newsbtc.com/feed/",
+    "reliability": 0.68,
+    "is_enabled": false,
+    "requires_api_key": false,
+    "status": "inactive",
+    "requires_solana_filter": true,
+    "candidate_category": "broad_rss",
+    "shadow_only": true,
+    "metadata_json": {
+      "purpose": "NewsBTC RSS (shadow bench)",
+      "max_items_per_run": 10,
+      "feed_verified": "2026-06-05"
+    }
+  },
+  {
+    "slug": "utoday-rss",
+    "name": "U.Today — RSS",
+    "source_type": "rss",
+    "base_url": "https://u.today",
+    "feed_url": "https://u.today/rss",
+    "reliability": 0.67,
+    "is_enabled": false,
+    "requires_api_key": false,
+    "status": "inactive",
+    "requires_solana_filter": true,
+    "candidate_category": "broad_rss",
+    "shadow_only": true,
+    "metadata_json": {
+      "purpose": "U.Today RSS (shadow bench)",
+      "max_items_per_run": 10,
+      "feed_verified": "2026-06-05",
+      "note": "/feed returns 404; /rss works"
     }
   }
 ]
