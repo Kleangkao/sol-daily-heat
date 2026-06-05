@@ -16,8 +16,8 @@ type Props = {
 export default function SectionJumpNav({ onNavigate }: Props) {
   return (
     <nav
-      className="mb-6 -mx-1 flex gap-2 overflow-x-auto px-1 pb-1"
-      aria-label="Jump to dashboard section"
+      className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1"
+      aria-label="Sections — jump to dashboard section"
     >
       {SECTION_LINKS.map((s) => (
         <button

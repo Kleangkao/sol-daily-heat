@@ -106,12 +106,23 @@ export default function HeatDashboard() {
   const topHeatEmptyMessage = useMemo(() => {
     if (!dashboard) return "No topics match this category filter.";
     const snapshot = dashboard.date;
+    const curatedNote = " Other sections below are curated separately.";
     if (category === "all") {
-      return `No Top Heat topics for snapshot ${snapshot} UTC.`;
+      return `No Top Heat topics for snapshot ${snapshot} UTC.${curatedNote}`;
     }
     const label = CATEGORY_LABELS[category];
-    return `No Top Heat topics matched ${label} for snapshot ${snapshot} UTC.`;
+    return `No Top Heat topics matched ${label} for snapshot ${snapshot} UTC.${curatedNote}`;
   }, [dashboard, category]);
+
+  const newTokenMints = useMemo(() => {
+    const set = new Set<string>();
+    for (const card of dashboard?.newTokens ?? []) {
+      for (const t of card.relatedTokens) {
+        if (t.mintAddress) set.add(t.mintAddress);
+      }
+    }
+    return set;
+  }, [dashboard?.newTokens]);
 
   const sectionSource = (key: DashboardSectionKey) => dashboard?.sectionSources?.[key];
 
@@ -151,29 +162,45 @@ export default function HeatDashboard() {
           snapshotDate={dashboard.date}
         />
       ) : null}
-      <MarketPulse heatDataSource={dashboard?.dataSource} />
-
       {awaitingData ? (
         <DashboardLoadingShell />
       ) : dashboard ? (
-        <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
-          <div className="mb-4">
-            <p className="mb-2 text-[12px] font-medium text-text-secondary">
-              Top Heat category filter
-            </p>
-            <CategoryFilter value={category} onChange={onCategoryChange} />
-            <p className="mt-1.5 text-[11px] text-text-muted">
-              Other sections are curated separately.
-            </p>
-          </div>
+        <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+          <MarketPulse
+            layout="mobile"
+            heatDataSource={dashboard.dataSource}
+            newTokenMints={newTokenMints}
+          />
 
-          <SectionJumpNav onNavigate={navigateToSection} />
+          <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_252px] lg:items-start lg:gap-8">
+            <div className="min-w-0">
+              <div className="mb-5 space-y-4 rounded-[10px] border border-border/60 bg-bg-card/40 p-4">
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-text-muted">
+                    Categories
+                  </p>
+                  <p className="mt-0.5 mb-2 text-[11px] leading-relaxed text-text-muted">
+                    Filters Top Heat by topic. Persona sections below stay curated separately.
+                  </p>
+                  <CategoryFilter value={category} onChange={onCategoryChange} />
+                </div>
 
-          <p className="mb-6 text-[12px] text-text-muted">
-            A topic may appear in multiple sections when it matters to different audiences.
-          </p>
+                <div className="border-t border-border/60 pt-4">
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-text-muted">
+                    Sections
+                  </p>
+                  <p className="mt-0.5 mb-2 text-[11px] text-text-muted">
+                    Jump to a dashboard section.
+                  </p>
+                  <SectionJumpNav onNavigate={navigateToSection} />
+                </div>
+              </div>
 
-          <HeatSection
+              <p className="mb-6 text-[12px] text-text-muted">
+                A topic may appear in multiple sections when it matters to different audiences.
+              </p>
+
+              <HeatSection
             title="Top Heat"
             sectionId="top-heat"
             sectionLabel="Top Heat"
@@ -264,9 +291,21 @@ export default function HeatDashboard() {
             onToggle={() => toggleSection("investor")}
           />
 
-          <footer className="mt-16 border-t border-border py-8 text-center text-[12px] text-text-muted">
-            {footerLabel} · <code className="text-accent">not investment advice</code>
-          </footer>
+              <footer className="mt-16 border-t border-border py-8 text-center text-[12px] text-text-muted">
+                {footerLabel} · <code className="text-accent">not investment advice</code>
+              </footer>
+            </div>
+
+            <aside className="hidden lg:block">
+              <div className="sticky top-4">
+                <MarketPulse
+                  layout="rail"
+                  heatDataSource={dashboard.dataSource}
+                  newTokenMints={newTokenMints}
+                />
+              </div>
+            </aside>
+          </div>
         </main>
       ) : null}
     </div>

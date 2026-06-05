@@ -8,6 +8,8 @@ import {
 } from "../lib/heat/reader-signal-copy";
 import { buildHomepageCardCopy } from "../lib/heat/homepage-card-copy";
 import { buildPersonaDisplayNote } from "../lib/heat/persona-display-copy";
+import { buildTokenCardHeadline } from "../lib/heat/token-display";
+import type { HeatCardView } from "../lib/types/heat";
 
 function printHomepageExample(label: string, input: ReaderCopyInput) {
   const copy = buildHomepageCardCopy(input);
@@ -73,6 +75,40 @@ printHomepageExample("Promoted boost", {
   itemTypes: ["market"],
   rankingSignals: ["boost"],
   sourceCount: 1,
+});
+
+function printTokenHeadline(label: string, card: Pick<HeatCardView, "title" | "summary" | "relatedTokens" | "relatedProjects" | "rankingSignals" | "category">) {
+  const headline = buildTokenCardHeadline(card as HeatCardView, card.title);
+  console.log(`\n=== Token headline: ${label} ===`);
+  console.log("Headline:", headline.headline);
+  if (headline.subtitle) console.log("Subtitle:", headline.subtitle);
+}
+
+printTokenHeadline("Boost with symbol metadata", {
+  title: "DexScreener boost: 4b1i…pump",
+  summary: "BONK · paid boost",
+  category: "meme",
+  rankingSignals: ["boost"],
+  relatedTokens: [{ symbol: "BONK", name: "Bonk", mintAddress: "9s96G11xGsHczudfJqKQzQxzvubQgJXSySJ1wRgxpump" }],
+  relatedProjects: [],
+});
+
+printTokenHeadline("Boost mint-only fallback", {
+  title: "DexScreener boost: Fuu6…pump",
+  summary: "paid boost",
+  category: "meme",
+  rankingSignals: ["boost"],
+  relatedTokens: [{ symbol: "Fuu6…pump", mintAddress: "Fuu6pumpMintAddressPlaceholder1234567890" }],
+  relatedProjects: [],
+});
+
+printTokenHeadline("New pair with symbol", {
+  title: "$PULSE — new pair on Raydium (4h old)",
+  summary: "24h vol $12K",
+  category: "meme",
+  rankingSignals: ["new_pair"],
+  relatedTokens: [{ symbol: "PULSE", mintAddress: "PulseMintAddressPlaceholder12345678901" }],
+  relatedProjects: [],
 });
 
 const legacy = buildReaderDisplayCopy({

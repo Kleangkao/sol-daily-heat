@@ -10,6 +10,7 @@ import {
 import { snapshotFreshnessFromFetchedAt } from "@/lib/market-pulse/snapshot-freshness";
 import { CATEGORY_LABELS } from "@/lib/types/heat";
 import { topicDetailPath } from "@/lib/heat/topic-link";
+import { shortMintAddress } from "@/lib/heat/token-display";
 import type { TokenDetailView } from "@/lib/types/token-detail";
 
 const CHANGE_CLASS = {
@@ -36,18 +37,13 @@ function formatUsd(n: number | null | undefined): string {
   return `$${n.toFixed(2)}`;
 }
 
-function shortMint(mint: string): string {
-  if (mint.length < 16) return mint;
-  return `${mint.slice(0, 6)}…${mint.slice(-6)}`;
-}
-
 function tokenHeaderSubtitle(token: TokenDetailView): string {
   const sym = token.symbol.replace(/^\$/, "").trim();
   const name = token.name?.trim();
   if (name && name.toLowerCase() !== sym.toLowerCase()) {
     return name;
   }
-  return shortMint(token.mint);
+  return shortMintAddress(token.mint);
 }
 
 type Props = {

@@ -27,7 +27,7 @@ export default function CategoryFilter({ value, onChange }: Props) {
     <div
       className="flex flex-wrap gap-2"
       role="group"
-      aria-label="Top Heat category filter"
+      aria-label="Categories — filters Top Heat only"
     >
       {FILTERS.map((cat) => {
         const active = value === cat;

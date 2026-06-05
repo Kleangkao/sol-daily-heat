@@ -9,6 +9,7 @@ import SignalTypeBadge from "@/components/ui/SignalTypeBadge";
 import { CATEGORY_LABELS } from "@/lib/types/heat";
 import { buildCardBadges, parseFeeDisplay } from "@/lib/heat/card-display";
 import { buildHomepageCardCopy } from "@/lib/heat/homepage-card-copy";
+import { buildTokenCardHeadline } from "@/lib/heat/token-display";
 import { readerCopyInputFromCard } from "@/lib/heat/reader-signal-copy";
 import { buildCardPersonaDisplay } from "@/lib/heat/persona-display-copy";
 import { isGenericRiskNote } from "@/lib/heat/risk-note";
@@ -67,13 +68,15 @@ export default function HeatCard({
     };
     const fee = parseFeeDisplay(item.title, item.scoreBreakdown);
     const preview = buildHomepageCardCopy(readerInput);
+    const cardTitle = buildTokenCardHeadline(item, fee.headline);
     return {
       badges: buildCardBadges(badgeInput),
       signalLabel: preview.signalLabel,
       brief: preview.brief,
       caution: preview.caution,
       mixedMetricHint: preview.mixedMetricHint,
-      headline: fee.headline,
+      headline: cardTitle.headline,
+      subtitle: cardTitle.subtitle,
       creatorPersona: buildCardPersonaDisplay("creator", item),
       investorPersona: buildCardPersonaDisplay("investor", item),
     };
@@ -115,6 +118,10 @@ export default function HeatCard({
           {display.headline}
         </h3>
       )}
+
+      {display.subtitle ? (
+        <p className="mt-1 text-[11px] text-text-muted">{display.subtitle}</p>
+      ) : null}
 
       <p className="mt-2 text-[11px] font-semibold uppercase tracking-wide text-accent/90">
         {display.signalLabel}
