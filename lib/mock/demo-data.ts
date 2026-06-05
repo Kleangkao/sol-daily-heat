@@ -320,8 +320,7 @@ export function getDemoDashboard(date?: string): HeatDashboardData {
 
 export function filterByCategory(
   items: HeatCardView[],
-  category: import("@/lib/types/heat").HeatCategoryFilter
+  category: import("@/lib/types/db").TopicCategory
 ): HeatCardView[] {
-  if (category === "all") return items;
   return items.filter((i) => i.category === category);
 }

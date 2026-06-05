@@ -10,24 +10,24 @@ import {
   parseCategoryParam,
   resolveDateParam,
 } from "@/lib/heat/dashboard-url-state";
+import {
+  resolveExploreChipAction,
+  type ExploreChipId,
+} from "@/lib/heat/explore-navigation";
 import { buildTopicSectionLabels } from "@/lib/heat/topic-section-appearances";
 import { utcAvailableDates, utcTodayIso } from "@/lib/heat/snapshot-date";
-import type {
-  HeatCategoryFilter,
-  HeatDashboardData,
-  DashboardSectionKey,
-} from "@/lib/types/heat";
+import type { HeatDashboardData, DashboardSectionKey } from "@/lib/types/heat";
+import type { TopicCategory } from "@/lib/types/db";
 import { CATEGORY_LABELS } from "@/lib/types/heat";
 import { SECTION_LIMITS } from "@/lib/process/section-limits";
 import { sectionItemsMetricHeavy } from "@/lib/heat/card-display";
-import CategoryFilter from "./CategoryFilter";
 import DashboardLoadingShell from "./DashboardLoadingShell";
 import DemoPreviewBanner from "./DemoPreviewBanner";
 import DisclaimerBar from "./DisclaimerBar";
+import ExploreBar from "./ExploreBar";
 import HeatHero from "./HeatHero";
 import HeatSection from "./HeatSection";
 import MarketPulse from "./MarketPulse";
-import SectionJumpNav from "./SectionJumpNav";
 import { useSectionOpenState } from "./useSectionOpenState";
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
@@ -36,14 +36,17 @@ export default function HeatDashboard() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const initialCategory = parseCategoryParam(searchParams.get("category"));
+  const initialCategoryFilter = parseCategoryParam(searchParams.get("category"));
   const initialDateRaw = searchParams.get("date");
 
   const [date, setDate] = useState<string | undefined>(() =>
     isValidDateParam(initialDateRaw) ? initialDateRaw! : undefined
   );
-  const [category, setCategory] = useState<HeatCategoryFilter>(initialCategory);
-  const { open: sectionOpen, toggleSection, navigateToSection } = useSectionOpenState();
+  const [categoryFilter, setCategoryFilter] = useState<TopicCategory | null>(
+    initialCategoryFilter
+  );
+  const { open: sectionOpen, toggleSection, navigateToSection, navigateToSections } =
+    useSectionOpenState();
 
   const heroDate = date ?? utcTodayIso();
   const heroDates = useMemo(() => utcAvailableDates(), []);
@@ -58,7 +61,7 @@ export default function HeatDashboard() {
   const dashboard = data ?? null;
 
   const syncUrl = useCallback(
-    (nextDate: string | undefined, nextCategory: HeatCategoryFilter) => {
+    (nextDate: string | undefined, nextCategory: TopicCategory | null) => {
       const effectiveDate = nextDate ?? dashboard?.date ?? utcTodayIso();
       const qs = buildDashboardQueryString(effectiveDate, nextCategory);
       router.replace(`/${qs}`, { scroll: false });
@@ -73,30 +76,51 @@ export default function HeatDashboard() {
     const resolved = resolveDateParam(raw, dashboard.availableDates);
     if (resolved && resolved !== raw) {
       setDate(resolved);
-      syncUrl(resolved, category);
+      syncUrl(resolved, categoryFilter);
     }
-  }, [dashboard, searchParams, category, syncUrl]);
+  }, [dashboard, searchParams, categoryFilter, syncUrl]);
 
   const onDateChange = useCallback(
     (d: string) => {
       setDate(d);
-      syncUrl(d, category);
+      syncUrl(d, categoryFilter);
     },
-    [category, syncUrl]
+    [categoryFilter, syncUrl]
   );
 
-  const onCategoryChange = useCallback(
-    (c: HeatCategoryFilter) => {
-      setCategory(c);
-      syncUrl(date ?? dashboard?.date, c);
+  const onExploreChip = useCallback(
+    (chipId: ExploreChipId) => {
+      const action = resolveExploreChipAction(chipId);
+
+      switch (action.type) {
+        case "clear-category":
+          setCategoryFilter(null);
+          syncUrl(date ?? dashboard?.date, null);
+          navigateToSection(action.scrollTo);
+          break;
+        case "section-only":
+          navigateToSection(action.section);
+          break;
+        case "category-lens":
+          setCategoryFilter(action.category);
+          syncUrl(date ?? dashboard?.date, action.category);
+          navigateToSection(action.scrollTo);
+          break;
+        case "defi-hybrid":
+          setCategoryFilter(action.category);
+          syncUrl(date ?? dashboard?.date, action.category);
+          navigateToSections(action.openSections, action.scrollTo);
+          break;
+      }
     },
-    [date, dashboard?.date, syncUrl]
+    [date, dashboard?.date, syncUrl, navigateToSection, navigateToSections]
   );
 
-  const topFiltered = useMemo(
-    () => (dashboard ? filterByCategory(dashboard.topHeat, category) : []),
-    [dashboard, category]
-  );
+  const topFiltered = useMemo(() => {
+    if (!dashboard) return [];
+    if (categoryFilter === null) return dashboard.topHeat;
+    return filterByCategory(dashboard.topHeat, categoryFilter);
+  }, [dashboard, categoryFilter]);
 
   const topicSections = useMemo(
     () => (dashboard ? buildTopicSectionLabels(dashboard) : undefined),
@@ -105,14 +129,12 @@ export default function HeatDashboard() {
 
   const topHeatEmptyMessage = useMemo(() => {
     if (!dashboard) return "No topics match this category filter.";
+    if (categoryFilter === null) return "No Top Heat topics for this snapshot.";
     const snapshot = dashboard.date;
     const curatedNote = " Other sections below are curated separately.";
-    if (category === "all") {
-      return `No Top Heat topics for snapshot ${snapshot} UTC.${curatedNote}`;
-    }
-    const label = CATEGORY_LABELS[category];
+    const label = CATEGORY_LABELS[categoryFilter];
     return `No Top Heat topics matched ${label} for snapshot ${snapshot} UTC.${curatedNote}`;
-  }, [dashboard, category]);
+  }, [dashboard, categoryFilter]);
 
   const newTokenMints = useMemo(() => {
     const set = new Set<string>();
@@ -175,7 +197,7 @@ export default function HeatDashboard() {
           <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_252px] lg:items-start lg:gap-8">
             <div className="min-w-0">
               <div className="mb-2">
-                <SectionJumpNav onNavigate={navigateToSection} />
+                <ExploreBar categoryFilter={categoryFilter} onChipClick={onExploreChip} />
               </div>
 
               <HeatSection
@@ -189,91 +211,83 @@ export default function HeatDashboard() {
                 sectionDataSource={sectionSource("topHeat")}
                 isOpen={sectionOpen["top-heat"]}
                 onToggle={() => toggleSection("top-heat")}
-                toolbar={
-                  <div>
-                    <p className="mb-1.5 text-[11px] text-text-muted">
-                      Filter this section by category — other sections stay curated separately.
-                    </p>
-                    <CategoryFilter value={category} onChange={onCategoryChange} />
-                  </div>
-                }
               />
 
               <HeatSection
-            title="New Solana Tokens"
-            sectionId="new-tokens"
-            sectionLabel="New Tokens"
-            topicSections={topicSections}
-            description="New pair and mint signals from DexScreener-style adapters (24h window, UTC snapshot day)."
-            items={dashboard.newTokens}
-            sectionDataSource={sectionSource("newTokens")}
-            isOpen={sectionOpen["new-tokens"]}
+                title="New Solana Tokens"
+                sectionId="new-tokens"
+                sectionLabel="New Tokens"
+                topicSections={topicSections}
+                description="New pair and mint signals from DexScreener-style adapters (24h window, UTC snapshot day)."
+                items={dashboard.newTokens}
+                sectionDataSource={sectionSource("newTokens")}
+                isOpen={sectionOpen["new-tokens"]}
                 onToggle={() => toggleSection("new-tokens")}
               />
 
               <HeatSection
                 title="DeFi / Protocol Signals"
-            sectionId="defi"
-            sectionLabel="DeFi"
-            topicSections={topicSections}
-            description="Protocol TVL, volume, and stake-flow context from free DeFi adapters."
-            items={dashboard.defiSignals}
-            sectionDataSource={sectionSource("defiSignals")}
-            isOpen={sectionOpen.defi}
+                sectionId="defi"
+                sectionLabel="DeFi"
+                topicSections={topicSections}
+                description="Protocol TVL, volume, and stake-flow context from free DeFi adapters."
+                items={dashboard.defiSignals}
+                sectionDataSource={sectionSource("defiSignals")}
+                isOpen={sectionOpen.defi}
                 onToggle={() => toggleSection("defi")}
               />
 
               <HeatSection
                 title="Builder / Infra Watch"
-            sectionId="builder"
-            sectionLabel="Builder"
-            topicSections={topicSections}
-            description="Infrastructure, developer tooling, protocol plumbing, and status signals for Solana builders."
-            items={dashboard.builderWatch}
-            sectionDataSource={sectionSource("builderWatch")}
-            sparseNote={
-              builderSparse
-                ? "Only builder-relevant infra, tooling, and status signals are shown."
-                : undefined
-            }
-            sectionDisclaimer="Operational and ecosystem context — not investment advice."
-            isOpen={sectionOpen.builder}
+                sectionId="builder"
+                sectionLabel="Builder"
+                topicSections={topicSections}
+                description="Infrastructure, developer tooling, protocol plumbing, and status signals for Solana builders."
+                items={dashboard.builderWatch}
+                sectionDataSource={sectionSource("builderWatch")}
+                sparseNote={
+                  builderSparse
+                    ? "Only builder-relevant infra, tooling, and status signals are shown."
+                    : undefined
+                }
+                sectionDisclaimer="Operational and ecosystem context — not investment advice."
+                isOpen={sectionOpen.builder}
                 onToggle={() => toggleSection("builder")}
               />
 
               <HeatSection
                 title="Creator Angles"
-            sectionId="creator"
-            sectionLabel="Creator"
-            topicSections={topicSections}
-            description="Thread and clip starting points derived from the UTC snapshot — add your own verification."
-            items={dashboard.creatorAngles}
-            sectionDataSource={sectionSource("creatorAngles")}
-            personaHighlight="creator"
-            sparseNote={
-              creatorSparse
-                ? "Only high-confidence narrative angles are shown."
-                : undefined
-            }
-            isOpen={sectionOpen.creator}
+                sectionId="creator"
+                sectionLabel="Creator"
+                topicSections={topicSections}
+                description="Thread and clip starting points derived from the UTC snapshot — add your own verification."
+                items={dashboard.creatorAngles}
+                sectionDataSource={sectionSource("creatorAngles")}
+                personaHighlight="creator"
+                sparseNote={
+                  creatorSparse
+                    ? "Only high-confidence narrative angles are shown."
+                    : undefined
+                }
+                isOpen={sectionOpen.creator}
                 onToggle={() => toggleSection("creator")}
               />
 
               <HeatSection
                 title="Investor Watchlist"
-            sectionId="investor"
-            sectionLabel="Investor"
-            topicSections={topicSections}
-            description="Neutral watch context for builders and investors."
-            items={dashboard.investorWatchlist}
-            sectionDataSource={sectionSource("investorWatchlist")}
-            personaHighlight="investor"
-            sectionDisclaimer={
-              investorMetricHeavy
-                ? "Watchlist items are signals, not recommendations."
-                : undefined
-            }
-            isOpen={sectionOpen.investor}
+                sectionId="investor"
+                sectionLabel="Investor"
+                topicSections={topicSections}
+                description="Neutral watch context for builders and investors."
+                items={dashboard.investorWatchlist}
+                sectionDataSource={sectionSource("investorWatchlist")}
+                personaHighlight="investor"
+                sectionDisclaimer={
+                  investorMetricHeavy
+                    ? "Watchlist items are signals, not recommendations."
+                    : undefined
+                }
+                isOpen={sectionOpen.investor}
                 onToggle={() => toggleSection("investor")}
               />
 

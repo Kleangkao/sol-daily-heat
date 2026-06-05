@@ -21,6 +21,7 @@ type Props = {
   personaHighlight?: HeatCardPersonaHighlight;
   isOpen?: boolean;
   onToggle?: () => void;
+  toolbar?: ReactNode;
 };
 
 function cardCountLabel(count: number): string {

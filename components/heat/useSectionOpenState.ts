@@ -72,5 +72,22 @@ export function useSectionOpenState() {
     });
   }, [setSectionOpen]);
 
-  return { open, toggleSection, openSection, navigateToSection };
+  const navigateToSections = useCallback(
+    (ids: DashboardSectionDomId[], scrollToId?: DashboardSectionDomId) => {
+      setOpen((prev) => {
+        const next = { ...prev };
+        for (const id of ids) next[id] = true;
+        saveSectionOpenState(next);
+        return next;
+      });
+      const scrollId = scrollToId ?? ids[0];
+      window.history.replaceState(null, "", `#${scrollId}`);
+      requestAnimationFrame(() => {
+        document.getElementById(scrollId)?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    },
+    []
+  );
+
+  return { open, toggleSection, openSection, navigateToSection, navigateToSections };
 }
