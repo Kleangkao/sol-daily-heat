@@ -7,7 +7,48 @@ import HeatScoreBadge from "@/components/heat/HeatScoreBadge";
 import ScoreBreakdown from "@/components/heat/ScoreBreakdown";
 import { explainScoreBreakdown } from "@/lib/heat/score-breakdown-explainer";
 import { buildTopicNarrativeBrief } from "@/lib/heat/topic-narrative-brief";
+import { buildHeatScoreContext } from "@/lib/heat/heat-score-context";
+import {
+  buildTopicMetricEvidence,
+  type TopicMetricEvidence,
+} from "@/lib/heat/topic-metric-evidence";
 type DisplayEvidenceKind = EvidenceKind | "status_incident";
+
+function MetricEvidenceRow({
+  label,
+  value,
+  muted,
+}: {
+  label: string;
+  value: string;
+  muted?: boolean;
+}) {
+  return (
+    <div className="grid grid-cols-[minmax(0,7rem)_1fr] gap-x-3 gap-y-0.5 text-[13px] sm:grid-cols-[minmax(0,8.5rem)_1fr]">
+      <span className="font-semibold text-text-muted">{label}</span>
+      <span className={muted ? "text-text-muted" : "text-text-primary"}>{value}</span>
+    </div>
+  );
+}
+
+function evidenceDepthLabel(depth: TopicMetricEvidence["evidenceDepth"]): string {
+  switch (depth) {
+    case "single_source":
+      return "Single source";
+    case "multi_source":
+      return "Multiple sources";
+    default:
+      return "Unknown";
+  }
+}
+
+function formatSectionRanks(
+  appearances: TopicDetailView["sectionAppearancesToday"]
+): string {
+  return appearances
+    .map((s) => `${s.sectionLabel}${s.rankPosition != null ? ` #${s.rankPosition}` : ""}`)
+    .join(" · ");
+}
 
 function formatTime(iso: string): string {
   const d = new Date(iso);
@@ -52,6 +93,8 @@ type Props = {
 
 export default function TopicDetailContent({ topic }: Props) {
   const brief = buildTopicNarrativeBrief(topic);
+  const metricEvidence = buildTopicMetricEvidence(topic);
+  const sectionCount = topic.sectionAppearancesToday.length;
   const scoreRows = explainScoreBreakdown(topic.scoreBreakdown, {
     uniqueSourceCount: topic.uniqueSourceCount,
   });
@@ -85,7 +128,12 @@ export default function TopicDetailContent({ topic }: Props) {
               </h1>
             </div>
             {topic.heatScore != null ? (
-              <HeatScoreBadge score={topic.heatScore} size="md" />
+              <div className="flex max-w-xs flex-col items-end gap-1.5 text-right">
+                <HeatScoreBadge score={topic.heatScore} size="md" />
+                <p className="text-[11px] leading-snug text-text-muted">
+                  {buildHeatScoreContext(topic.heatScore)}
+                </p>
+              </div>
             ) : (
               <span
                 className="inline-flex items-center rounded-full border border-border bg-bg-secondary px-2.5 py-1 text-[13px] font-semibold text-text-muted"
@@ -95,20 +143,21 @@ export default function TopicDetailContent({ topic }: Props) {
               </span>
             )}
           </div>
-          <div className="mt-4 flex flex-wrap gap-2">
+          <div className="mt-4 flex flex-wrap items-center gap-2">
             <span className="inline-flex rounded-full bg-bg-secondary px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-accent">
               {CATEGORY_LABELS[topic.category]}
             </span>
-            {topic.sectionAppearancesToday.map((s) => (
-              <span
-                key={`${s.section}-${s.rankPosition}`}
-                className="inline-flex rounded-full border border-border px-2.5 py-0.5 text-[11px] text-text-secondary"
-              >
-                {s.sectionLabel}
-                {s.rankPosition != null ? ` #${s.rankPosition}` : ""} · {s.heatScore} heat
+            {sectionCount > 0 ? (
+              <span className="inline-flex rounded-full border border-border px-2.5 py-0.5 text-[11px] text-text-secondary">
+                Ranked in {sectionCount} section{sectionCount !== 1 ? "s" : ""}
               </span>
-            ))}
+            ) : null}
           </div>
+          {sectionCount > 0 ? (
+            <p className="mt-2 text-[11px] text-text-muted">
+              {formatSectionRanks(topic.sectionAppearancesToday)}
+            </p>
+          ) : null}
           <p className="mt-3 text-[12px] text-text-muted">
             First seen {formatTime(topic.firstSeenAt)} · Last updated{" "}
             {formatTime(topic.lastUpdatedAt)} · Snapshot {topic.rankingDate}
@@ -153,6 +202,104 @@ export default function TopicDetailContent({ topic }: Props) {
             <p className="mt-3 text-[12px] leading-relaxed text-text-muted">{brief.confidenceNote}</p>
           ) : null}
         </section>
+
+        {metricEvidence ? (
+          <>
+            <section className="mt-6 rounded-[10px] border border-border bg-bg-card p-5">
+              <h2 className="font-heading text-[18px] font-bold uppercase tracking-wide text-text-primary">
+                Metric evidence
+              </h2>
+              <div className="mt-3 space-y-2">
+                <MetricEvidenceRow
+                  label="Metric"
+                  value={metricEvidence.evidence.metricLabel}
+                />
+                {metricEvidence.evidence.currentValueLabel ? (
+                  <MetricEvidenceRow
+                    label="Current"
+                    value={metricEvidence.evidence.currentValueLabel}
+                  />
+                ) : null}
+                {metricEvidence.evidence.previousValueLabel ? (
+                  <MetricEvidenceRow
+                    label="Previous"
+                    value={metricEvidence.evidence.previousValueLabel}
+                    muted={metricEvidence.evidence.derivedFields?.includes("previousValueLabel")}
+                  />
+                ) : null}
+                {metricEvidence.evidence.changePctLabel ? (
+                  <MetricEvidenceRow
+                    label="Change"
+                    value={metricEvidence.evidence.changePctLabel}
+                  />
+                ) : null}
+                {metricEvidence.evidence.sourceName ? (
+                  <MetricEvidenceRow
+                    label="Source"
+                    value={metricEvidence.evidence.sourceName}
+                  />
+                ) : null}
+                {metricEvidence.evidence.snapshotLabel ? (
+                  <MetricEvidenceRow
+                    label="Snapshot"
+                    value={metricEvidence.evidence.snapshotLabel}
+                  />
+                ) : null}
+                <MetricEvidenceRow
+                  label="Depth"
+                  value={evidenceDepthLabel(metricEvidence.evidence.evidenceDepth)}
+                />
+              </div>
+              {metricEvidence.evidence.limitations &&
+              metricEvidence.evidence.limitations.length > 0 ? (
+                <ul className="mt-4 space-y-1 text-[12px] leading-relaxed text-text-muted">
+                  {metricEvidence.evidence.limitations.map((note, i) => (
+                    <li key={`lim-${i}`}>{note}</li>
+                  ))}
+                </ul>
+              ) : null}
+            </section>
+
+            <section className="mt-6 rounded-[10px] border border-border bg-bg-card p-5">
+              <div className="grid gap-5 sm:grid-cols-2">
+                <div>
+                  <h3 className="text-[11px] font-semibold uppercase tracking-wide text-text-muted">
+                    Confirmed facts
+                  </h3>
+                  <ul className="mt-2 list-disc space-y-1.5 pl-5 text-[13px] leading-relaxed text-text-secondary">
+                    {metricEvidence.confirmedFacts.map((fact, i) => (
+                      <li key={`fact-${i}`}>{fact}</li>
+                    ))}
+                  </ul>
+                </div>
+                <div>
+                  <h3 className="text-[11px] font-semibold uppercase tracking-wide text-text-muted">
+                    Possible interpretations
+                  </h3>
+                  <p className="mt-1 text-[11px] text-text-muted">
+                    Not confirmed — hypotheses only.
+                  </p>
+                  <ul className="mt-2 list-disc space-y-1.5 pl-5 text-[13px] leading-relaxed text-text-secondary">
+                    {metricEvidence.possibleInterpretations.map((item, i) => (
+                      <li key={`interp-${i}`}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </section>
+
+            <section className="mt-6 rounded-[10px] border border-border bg-bg-card p-5">
+              <h2 className="font-heading text-[16px] font-bold uppercase tracking-wide text-text-primary">
+                Needs confirmation from
+              </h2>
+              <ul className="mt-3 list-disc space-y-1.5 pl-5 text-[13px] leading-relaxed text-text-secondary">
+                {metricEvidence.needsConfirmation.map((item, i) => (
+                  <li key={`confirm-${i}`}>{item}</li>
+                ))}
+              </ul>
+            </section>
+          </>
+        ) : null}
 
         {topic.evidence ? (
           <section className="mt-6 rounded-[10px] border border-border bg-bg-card p-5">

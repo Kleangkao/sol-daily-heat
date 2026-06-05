@@ -9,6 +9,8 @@ import { mergeDashboard } from "../lib/db/merge-dashboard";
 import { getDemoDashboard } from "../lib/mock/demo-data";
 import { getTopicDetail } from "../lib/db/queries/topic-detail";
 import { buildTopicNarrativeBrief } from "../lib/heat/topic-narrative-brief";
+import { buildTopicMetricEvidence } from "../lib/heat/topic-metric-evidence";
+import { buildHeatScoreContext } from "../lib/heat/heat-score-context";
 import type { HeatCardView } from "../lib/types/heat";
 
 const SAMPLES = [
@@ -55,8 +57,12 @@ async function main() {
       continue;
     }
     const brief = buildTopicNarrativeBrief(topic);
+    const metric = buildTopicMetricEvidence(topic);
     console.log(`\n=== ${sample.label}: ${topic.title.slice(0, 60)} ===`);
     console.log("mode:", brief.mode, "| heading:", brief.heading);
+    if (topic.heatScore != null) {
+      console.log("heat context:", buildHeatScoreContext(topic.heatScore));
+    }
     brief.paragraphs.forEach((p, i) => console.log(`P${i + 1}:`, p));
     if (brief.watchNext.length) {
       console.log("Watch next:");
@@ -64,6 +70,13 @@ async function main() {
     }
     if (brief.caution) console.log("Caution:", brief.caution);
     if (brief.confidenceNote) console.log("Confidence:", brief.confidenceNote);
+    if (metric) {
+      console.log("metric evidence:");
+      console.log(" ", JSON.stringify(metric.evidence, null, 2).split("\n").join("\n  "));
+      console.log(" confirmed:", metric.confirmedFacts.length, "facts");
+    } else {
+      console.log("metric evidence: (none — non-metric topic)");
+    }
   }
 }
 
