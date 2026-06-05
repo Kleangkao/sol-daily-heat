@@ -6,11 +6,7 @@ import { canLinkTokenDetail, tokenDetailPath } from "@/lib/heat/token-link";
 import HeatScoreBadge from "@/components/heat/HeatScoreBadge";
 import ScoreBreakdown from "@/components/heat/ScoreBreakdown";
 import { explainScoreBreakdown } from "@/lib/heat/score-breakdown-explainer";
-import { isGenericRiskNote } from "@/lib/heat/risk-note";
-import {
-  buildReaderDisplayCopy,
-  readerCopyInputFromTopic,
-} from "@/lib/heat/reader-signal-copy";
+import { buildTopicNarrativeBrief } from "@/lib/heat/topic-narrative-brief";
 type DisplayEvidenceKind = EvidenceKind | "status_incident";
 
 function formatTime(iso: string): string {
@@ -55,7 +51,7 @@ type Props = {
 };
 
 export default function TopicDetailContent({ topic }: Props) {
-  const readerCopy = buildReaderDisplayCopy(readerCopyInputFromTopic(topic));
+  const brief = buildTopicNarrativeBrief(topic);
   const scoreRows = explainScoreBreakdown(topic.scoreBreakdown, {
     uniqueSourceCount: topic.uniqueSourceCount,
   });
@@ -68,7 +64,6 @@ export default function TopicDetailContent({ topic }: Props) {
     "interpretation",
   ];
   const flatEvidenceItems = displayOrder.flatMap((kind) => evidenceGroups[kind]);
-  const showSpecificRisk = !isGenericRiskNote(topic.riskNote);
 
   return (
     <div className="min-h-screen">
@@ -127,46 +122,35 @@ export default function TopicDetailContent({ topic }: Props) {
       <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
         <section className="rounded-[10px] border border-border bg-bg-card p-5">
           <h2 className="font-heading text-[18px] font-bold uppercase tracking-wide text-text-primary">
-            Summary
+            {brief.heading}
           </h2>
-          <p className="mt-3 text-[14px] leading-relaxed text-text-primary">{readerCopy.summary}</p>
-          <p className="mt-3 text-[13px] leading-relaxed text-text-secondary">
-            <span className="font-semibold text-text-muted">Why ranked:</span>{" "}
-            {readerCopy.whyRanked}
-          </p>
-          {readerCopy.pctCaution ? (
-            <p className="mt-2 text-[12px] text-amber-200/90">{readerCopy.pctCaution}</p>
-          ) : null}
-          <div className="mt-4 rounded-[8px] border border-border/60 bg-bg-secondary/50 px-3 py-2.5">
-            <p className="text-[11px] font-semibold uppercase tracking-wide text-text-muted">
-              Why hot
-            </p>
-            <p className="mt-1 text-[13px] leading-relaxed text-text-primary">{readerCopy.whyHot}</p>
+          <div className="mt-3 space-y-3">
+            {brief.paragraphs.map((paragraph, i) => (
+              <p
+                key={`brief-p-${i}`}
+                className="text-[14px] leading-relaxed text-text-primary"
+              >
+                {paragraph}
+              </p>
+            ))}
           </div>
-          {topic.evidence?.watchNext ? (
-            <div className="mt-3 rounded-[8px] border border-accent/20 bg-accent/5 px-3 py-2.5">
-              <p className="text-[11px] font-semibold uppercase tracking-wide text-accent">
-                Why it matters / watch next
+          {brief.watchNext.length > 0 ? (
+            <div className="mt-4">
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-text-muted">
+                Watch next
               </p>
-              <p className="mt-1 text-[13px] leading-relaxed text-text-primary">
-                {topic.evidence.watchNext}
-              </p>
+              <ul className="mt-2 list-disc space-y-1.5 pl-5 text-[13px] leading-relaxed text-text-secondary">
+                {brief.watchNext.map((item, i) => (
+                  <li key={`watch-${i}`}>{item}</li>
+                ))}
+              </ul>
             </div>
           ) : null}
-          {showSpecificRisk ? (
-            <p className="mt-4 text-[12px] leading-relaxed text-amber-200/90">{topic.riskNote}</p>
+          {brief.caution ? (
+            <p className="mt-4 text-[12px] leading-relaxed text-amber-200/90">{brief.caution}</p>
           ) : null}
-          {topic.evidence?.interpretationNote ? (
-            <p className="mt-2 text-[12px] text-text-secondary">
-              <span className="font-semibold text-text-muted">Interpretation:</span>{" "}
-              {topic.evidence.interpretationNote}
-            </p>
-          ) : null}
-          {topic.headlineOnlySources ? (
-            <p className="mt-3 rounded-[8px] border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-[12px] text-amber-100/90">
-              Headline-only discovery — article body was not ingested. Open source links to
-              verify.
-            </p>
+          {brief.confidenceNote ? (
+            <p className="mt-3 text-[12px] leading-relaxed text-text-muted">{brief.confidenceNote}</p>
           ) : null}
         </section>
 
