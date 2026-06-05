@@ -6,6 +6,10 @@ import { canLinkTokenDetail, tokenDetailPath } from "@/lib/heat/token-link";
 import HeatScoreBadge from "@/components/heat/HeatScoreBadge";
 import ScoreBreakdown from "@/components/heat/ScoreBreakdown";
 import { explainScoreBreakdown } from "@/lib/heat/score-breakdown-explainer";
+import {
+  buildReaderDisplayCopy,
+  readerCopyInputFromTopic,
+} from "@/lib/heat/reader-signal-copy";
 type DisplayEvidenceKind = EvidenceKind | "status_incident";
 
 const KIND_LABELS: Record<DisplayEvidenceKind, string> = {
@@ -66,6 +70,7 @@ type Props = {
 };
 
 export default function TopicDetailContent({ topic }: Props) {
+  const readerCopy = buildReaderDisplayCopy(readerCopyInputFromTopic(topic));
   const scoreRows = explainScoreBreakdown(topic.scoreBreakdown, {
     uniqueSourceCount: topic.uniqueSourceCount,
   });
@@ -137,12 +142,19 @@ export default function TopicDetailContent({ topic }: Props) {
           <h2 className="font-heading text-[18px] font-bold uppercase tracking-wide text-text-primary">
             Summary
           </h2>
-          <p className="mt-3 text-[14px] leading-relaxed text-text-primary">{topic.summary}</p>
+          <p className="mt-3 text-[14px] leading-relaxed text-text-primary">{readerCopy.summary}</p>
+          <p className="mt-3 text-[13px] leading-relaxed text-text-secondary">
+            <span className="font-semibold text-text-muted">Why ranked:</span>{" "}
+            {readerCopy.whyRanked}
+          </p>
+          {readerCopy.pctCaution ? (
+            <p className="mt-2 text-[12px] text-amber-200/90">{readerCopy.pctCaution}</p>
+          ) : null}
           <div className="mt-4 rounded-[8px] border border-border/60 bg-bg-secondary/50 px-3 py-2.5">
             <p className="text-[11px] font-semibold uppercase tracking-wide text-text-muted">
               Why hot
             </p>
-            <p className="mt-1 text-[13px] leading-relaxed text-text-primary">{topic.whyHot}</p>
+            <p className="mt-1 text-[13px] leading-relaxed text-text-primary">{readerCopy.whyHot}</p>
           </div>
           {topic.evidence?.watchNext ? (
             <div className="mt-3 rounded-[8px] border border-accent/20 bg-accent/5 px-3 py-2.5">

@@ -1,3 +1,4 @@
+import { buildReaderDisplayCopy } from "@/lib/heat/reader-signal-copy";
 import type { HeatCardView } from "@/lib/types/heat";
 import {
   GITHUB_RELEASE_SOURCE_SLUGS,
@@ -240,66 +241,13 @@ export function parseFeeDisplay(
 
   return {
     headline: `${m[1]}: fees ${direction} (24h)`,
-    feeCaution: `Fees spike: ${pctLabel} shown · % capped for scoring (see evidence for raw value)`,
+    feeCaution: "Large % move; baseline may be low. Check evidence for raw value.",
     rawPct: Number.isFinite(rawPct) ? rawPct : undefined,
   };
 }
 
 export function buildWhyRanked(input: CardDisplayInput): string {
-  const b = input.scoreBreakdown ?? {};
-  const slugs = input.sourceSlugs ?? [];
-  const itemTypes = input.itemTypes ?? [];
-  const signals = input.rankingSignals ?? [];
-  const parts: string[] = [];
-
-  const boost = isBoostOnly(input.title, signals, itemTypes, slugs);
-  const metricOnly = isMetricOnly(itemTypes, slugs);
-  const sitemapOnly = slugs.some((s) => SITEMAP_DISCOVERY_SLUGS.has(s));
-  const official = breakdownNum(b, "official_source_bonus") > 0;
-  const editorialConf = breakdownNum(b, "editorial_confirmation") > 0;
-  const cross = breakdownNum(b, "cross_type_corroboration") > 0;
-  const feePass = breakdownNum(b, "fee_threshold_passed") > 0;
-  const smallBase = breakdownNum(b, "fee_small_base_discount") < 0;
-  const boostPenalty = breakdownNum(b, "boost_top_heat_penalty") < 0;
-
-  if (sitemapOnly) {
-    parts.push("Headline-only · SolanaFloor sitemap discovery");
-  } else if (editorialConf && official) {
-    parts.push("Official + independent coverage");
-  } else if (editorialConf) {
-    parts.push("Multi-source editorial coverage");
-  } else if (official) {
-    parts.push("Official project source");
-  } else if (slugs.some((s) => GITHUB_RELEASE_SOURCE_SLUGS.has(s))) {
-    parts.push("GitHub infra release");
-  } else if (slugs.some((s) => EDITORIAL_SLUGS.has(s))) {
-    parts.push("Solana news / editorial");
-  }
-
-  if (cross) parts.push("news + metric corroboration");
-
-  if (/fees?\s+(up|down)/i.test(input.title)) {
-    if (feePass) parts.push("protocol fees · passes fee threshold");
-    else parts.push("protocol fees signal");
-    if (smallBase) parts.push("small-base % discounted");
-  } else if (/tvl/i.test(input.title)) {
-    parts.push("TVL mover · metric signal");
-  } else if (boost) {
-    parts.push("market signal only");
-    if (boostPenalty) parts.push("promoted boost discounted");
-  } else if (metricOnly) {
-    parts.push("metric-only signal");
-  } else if (itemTypes.includes("market")) {
-    parts.push("market / token activity");
-  } else if (itemTypes.includes("protocol")) {
-    parts.push("protocol metric");
-  }
-
-  if (parts.length === 0) {
-    parts.push("rule-based heat from clustered signals");
-  }
-
-  return parts.join(" · ");
+  return buildReaderDisplayCopy(input).whyRanked;
 }
 
 export function sectionItemsMetricHeavy(items: CardDisplayInput[]): boolean {

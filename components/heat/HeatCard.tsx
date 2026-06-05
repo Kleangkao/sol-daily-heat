@@ -9,9 +9,12 @@ import SignalTypeBadge from "@/components/ui/SignalTypeBadge";
 import { CATEGORY_LABELS } from "@/lib/types/heat";
 import {
   buildCardBadges,
-  buildWhyRanked,
   parseFeeDisplay,
 } from "@/lib/heat/card-display";
+import {
+  buildReaderDisplayCopy,
+  readerCopyInputFromCard,
+} from "@/lib/heat/reader-signal-copy";
 import SignalQualityBadges from "./SignalQualityBadges";
 import HeatScoreBadge from "./HeatScoreBadge";
 import EvidencePanel from "./EvidencePanel";
@@ -56,7 +59,8 @@ export default function HeatCard({
   const detailHref = showDetailLink ? topicDetailPath(item.id) : null;
 
   const display = useMemo(() => {
-    const input = {
+    const readerInput = readerCopyInputFromCard(item);
+    const badgeInput = {
       title: item.title,
       scoreBreakdown: item.scoreBreakdown,
       evidence: item.evidence,
@@ -66,11 +70,14 @@ export default function HeatCard({
       rankingSignals: item.rankingSignals,
     };
     const fee = parseFeeDisplay(item.title, item.scoreBreakdown);
+    const reader = buildReaderDisplayCopy(readerInput);
     return {
-      badges: buildCardBadges(input),
-      whyRanked: buildWhyRanked(input),
+      badges: buildCardBadges(badgeInput),
+      whyRanked: reader.whyRanked,
+      summary: reader.summary,
+      whyHot: reader.whyHot,
       headline: fee.headline,
-      feeCaution: fee.feeCaution,
+      feeCaution: reader.pctCaution ?? fee.feeCaution,
     };
   }, [item]);
 
@@ -144,14 +151,14 @@ export default function HeatCard({
           overflow: "hidden",
         }}
       >
-        {item.summary}
+        {display.summary}
       </p>
 
       <div className="mt-3 rounded-[8px] border border-border/60 bg-bg-secondary/50 px-3 py-2">
         <p className="text-[11px] font-semibold uppercase tracking-wide text-text-muted">
           Why hot
         </p>
-        <p className="mt-1 text-[12px] leading-[1.4] text-text-primary">{item.whyHot}</p>
+        <p className="mt-1 text-[12px] leading-[1.4] text-text-primary">{display.whyHot}</p>
       </div>
 
       {(item.relatedTokens.length > 0 || item.relatedProjects.length > 0) && (
