@@ -11,9 +11,11 @@ import {
   resolveDateParam,
 } from "@/lib/heat/dashboard-url-state";
 import {
+  deriveActiveExploreChip,
   resolveExploreChipAction,
   type ExploreChipId,
 } from "@/lib/heat/explore-navigation";
+import { parseSectionHash } from "@/lib/heat/section-collapse";
 import { buildTopicSectionLabels } from "@/lib/heat/topic-section-appearances";
 import { utcAvailableDates, utcTodayIso } from "@/lib/heat/snapshot-date";
 import type { HeatDashboardData, DashboardSectionKey } from "@/lib/types/heat";
@@ -45,8 +47,25 @@ export default function HeatDashboard() {
   const [categoryFilter, setCategoryFilter] = useState<TopicCategory | null>(
     initialCategoryFilter
   );
+  const [activeExploreChip, setActiveExploreChip] = useState<ExploreChipId>(() =>
+    deriveActiveExploreChip(initialCategoryFilter, null)
+  );
   const { open: sectionOpen, toggleSection, navigateToSection, navigateToSections } =
     useSectionOpenState();
+
+  useEffect(() => {
+    const hash = parseSectionHash(window.location.hash);
+    setActiveExploreChip(deriveActiveExploreChip(categoryFilter, hash));
+  }, [categoryFilter]);
+
+  useEffect(() => {
+    const onHashChange = () => {
+      const hash = parseSectionHash(window.location.hash);
+      setActiveExploreChip(deriveActiveExploreChip(categoryFilter, hash));
+    };
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
+  }, [categoryFilter]);
 
   const heroDate = date ?? utcTodayIso();
   const heroDates = useMemo(() => utcAvailableDates(), []);
@@ -90,6 +109,7 @@ export default function HeatDashboard() {
 
   const onExploreChip = useCallback(
     (chipId: ExploreChipId) => {
+      setActiveExploreChip(chipId);
       const action = resolveExploreChipAction(chipId);
 
       switch (action.type) {
@@ -196,9 +216,7 @@ export default function HeatDashboard() {
 
           <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_252px] lg:items-start lg:gap-8">
             <div className="min-w-0">
-              <div className="mb-2">
-                <ExploreBar categoryFilter={categoryFilter} onChipClick={onExploreChip} />
-              </div>
+              <ExploreBar activeChip={activeExploreChip} onChipClick={onExploreChip} />
 
               <HeatSection
                 title="Top Heat"

@@ -77,7 +77,7 @@ export default function HeatSection({
   );
 
   return (
-    <section id={sectionId} className="mt-10 scroll-mt-24">
+    <section id={sectionId} className="mt-10 scroll-mt-[4.5rem]">
       <div className="mb-4 rounded-[10px] border border-border bg-bg-card/40">
         {collapsible ? (
           <button

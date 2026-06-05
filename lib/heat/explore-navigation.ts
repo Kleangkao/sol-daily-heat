@@ -103,13 +103,27 @@ export function resolveExploreChipAction(id: ExploreChipId): ExploreChipAction {
   }
 }
 
-export function isExploreChipActive(
-  id: ExploreChipId,
-  categoryFilter: TopicCategory | null
-): boolean {
-  if (id === "top-heat") return categoryFilter === null;
-  if ((TOP_HEAT_CATEGORY_LENSES as readonly string[]).includes(id)) {
-    return categoryFilter === id;
+const SECTION_ONLY_EXPLORE_CHIPS: ExploreChipId[] = [
+  "new-tokens",
+  "builder",
+  "creator",
+  "investor",
+];
+
+/** Derive highlighted chip from URL category + section hash. */
+export function deriveActiveExploreChip(
+  categoryFilter: TopicCategory | null,
+  sectionHash: DashboardSectionDomId | null
+): ExploreChipId {
+  if (
+    sectionHash &&
+    (SECTION_ONLY_EXPLORE_CHIPS as readonly string[]).includes(sectionHash)
+  ) {
+    return sectionHash;
   }
-  return false;
+  if (categoryFilter) {
+    return categoryFilter as ExploreChipId;
+  }
+  if (sectionHash === "defi") return "defi";
+  return "top-heat";
 }
