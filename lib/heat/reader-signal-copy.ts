@@ -70,6 +70,14 @@ export type ParsedFeeMetric = {
   pct: number;
 };
 
+export type ParsedTvlMetric = {
+  protocol: string;
+  direction: "up" | "down";
+  pct: number;
+};
+
+export type HomepageMetricKind = "fee" | "tvl" | "volume" | "generic";
+
 function breakdownNum(
   b: ScoreBreakdown | Record<string, number> | undefined,
   key: string
@@ -257,6 +265,109 @@ export function parseFeeFromTitle(title: string): ParsedFeeMetric | null {
   return parseFeeMetric(title);
 }
 
+/** Parse TVL metric fields from title or summary. */
+export function parseTvlMetric(title: string, summary?: string): ParsedTvlMetric | null {
+  const titlePatterns: Array<{
+    re: RegExp;
+    protocol: number;
+    dir?: number;
+    sign?: number;
+    pct: number;
+  }> = [
+    {
+      re: /^(.+?):\s*TVL\s+(up|down)\s+([\d,.]+)%\s*\(24h\)/i,
+      protocol: 1,
+      dir: 2,
+      pct: 3,
+    },
+    {
+      re: /^(.+?)\s+TVL\s+(up|down)\s+([\d,.]+)%\s*\(24h\)/i,
+      protocol: 1,
+      dir: 2,
+      pct: 3,
+    },
+    {
+      re: /^(.+?)\s+TVL\s+([+-])([\d,.]+)%\s*\(24h\)/i,
+      protocol: 1,
+      sign: 2,
+      pct: 3,
+    },
+  ];
+
+  for (const pattern of titlePatterns) {
+    const m = title.match(pattern.re);
+    if (!m) continue;
+    const pct = parsePct(m[pattern.pct]);
+    if (pct == null) continue;
+    return {
+      protocol: m[pattern.protocol].trim(),
+      direction: directionFromParts(
+        pattern.dir != null ? m[pattern.dir] : undefined,
+        pattern.sign != null ? m[pattern.sign] : undefined
+      ),
+      pct,
+    };
+  }
+
+  for (const text of [summary, title].filter(Boolean)) {
+    const m = text!.match(/TVL\s+(up|down)\s+([\d,.]+)%/i);
+    if (!m) continue;
+    const pct = parsePct(m[2]);
+    if (pct == null) continue;
+    return {
+      protocol: title.split(":")[0]?.trim() || "Protocol",
+      direction: m[1].toLowerCase() === "down" ? "down" : "up",
+      pct,
+    };
+  }
+
+  return null;
+}
+
+export function isMetricTvlSignal(input: ReaderCopyInput): boolean {
+  const signals = input.rankingSignals ?? [];
+  const title = input.title;
+  const summary = input.summary ?? "";
+
+  if (signals.some((s) => s === "tvl_move" || s === "chain_tvl")) {
+    return true;
+  }
+  if (parseTvlMetric(title, summary)) {
+    return true;
+  }
+  if (/:\s*TVL\b/i.test(title) || /\bTVL\s+(up|down|[+-])/i.test(title)) {
+    return true;
+  }
+  return /\bTVL\s+(up|down)/i.test(summary);
+}
+
+export function detectHomepageMetricKind(input: ReaderCopyInput): HomepageMetricKind | null {
+  const title = input.title;
+  const summary = input.summary ?? "";
+  const combined = `${title} ${summary}`;
+
+  if (isMetricTvlSignal(input)) {
+    return "tvl";
+  }
+
+  if (
+    /\bvolume\b/i.test(combined) &&
+    (/\bvolume\s+(up|down)/i.test(combined) || /\bvolume\s+[+-]/i.test(title))
+  ) {
+    return "volume";
+  }
+
+  if (isMetricFeeSignal(input) || parseFeeMetric(title, summary)) {
+    return "fee";
+  }
+
+  if (isMetricOnly(input.itemTypes ?? [], input.sourceSlugs ?? [])) {
+    return "generic";
+  }
+
+  return null;
+}
+
 export function isMetricFeeSignal(input: ReaderCopyInput): boolean {
   const slugs = input.sourceSlugs ?? [];
   const itemTypes = input.itemTypes ?? [];
@@ -264,6 +375,10 @@ export function isMetricFeeSignal(input: ReaderCopyInput): boolean {
   const title = input.title;
   const summary = input.summary ?? "";
   const combined = `${title} ${summary}`;
+
+  if (isMetricTvlSignal(input)) {
+    return false;
+  }
 
   if (slugs.some((s) => s === "defillama-fees-solana" || s.includes("defillama-fees"))) {
     return true;
@@ -477,15 +592,15 @@ export function classifyReaderSignal(input: ReaderCopyInput): ReaderSignalKind {
     return "single_editorial";
   }
 
+  if (isMetricTvlSignal(input)) {
+    return "metric_tvl";
+  }
   if (isMetricFeeSignal(input)) {
     return "metric_fee";
   }
-  if (/tvl/i.test(title) || signals.some((s) => s === "tvl_move" || s === "chain_tvl")) {
-    return "metric_tvl";
-  }
 
   if (isMetricOnly(itemTypes, slugs)) {
-    return /tvl/i.test(title) ? "metric_tvl" : "metric_fee";
+    return detectHomepageMetricKind(input) === "tvl" ? "metric_tvl" : "metric_fee";
   }
 
   return "generic";

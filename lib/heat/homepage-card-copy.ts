@@ -1,6 +1,9 @@
 import {
   classifyReaderSignal,
+  detectHomepageMetricKind,
   parseFeeMetric,
+  parseTvlMetric,
+  type HomepageMetricKind,
   type ReaderCopyInput,
   type ReaderSignalKind,
 } from "@/lib/heat/reader-signal-copy";
@@ -46,18 +49,47 @@ function largePctCaution(input: ReaderCopyInput): string | undefined {
   return undefined;
 }
 
+function metricPctAbs(input: ReaderCopyInput, metricKind: HomepageMetricKind): number | null {
+  if (metricKind === "tvl") {
+    return parseTvlMetric(input.title, input.summary)?.pct ?? null;
+  }
+  if (metricKind === "fee") {
+    return parseFeeMetric(input.title, input.summary)?.pct ?? null;
+  }
+  return null;
+}
+
+function metricSignalLabel(input: ReaderCopyInput, kind: ReaderSignalKind): string {
+  const metricKind =
+    detectHomepageMetricKind(input) ??
+    (kind === "metric_tvl" ? "tvl" : kind === "metric_fee" ? "fee" : "generic");
+  const pct = metricPctAbs(input, metricKind);
+
+  switch (metricKind) {
+    case "tvl":
+      if (pct != null && pct > 200) {
+        return "Large TVL move · liquidity signal";
+      }
+      return "TVL movement · liquidity signal";
+    case "volume":
+      return "Volume movement · activity signal";
+    case "fee":
+      if (pct != null && pct > 200) {
+        return "Large fee spike · single-source metric signal";
+      }
+      return "Fee movement · single-source metric signal";
+    default:
+      return "Protocol metric signal · single-source";
+  }
+}
+
 function signalLabelForKind(kind: ReaderSignalKind, input: ReaderCopyInput): string {
-  const fee = parseFeeMetric(input.title, input.summary);
   const multiSource = (input.sourceCount ?? 0) > 1;
 
   switch (kind) {
     case "metric_fee":
-      if (fee && fee.pct > 200) {
-        return "Large fee spike · single-source metric signal";
-      }
-      return "Fee spike · single-source metric signal";
     case "metric_tvl":
-      return "TVL move · single-source metric signal";
+      return metricSignalLabel(input, kind);
     case "single_editorial":
       return "Early ecosystem narrative";
     case "multi_editorial":
@@ -78,12 +110,20 @@ function signalLabelForKind(kind: ReaderSignalKind, input: ReaderCopyInput): str
 
 function briefForKind(kind: ReaderSignalKind, input: ReaderCopyInput): string {
   const fee = parseFeeMetric(input.title, input.summary);
+  const tvl = parseTvlMetric(input.title, input.summary);
   const amount = extractFeeAmount(input.summary, input.title);
   const name = input.title.split(":")[0]?.trim() || "This protocol";
   const stored = input.summary?.trim();
+  const metricKind = detectHomepageMetricKind(input);
 
   switch (kind) {
     case "metric_fee": {
+      if (metricKind === "tvl" || tvl) {
+        return `${name} registered a notable TVL move in the last 24h. Check evidence for underlying protocol values before treating it as a durable trend.`;
+      }
+      if (metricKind === "volume") {
+        return `${name} registered a notable volume move in the last 24h. Verify raw evidence before treating it as sustained activity.`;
+      }
       if (fee?.protocol && amount) {
         const dir = fee.direction === "up" ? "rose" : "fell";
         const baseline =
@@ -94,8 +134,16 @@ function briefForKind(kind: ReaderSignalKind, input: ReaderCopyInput): string {
       }
       return `${name} registered a sharp 24h fee move. Verify raw evidence before treating it as sustained momentum.`;
     }
-    case "metric_tvl":
+    case "metric_tvl": {
+      if (tvl && input.summary?.includes("TVL ~")) {
+        const tvlAmt = input.summary.match(/TVL\s*~?\s*\$?([\d,.]+[KMB]?)/i)?.[1];
+        if (tvlAmt) {
+          const verb = tvl.direction === "up" ? "rose to" : "fell to";
+          return `${name} 24h TVL ${verb} about $${tvlAmt}. Check evidence for underlying protocol values before treating it as a durable trend.`;
+        }
+      }
       return `${name} registered a notable TVL move in the last 24h. Check evidence for underlying protocol values before treating it as a durable trend.`;
+    }
     case "single_editorial":
       if (stored && stored.length > 40 && !/adapter signal|fees move/i.test(stored)) {
         return `${stored.slice(0, 200)} Watch for follow-up coverage or on-chain evidence.`;

@@ -43,6 +43,17 @@ printHomepageExample("Single-source editorial topic", {
   sourceCount: 1,
 });
 
+printHomepageExample("TVL metric topic", {
+  title: "Meteora DAMM V2: TVL down 25.0% (24h)",
+  summary:
+    "Meteora DAMM V2 TVL ~$420M (DeFi) · 24h down 25.0%",
+  scoreBreakdown: { volume_signal: 12 },
+  sourceSlugs: ["defillama-solana"],
+  itemTypes: ["protocol"],
+  rankingSignals: ["tvl_move"],
+  sourceCount: 1,
+});
+
 printHomepageExample("Promoted boost", {
   title: "DexScreener boost: 4b1i…pump",
   summary: "4b1i…pump · on DexScreener paid boost leaderboard",

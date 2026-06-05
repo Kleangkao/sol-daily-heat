@@ -59,9 +59,24 @@ function auditFields(copy: HomepageCardCopy): string[] {
   return reasons;
 }
 
+function auditCardTitle(card: HeatCardView, copy: HomepageCardCopy): string[] {
+  const reasons: string[] = [];
+  const title = card.title;
+  const label = copy.signalLabel.toLowerCase();
+
+  if (/\bTVL\b/i.test(title) && /\bfee\b/i.test(label)) {
+    reasons.push("signalLabel: fee-oriented label on TVL topic");
+  }
+  if (/\bTVL\b/i.test(title) && /fee move/i.test(copy.brief)) {
+    reasons.push("brief: fee-oriented copy on TVL topic");
+  }
+
+  return reasons;
+}
+
 function auditCard(section: string, card: HeatCardView, index: number): FlaggedCard | null {
   const copy = buildHomepageCardCopy(readerCopyInputFromCard(card));
-  const reasons = auditFields(copy);
+  const reasons = [...auditFields(copy), ...auditCardTitle(card, copy)];
   if (reasons.length === 0) return null;
 
   return {
