@@ -114,6 +114,22 @@
     "max_items_per_run": 10
   },
   {
+    "slug": "utoday-rss",
+    "name": "U.Today — RSS",
+    "feed_url": "https://u.today/rss",
+    "reliability": 0.67,
+    "requires_solana_filter": true,
+    "max_items_per_run": 8
+  },
+  {
+    "slug": "thedefiant-rss",
+    "name": "The Defiant — RSS",
+    "feed_url": "https://thedefiant.io/feed",
+    "reliability": 0.76,
+    "requires_solana_filter": true,
+    "max_items_per_run": 8
+  },
+  {
     "slug": "agave-releases",
     "name": "Agave — GitHub Releases",
     "feed_url": "https://github.com/anza-xyz/agave/releases.atom",
@@ -142,6 +158,35 @@
     "name": "marginfi — GitHub Releases",
     "feed_url": "https://github.com/mrgnlabs/marginfi-v2/releases.atom",
     "reliability": 0.84,
+    "feed_format": "atom",
+    "max_items_per_run": 5
+  },
+  {
+    "slug": "meteoraag-medium",
+    "name": "Meteora — Medium",
+    "feed_url": "https://meteoraag.medium.com/feed",
+    "reliability": 0.86,
+    "max_items_per_run": 10
+  },
+  {
+    "slug": "kamino-blog",
+    "name": "Kamino Blog",
+    "feed_url": "https://blog.kamino.com/feed",
+    "reliability": 0.87,
+    "max_items_per_run": 10
+  },
+  {
+    "slug": "tensor-blog",
+    "name": "Tensor — Substack",
+    "feed_url": "https://blog.tensor.trade/feed",
+    "reliability": 0.82,
+    "max_items_per_run": 8
+  },
+  {
+    "slug": "kamino-releases",
+    "name": "Kamino — GitHub Releases",
+    "feed_url": "https://github.com/Kamino-Finance/klend/releases.atom",
+    "reliability": 0.86,
     "feed_format": "atom",
     "max_items_per_run": 5
   }

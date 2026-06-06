@@ -5,8 +5,8 @@ import { useMemo } from "react";
 import type { HeatCardPersonaHighlight, HeatCardView } from "@/lib/types/heat";
 import { isLiveTopicId, topicDetailPath } from "@/lib/heat/topic-link";
 import { canLinkTokenDetail, tokenDetailPath } from "@/lib/heat/token-link";
-import SignalTypeBadge from "@/components/ui/SignalTypeBadge";
 import { CATEGORY_LABELS } from "@/lib/types/heat";
+import { resolveTopicDisplayCategory } from "@/lib/heat/topic-display-category";
 import { buildCardBadges, parseFeeDisplay } from "@/lib/heat/card-display";
 import { buildHomepageCardCopy } from "@/lib/heat/homepage-card-copy";
 import { buildTokenCardHeadline } from "@/lib/heat/token-display";
@@ -15,8 +15,7 @@ import { buildCardPersonaDisplay } from "@/lib/heat/persona-display-copy";
 import { isGenericRiskNote } from "@/lib/heat/risk-note";
 import SignalQualityBadges from "./SignalQualityBadges";
 import HeatScoreBadge from "./HeatScoreBadge";
-import { formatStoryTimestampLine } from "@/lib/heat/story-timestamp";
-
+import { formatStoryDateShort } from "@/lib/heat/story-timestamp";
 type Props = {
   item: HeatCardView;
   variant?: "default" | "compact";
@@ -78,12 +77,20 @@ export default function HeatCard({
     display.caution ??
     (!isGenericRiskNote(item.riskNote) ? item.riskNote : undefined);
 
+  const displayCategory = resolveTopicDisplayCategory({
+    category: item.category,
+    sourceSlugs: item.sourceSlugs ?? [],
+    title: item.title,
+    summary: item.summary,
+    itemTypes: item.itemTypes,
+  });
+
   return (
-    <article className="group flex flex-col overflow-hidden rounded-[12px] border border-border/80 bg-bg-card/82 p-4 backdrop-blur-[3px] transition-all duration-200 hover:-translate-y-0.5 hover:border-accent/60 hover:shadow-lg hover:shadow-black/20">
+    <article className="group flex flex-col overflow-hidden rounded-[12px] border border-border/80 bg-bg-card/50 p-4 backdrop-blur-[4px] transition-all duration-200 hover:-translate-y-0.5 hover:border-accent/60 hover:bg-bg-card/60 hover:shadow-lg hover:shadow-black/20">
       <div className="flex items-start justify-between gap-3">
         <div className="flex flex-wrap gap-2">
           <span className="inline-flex rounded-full bg-bg-secondary px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-accent">
-            {CATEGORY_LABELS[item.category]}
+            {CATEGORY_LABELS[displayCategory]}
           </span>
           {item.isUpdatedStory ? (
             <span className="inline-flex rounded-full border border-heat/40 bg-heat/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-heat">
@@ -156,7 +163,7 @@ export default function HeatCard({
         <PersonaHighlightBlock label="Investor watch" text={display.investorPersona} />
       ) : null}
 
-      {(item.relatedTokens.length > 0 || item.relatedProjects.length > 0) && (
+      {item.relatedTokens.length > 0 ? (
         <div className="mt-3 flex flex-wrap gap-2">
           {item.relatedTokens.map((t) => {
             const tokenHref = canLinkTokenDetail(t.mintAddress, detailEnabled)
@@ -179,16 +186,8 @@ export default function HeatCard({
               </span>
             );
           })}
-          {item.relatedProjects.map((p) => (
-            <span
-              key={p.name}
-              className="inline-flex items-center rounded-full bg-bg-secondary px-2 py-0.5 text-[11px] font-semibold text-accent"
-            >
-              {p.name}
-            </span>
-          ))}
         </div>
-      )}
+      ) : null}
 
       <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-text-secondary">
         {item.rankPosition != null ? (
@@ -197,14 +196,11 @@ export default function HeatCard({
             <span>·</span>
           </>
         ) : null}
+        <span>{formatStoryDateShort(item.storyTimeKind, item.storyAt)}</span>
+        <span>·</span>
         <span>
           {item.sourceCount} source{item.sourceCount !== 1 ? "s" : ""}
         </span>
-        <span>·</span>
-        <span>
-          {formatStoryTimestampLine(item.storyTimeKind, item.storyAt)}
-        </span>
-        <SignalTypeBadge type={item.interpretationType} />
       </div>
 
       {detailHref ? (

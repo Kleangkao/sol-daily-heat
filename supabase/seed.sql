@@ -289,5 +289,89 @@ VALUES
     false,
     'active',
     '{"purpose": "Jito validator / MEV client releases", "feed_format": "atom", "max_items_per_run": 5, "coverage": "infra_builder", "builder_source": true}'::jsonb
+  ),
+  (
+    'marginfi-releases',
+    'marginfi — GitHub Releases',
+    'rss',
+    'https://github.com/mrgnlabs/marginfi-v2',
+    'https://github.com/mrgnlabs/marginfi-v2/releases.atom',
+    0.84,
+    true,
+    false,
+    'active',
+    '{"purpose": "marginfi protocol CLI / SDK releases", "feed_format": "atom", "max_items_per_run": 5, "coverage": "defi_builder", "builder_source": true, "wave": "4d1"}'::jsonb
+  ),
+  (
+    'utoday-rss',
+    'U.Today — RSS',
+    'rss',
+    'https://u.today',
+    'https://u.today/rss',
+    0.67,
+    true,
+    false,
+    'active',
+    '{"purpose": "Broad crypto editorial (Solana-filtered at ingest) — Wave 5", "requires_solana_filter": true, "max_items_per_run": 8, "coverage": "ecosystem_editorial", "broad_rss_trial": true, "official_source": false}'::jsonb
+  ),
+  (
+    'thedefiant-rss',
+    'The Defiant — RSS',
+    'rss',
+    'https://thedefiant.io',
+    'https://thedefiant.io/feed',
+    0.76,
+    true,
+    false,
+    'active',
+    '{"purpose": "DeFi editorial (Solana-filtered at ingest) — Wave 5", "requires_solana_filter": true, "max_items_per_run": 8, "coverage": "ecosystem_editorial", "broad_rss_trial": true, "official_source": false}'::jsonb
+  ),
+  (
+    'meteoraag-medium',
+    'Meteora — Medium',
+    'rss',
+    'https://meteoraag.medium.com',
+    'https://meteoraag.medium.com/feed',
+    0.86,
+    true,
+    false,
+    'active',
+    '{"purpose": "Meteora official DeFi publication", "max_items_per_run": 10, "coverage": "defi_official", "official_source": true, "wave": "4d"}'::jsonb
+  ),
+  (
+    'kamino-blog',
+    'Kamino Blog',
+    'rss',
+    'https://blog.kamino.com',
+    'https://blog.kamino.com/feed',
+    0.87,
+    true,
+    false,
+    'active',
+    '{"purpose": "Kamino official blog (Substack)", "max_items_per_run": 10, "coverage": "defi_official", "official_source": true, "wave": "4d"}'::jsonb
+  ),
+  (
+    'tensor-blog',
+    'Tensor — Substack',
+    'rss',
+    'https://blog.tensor.trade',
+    'https://blog.tensor.trade/feed',
+    0.82,
+    true,
+    false,
+    'active',
+    '{"purpose": "Tensor official NFT blog", "max_items_per_run": 8, "coverage": "nft_official", "official_source": true, "wave": "4d"}'::jsonb
+  ),
+  (
+    'kamino-releases',
+    'Kamino — GitHub Releases',
+    'rss',
+    'https://github.com/Kamino-Finance/klend',
+    'https://github.com/Kamino-Finance/klend/releases.atom',
+    0.86,
+    true,
+    false,
+    'active',
+    '{"purpose": "Kamino klend protocol releases", "feed_format": "atom", "max_items_per_run": 5, "coverage": "defi_builder", "builder_source": true, "wave": "4d"}'::jsonb
   )
 ON CONFLICT (slug) DO NOTHING;

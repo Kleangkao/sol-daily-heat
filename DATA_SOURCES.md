@@ -15,14 +15,21 @@ Solana Daily Heat Scanner uses **free-first** adapters. Missing API keys never b
 | Sanctum — Medium | `sanctum-medium` | RSS | Free | No | **Enabled** | DeFi / LST / restaking (5/run; low volume) | — |
 | Drift — Medium | `drift-medium` | RSS | Free | No | **Enabled** | DeFi / perps official (10/run, 30d ingest) | — |
 | Metaplex — Medium | `metaplex-medium` | RSS | Free | No | **Enabled** | NFT / protocol official (10/run, 30d ingest) | — |
+| Meteora — Medium | `meteoraag-medium` | RSS | Free | No | **Enabled** | DeFi / DLMM official (10/run, 30d ingest, Wave 4D) | — |
+| Kamino Blog | `kamino-blog` | RSS | Free | No | **Enabled** | DeFi / lending official Substack (10/run, 30d ingest, Wave 4D) | — |
+| Tensor — Substack | `tensor-blog` | RSS | Free | No | **Enabled** | NFT marketplace official (8/run, 30d ingest, Wave 4D) | — |
 | Magic Eden — Status | `magiceden-status` | RSS | Free | No | **Enabled** | NFT marketplace incidents (10/run, status rules) | — |
 | DL News — RSS | `dlnews-rss` | RSS | Free | No | **Enabled** | DeFi / ecosystem news, **Solana-filtered at ingest** (10/run) | — |
 | Decrypt — RSS | `decrypt-rss` | RSS | Free | No | **Enabled** | Ecosystem / NFT / gaming news, **Solana-filtered at ingest** (10/run) | — |
 | CoinDesk — RSS | `coindesk-rss` | RSS | Free | No | **Enabled (trial)** | Broad crypto editorial, **Solana-filtered at ingest** (8/run, Wave 3 trial) | — |
 | Cointelegraph — Solana tag | `cointelegraph-solana-rss` | RSS | Free | No | **Enabled** | Solana-tagged editorial + secondary filter (10/run, Wave 4A) | — |
+| U.Today — RSS | `utoday-rss` | RSS | Free | No | **Enabled (trial)** | Broad crypto editorial, **Solana-filtered at ingest** (8/run, Wave 5) | — |
+| The Defiant — RSS | `thedefiant-rss` | RSS | Free | No | **Enabled (trial)** | DeFi editorial, **Solana-filtered at ingest** (8/run, Wave 5) | — |
 | Agave — GitHub Releases | `agave-releases` | RSS (Atom) | Free | No | **Enabled** | Anza/Agave validator client releases (5/run, 30d ingest) | — |
 | Firedancer — GitHub Releases | `firedancer-releases` | RSS (Atom) | Free | No | **Enabled** | Firedancer/Frankendancer releases (5/run, 30d ingest) | — |
 | Jito Solana — GitHub Releases | `jito-solana-releases` | RSS (Atom) | Free | No | **Enabled** | Jito validator/MEV client releases (5/run, 30d ingest) | — |
+| marginfi — GitHub Releases | `marginfi-releases` | RSS (Atom) | Free | No | **Enabled** | marginfi protocol releases (5/run, 30d ingest, Wave 4D.1) | — |
+| Kamino — GitHub Releases | `kamino-releases` | RSS (Atom) | Free | No | **Enabled** | Kamino klend protocol releases (5/run, 30d ingest, Wave 4D) | — |
 | SolanaFloor — News (sitemap) | `solanafloor-sitemap` | Sitemap | Free | No | **Enabled** | Headline-only discovery via public `news/sitemap.xml` (15/run, 7d `lastmod`) | — |
 | The Block — Solana (legacy) | `the-block-solana` | RSS | Free | No | **Disabled** | Superseded by `the-block-news` | — |
 | DexScreener | `dexscreener-solana` | API | Free (public) | No | Enabled | New pairs, boosts, volume | Empty market section |
@@ -89,6 +96,8 @@ Public **Atom only** (`releases.atom`) — no GitHub API, no release HTML scrapi
 | `agave-releases` | `https://github.com/anza-xyz/agave/releases.atom` | 0.88 | 5 |
 | `firedancer-releases` | `https://github.com/firedancer-io/firedancer/releases.atom` | 0.86 | 5 |
 | `jito-solana-releases` | `https://github.com/jito-foundation/jito-solana/releases.atom` | 0.86 | 5 |
+| `marginfi-releases` | `https://github.com/mrgnlabs/marginfi-v2/releases.atom` | 0.84 | 5 |
+| `kamino-releases` | `https://github.com/Kamino-Finance/klend/releases.atom` | 0.86 | 5 |
 
 - **Ingest:** existing `RssAdapter` + `rss-parser` (Atom supported); `metadata_json.feed_format: "atom"`, `source_kind: "github_release"`.
 - **Freshness:** 30-day `published_at` ingest guard; 90-day ranking archive (same as other `PROJECT_RSS_STALE_GUARD` RSS).
@@ -115,6 +124,62 @@ Public **Atom only** (`releases.atom`) — no GitHub API, no release HTML scrapi
 - **Ingest guard:** `Price predictions …` listicles dropped at ingest (see `FILTERED_BROAD_RSS_SKIP_PRICE_PREDICTION_SLUGS`).
 - **Risk:** generic market templates (OI / funding) may still pass — monitor vs The Block / Decrypt overlap.
 
+### Meteora — Medium (`meteoraag-medium`) — Wave 4D
+
+- Feed: `https://meteoraag.medium.com/feed` (`@meteora` Medium handle 404).
+- **Free / no API key.** Official Meteora DeFi publication.
+- **Coverage:** DLMM, liquidity, ecosystem. Category hint: `defi`. Cap **10**/run; 30d ingest guard; official-source bonus when fresh.
+- **Enable:** `npx tsx scripts/apply-wave4d-official.ts` (all Wave 4D sources) or migrations `013` + `015`.
+- **Impact audit:** `npx tsx scripts/audit-source-impact.ts meteoraag-medium`.
+
+### Kamino Blog (`kamino-blog`) — Wave 4D
+
+- Feed: `https://blog.kamino.com/feed` (Substack; `kamino.finance/blog/rss.xml` broken).
+- **Free / no API key.** Official Kamino lending / DeFi blog.
+- **Coverage:** DeFi, lending, ecosystem. Category hint: `defi`. Cap **10**/run; 30d ingest guard; official-source bonus when fresh.
+- **Risk:** low volume (few posts/quarter) — archive may look sparse between publishes.
+- **Enable:** `npx tsx scripts/apply-wave4d-official.ts` (all Wave 4D sources) or migrations `013` + `015`.
+- **Impact audit:** `npx tsx scripts/audit-source-impact.ts kamino-blog`.
+
+### Tensor — Substack (`tensor-blog`) — Wave 4D
+
+- Feed: `https://blog.tensor.trade/feed`.
+- **Free / no API key.** Official Tensor NFT marketplace blog.
+- **Coverage:** NFT, marketplace, ecosystem. Category hint: `nft`. Cap **8**/run; 30d ingest guard; official-source bonus when fresh.
+- **Risk:** feed may go quiet for months — stale items skipped at ingest; ranking archive 90d.
+- **Enable:** `npx tsx scripts/apply-wave4d-official.ts` (all Wave 4D sources) or migrations `013` + `015`.
+- **Impact audit:** `npx tsx scripts/audit-source-impact.ts tensor-blog`.
+
+### Kamino — GitHub Releases (`kamino-releases`) — Wave 4D
+
+- Atom: `https://github.com/Kamino-Finance/klend/releases.atom`.
+- **Free / no API key.** Kamino klend protocol releases (builder / DeFi infra).
+- **Placement:** Builder / Infra Watch (`BUILDER_SOURCE_SLUGS`); cap **5**/run; 30d ingest + 90d rank guard.
+- **Enable:** `npx tsx scripts/apply-wave4d-official.ts` (all Wave 4D sources) or migrations `013` + `015`.
+- **Impact audit:** `npx tsx scripts/audit-source-impact.ts kamino-releases`.
+
+### U.Today — RSS (`utoday-rss`) — Wave 5
+
+- Feed: `https://u.today/rss` (`/feed` returns 404).
+- **Free / no API key.** Broad crypto editorial with **Solana keyword filter** at ingest.
+- **Trial caps:** **8** items/run; reliability **0.67**; 30d ingest stale guard (filtered broad RSS).
+- **Not official:** excluded from `OFFICIAL_SOURCE_SLUGS`.
+- Ingest logs: `[rss:utoday-rss] fetched=… passed_filter=… rejected=… stored=…`.
+- **Impact audit:** `npx tsx scripts/audit-source-impact.ts utoday-rss`.
+- **Enable:** `npx tsx scripts/apply-wave5-utoday-thedefiant.ts` or migration `014_wave5_utoday_thedefiant.sql`.
+- **Risk:** morning-report templates may pass filter — monitor noise vs yield.
+
+### The Defiant — RSS (`thedefiant-rss`) — Wave 5
+
+- Feed: `https://thedefiant.io/feed` (`/rss` returns 403).
+- **Free / no API key.** DeFi editorial with **Solana keyword filter** at ingest.
+- **Trial caps:** **8** items/run; reliability **0.76**; 30d ingest stale guard (filtered broad RSS).
+- **Not official:** excluded from `OFFICIAL_SOURCE_SLUGS`.
+- Ingest logs: `[rss:thedefiant-rss] fetched=… passed_filter=… rejected=… stored=…`.
+- **Impact audit:** `npx tsx scripts/audit-source-impact.ts thedefiant-rss`.
+- **Enable:** `npx tsx scripts/apply-wave5-utoday-thedefiant.ts` or migration `014_wave5_utoday_thedefiant.sql`.
+- **Risk:** generic DeFi stories may pass via `tokenization` / `rwa` keywords — watch Solana precision.
+
 ### CoinDesk — RSS (`coindesk-rss`) — Wave 3 trial
 
 - Feed: `https://www.coindesk.com/arc/outboundfeeds/rss/` (Arc outbound; same pattern as DL News).
@@ -127,11 +192,11 @@ Public **Atom only** (`releases.atom`) — no GitHub API, no release HTML scrapi
 
 ### Solana relevance filter (general news)
 
-Used for `the-block-news`, `dlnews-rss`, `decrypt-rss`, `coindesk-rss`, `cointelegraph-solana-rss`, and any source with `metadata_json.requires_solana_filter: true`.
+Used for `the-block-news`, `dlnews-rss`, `decrypt-rss`, `coindesk-rss`, `cointelegraph-solana-rss`, `utoday-rss`, `thedefiant-rss`, and any source with `metadata_json.requires_solana_filter: true`.
 
 Keywords (title + snippet): ecosystem phrases and word-boundary matches for short tickers (`sol`, `spl`, `wif`, `bonk`, `pump.fun` / `pump fun` / `$PUMP` — not bare `pump` inside unrelated words, and not `spl` inside words like “splashy”). Named projects: Jupiter, Jito, Kamino, Drift, Phantom, Metaplex, etc.
 
-`dlnews-rss`, `decrypt-rss`, and `coindesk-rss` also skip RSS items with `published_at` older than **30 days** at ingest (ingest-only stale guard).
+Filtered broad RSS slugs (`dlnews-rss`, `decrypt-rss`, `coindesk-rss`, `cointelegraph-solana-rss`, `utoday-rss`, `thedefiant-rss`) also skip RSS items with `published_at` older than **30 days** at ingest (ingest-only stale guard).
 
 Broad BTC/ETH-only stories are dropped unless they mention Solana or a listed ecosystem entity.
 
@@ -147,7 +212,7 @@ Broad BTC/ETH-only stories are dropped unless they mention Solana or a listed ec
 ## Heat score (v1 additions)
 
 - **Boost-only cap / Top Heat penalty**: paid boost clusters capped; extra `boost_top_heat_penalty` for placement.
-- **Official source bonus**: fresh official/project RSS (`solana-blog`, `helius-blog`, `raydium-medium`, `marinade-blog`, `orca-medium`, `sanctum-medium`, `drift-medium`, `metaplex-medium`, `solana-status` within age limits).
+- **Official source bonus**: fresh official/project RSS (`solana-blog`, `helius-blog`, `raydium-medium`, `marinade-blog`, `orca-medium`, `sanctum-medium`, `drift-medium`, `metaplex-medium`, `meteoraag-medium`, `kamino-blog`, `tensor-blog`, `solana-status` within age limits).
 - **Project RSS freshness**: ingest skips items older than **30 days** for official/status feeds; rankings drop RSS items older than **90 days**.
 - **Status feeds** (`solana-status`, `pyth-status`, `magiceden-status`): primary placement `investor_watchlist` when fresh (30d); top_heat only for severe/fresh status (max 1). Investor section: max **4** metric-only, prefer ≥1 status + ≥1 editorial when eligible.
 - **Editorial confirmation**: ≥2 distinct fresh RSS editorial sources in the 48h window.

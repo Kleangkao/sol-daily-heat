@@ -7,7 +7,9 @@ import {
   type ReaderCopyInput,
   type ReaderSignalKind,
 } from "@/lib/heat/reader-signal-copy";
-import { excerptForCard, stripEmDash } from "@/lib/heat/copy-format";
+import { hasOfficialSource } from "@/lib/scoring/official-sources";
+import { stripEmDash } from "@/lib/heat/copy-format";
+import { buildCardTeaser } from "@/lib/heat/topic-copy-layers";
 import { buildHomepageMixedMetricHint } from "@/lib/heat/topic-mixed-metrics";
 
 export type HomepageCardCopy = {
@@ -23,21 +25,6 @@ function breakdownNum(
 ): number {
   const v = b?.[key];
   return typeof v === "number" ? v : 0;
-}
-
-function extractFeeAmount(...texts: Array<string | undefined>): string | null {
-  for (const text of texts) {
-    if (!text) continue;
-    const patterns = [
-      /24h fees\s*~?\s*\$?([\d,.]+[KMB]?)/i,
-      /fees\s*~?\s*\$?([\d,.]+[KMB]?)/i,
-    ];
-    for (const re of patterns) {
-      const m = text.match(re);
-      if (m) return m[1].replace(/^\$/, "");
-    }
-  }
-  return null;
 }
 
 function largePctCaution(input: ReaderCopyInput): string | undefined {
@@ -93,8 +80,11 @@ function signalLabelForKind(kind: ReaderSignalKind, input: ReaderCopyInput): str
     case "metric_fee":
     case "metric_tvl":
       return metricSignalLabel(input, kind);
-    case "single_editorial":
+    case "single_editorial": {
+      const slugs = input.sourceSlugs ?? [];
+      if (hasOfficialSource(slugs)) return "Ecosystem update";
       return "Early ecosystem narrative";
+    }
     case "multi_editorial":
       return "Cross-source ecosystem narrative";
     case "headline_only":
@@ -112,73 +102,7 @@ function signalLabelForKind(kind: ReaderSignalKind, input: ReaderCopyInput): str
 }
 
 function briefForKind(kind: ReaderSignalKind, input: ReaderCopyInput): string {
-  const fee = parseFeeMetric(input.title, input.summary);
-  const tvl = parseTvlMetric(input.title, input.summary);
-  const amount = extractFeeAmount(input.summary, input.title);
-  const name = input.title.split(":")[0]?.trim() || "This protocol";
-  const stored = input.summary?.trim();
-  const metricKind = detectHomepageMetricKind(input);
-
-  switch (kind) {
-    case "metric_fee": {
-      if (metricKind === "tvl" || tvl) {
-        return `${name} registered a notable TVL move in the last 24h. Check evidence for underlying protocol values before treating it as a durable trend.`;
-      }
-      if (metricKind === "volume") {
-        return `${name} registered a notable volume move in the last 24h. Verify raw evidence before treating it as sustained activity.`;
-      }
-      if (fee?.protocol && amount) {
-        const dir = fee.direction === "up" ? "rose" : "fell";
-        const baseline =
-          fee.pct > 200
-            ? " Previous baseline appears low, so verify the raw evidence before treating this as sustained momentum."
-            : " Verify the raw evidence before treating this as sustained momentum.";
-        return `${fee.protocol} 24h fees ${dir} to about $${amount}.${baseline}`;
-      }
-      return `${name} registered a sharp 24h fee move. Verify raw evidence before treating it as sustained momentum.`;
-    }
-    case "metric_tvl": {
-      if (tvl && input.summary?.includes("TVL ~")) {
-        const tvlAmt = input.summary.match(/TVL\s*~?\s*\$?([\d,.]+[KMB]?)/i)?.[1];
-        if (tvlAmt) {
-          const verb = tvl.direction === "up" ? "rose to" : "fell to";
-          return `${name} 24h TVL ${verb} about $${tvlAmt}. Check evidence for underlying protocol values before treating it as a durable trend.`;
-        }
-      }
-      return `${name} registered a notable TVL move in the last 24h. Check evidence for underlying protocol values before treating it as a durable trend.`;
-    }
-    case "single_editorial":
-      if (stored && stored.length > 40 && !/adapter signal|fees move/i.test(stored)) {
-        return `${excerptForCard(stored)} Watch for follow-up coverage or on-chain evidence.`;
-      }
-      return "Primary-source or editorial coverage matched the scanner. Watch for follow-up coverage or on-chain evidence.";
-    case "multi_editorial":
-      if (stored && stored.length > 40 && !/adapter signal/i.test(stored)) {
-        return `${excerptForCard(stored)} Multiple sources covered the same story today.`;
-      }
-      return "Multiple sources covered the same Solana-related story, making it more likely to be worth tracking.";
-    case "headline_only":
-      return "SolanaFloor headline discovery only. Full article text was not ingested. Open the source link before relying on this summary.";
-    case "promoted_boost": {
-      const token = input.title.replace(/^DexScreener boost:\s*/i, "").trim();
-      return `This token (${token || "mint"}) appeared through paid DexScreener visibility. Promotion increases discoverability, not fundamental validation.`;
-    }
-    case "pump_style": {
-      const token = input.title.replace(/^DexScreener boost:\s*/i, "").trim();
-      return `Early visibility on a pump-style or thin-liquidity mint (${token || "mint"}). High risk. Not validation.`;
-    }
-    case "status_incident":
-      return stored && stored.length > 20
-        ? `${stored.slice(0, 220)} Confirm current status on the official page.`
-        : "Status-source activity suggests a service or infrastructure issue worth monitoring.";
-    case "github_release":
-      return "A client or infrastructure release was detected. Builders should check compatibility, release notes, and downstream impact.";
-    default:
-      if (stored && stored.length > 30 && !/^Clustered from|adapter signal/i.test(stored)) {
-        return excerptForCard(stored, 200);
-      }
-      return "Clustered Solana signals surfaced this topic in today's UTC snapshot.";
-  }
+  return buildCardTeaser(kind, input);
 }
 
 /** Compact reader-first preview copy for homepage cards (display only). */

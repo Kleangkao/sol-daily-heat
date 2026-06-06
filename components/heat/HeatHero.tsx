@@ -2,32 +2,14 @@
 
 import Link from "next/link";
 import { formatSnapshotArchiveHeading } from "@/lib/heat/snapshot-date";
-import type { DashboardDataSource } from "@/lib/types/heat";
-
 type Props = {
-  dataSource?: DashboardDataSource;
-  isLoading?: boolean;
   /** Set when viewing ?date= archive (not latest). */
   archiveDate?: string;
 };
 
-function statusLine(dataSource?: DashboardDataSource, isLoading?: boolean): string {
-  if (isLoading) return "Loading live scanner data…";
-  if (dataSource === "live") {
-    return "Live data · Rankings refresh about every 3 hours · Not investment advice";
-  }
-  if (dataSource === "mixed") {
-    return "Mixed live and demo sections · Not investment advice";
-  }
-  if (dataSource === "mock") {
-    return "Demo preview · Not investment advice";
-  }
-  return "Not investment advice";
-}
-
-export default function HeatHero({ dataSource, isLoading, archiveDate }: Props) {
+export default function HeatHero({ archiveDate }: Props) {
   return (
-    <header className="relative border-b border-border/70 bg-bg-secondary/20 px-4 py-10 backdrop-blur-[2px] sm:px-6 lg:px-8">
+    <header className="relative bg-bg-secondary/20 px-4 pt-8 pb-3 backdrop-blur-[2px] sm:px-6 sm:pt-10 sm:pb-4 lg:px-8">
       <div className="mx-auto max-w-6xl">
         <p className="editorial-pipe text-[12px] font-semibold uppercase tracking-[0.2em] text-accent">
           Solana Radar
@@ -39,18 +21,15 @@ export default function HeatHero({ dataSource, isLoading, archiveDate }: Props) 
           Find what is hot on Solana before it becomes obvious. Card timestamps show when
           each story broke at the source, not when our scanner last refreshed.
         </p>
-        <div className="mt-5 flex flex-col gap-2">
-          <p className="text-[11px] text-text-muted">{statusLine(dataSource, isLoading)}</p>
-          {archiveDate ? (
-            <p className="text-[11px] text-text-secondary">
-              Archive snapshot · {formatSnapshotArchiveHeading(archiveDate)}
-              {" · "}
-              <Link href="/" className="font-medium text-heat hover:text-heat-hover">
-                Back to latest
-              </Link>
-            </p>
-          ) : null}
-        </div>
+        {archiveDate ? (
+          <p className="mt-4 text-[11px] text-text-secondary">
+            Archive snapshot · {formatSnapshotArchiveHeading(archiveDate)}
+            {" · "}
+            <Link href="/" className="font-medium text-heat hover:text-heat-hover">
+              Back to latest
+            </Link>
+          </p>
+        ) : null}
       </div>
     </header>
   );

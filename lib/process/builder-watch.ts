@@ -19,6 +19,7 @@ export const BUILDER_SOURCE_SLUGS = new Set([
   "firedancer-releases",
   "jito-solana-releases",
   "marginfi-releases",
+  "kamino-releases",
 ]);
 
 /** Max GitHub release cards in builder_watch when enough non-release builder topics exist. */

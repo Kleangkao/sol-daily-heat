@@ -18,7 +18,11 @@ import {
 } from "@/lib/market-pulse/format";
 import { hotTapeBadges } from "@/lib/market-pulse/hot-tape-badges";
 import { pulseLabelsToBadges } from "@/lib/market-pulse/pulse-label-badges";
+import { splitHotTokens } from "@/lib/market-pulse/split-hot-tokens";
 import type { HotTapeItem, MarketPulseResponse, PulseTokenRow } from "@/lib/market-pulse/types";
+
+/** Client poll interval — reads cached pulse snapshot (cron refreshes prices ~30m). */
+const PULSE_CLIENT_REFRESH_MS = 120_000;
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
@@ -193,24 +197,13 @@ function TapeRow({
   return <div className={shell}>{inner}</div>;
 }
 
-function splitHotTokens(tokens: PulseTokenRow[]) {
-  const withChange = tokens.filter((t) => t.change24hPct != null);
-  const gainers = [...withChange]
-    .filter((t) => (t.change24hPct ?? 0) > 0)
-    .sort((a, b) => (b.change24hPct ?? 0) - (a.change24hPct ?? 0))
-    .slice(0, 3);
-  const droppers = [...withChange]
-    .filter((t) => (t.change24hPct ?? 0) < 0)
-    .sort((a, b) => (a.change24hPct ?? 0) - (b.change24hPct ?? 0))
-    .slice(0, 2);
-  const highRisk = tokens
-    .filter((t) =>
-      t.labels.some((l) =>
-        ["Promoted boost", "High risk", "Pump.fun style", "Low liquidity"].includes(l)
-      )
-    )
-    .slice(0, 3);
-  return { gainers, droppers, highRisk };
+function formatPulseAge(fetchedAt: string | null | undefined): string | null {
+  if (!fetchedAt) return null;
+  const min = Math.round((Date.now() - new Date(fetchedAt).getTime()) / 60_000);
+  if (min < 1) return "just now";
+  if (min < 60) return `${min}m ago`;
+  const h = Math.round(min / 60);
+  return `${h}h ago`;
 }
 
 export default function MarketPulse({
@@ -220,8 +213,8 @@ export default function MarketPulse({
 }: Props) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { data, isLoading } = useSWR<MarketPulseResponse>("/api/market/pulse", fetcher, {
-    revalidateOnFocus: false,
-    refreshInterval: 600_000,
+    revalidateOnFocus: true,
+    refreshInterval: PULSE_CLIENT_REFRESH_MS,
   });
 
   const pulse = data;
@@ -229,16 +222,27 @@ export default function MarketPulse({
   const hotTokens = useMemo(() => pulse?.hotTokens ?? [], [pulse?.hotTokens]);
   const linkEnabled = pulse?.dataSource === "live";
 
-  const { gainers, droppers, highRisk } = useMemo(
+  const { gainers, droppers, highRisk, usedMints } = useMemo(
     () => splitHotTokens(hotTokens),
     [hotTokens]
   );
 
+  const pulseAge = formatPulseAge(pulse?.fetchedAt);
+
+  const displayedMints = useMemo(() => {
+    const mints = new Set(usedMints);
+    if (anchor?.mint) mints.add(anchor.mint);
+    return mints;
+  }, [usedMints, anchor?.mint]);
+
   const filteredTape = useMemo(() => {
     const tape = pulse?.hotTape ?? [];
-    if (!newTokenMints?.size) return tape;
-    return tape.filter((item) => !item.mint || !newTokenMints.has(item.mint));
-  }, [pulse?.hotTape, newTokenMints]);
+    return tape.filter((item) => {
+      if (item.mint && displayedMints.has(item.mint)) return false;
+      if (item.mint && newTokenMints?.has(item.mint)) return false;
+      return true;
+    });
+  }, [pulse?.hotTape, newTokenMints, displayedMints]);
 
   const hiddenTapeCount = (pulse?.hotTape.length ?? 0) - filteredTape.length;
 
@@ -372,7 +376,9 @@ export default function MarketPulse({
             >
               Market tape
             </h2>
-            <p className="text-[10px] text-text-muted">SOL · movers · risk context</p>
+            <p className="text-[10px] text-text-muted">
+              SOL · movers · risk context{pulseAge ? ` · ${pulseAge}` : ""}
+            </p>
           </div>
           <span className="text-[11px] text-text-muted">{mobileOpen ? "−" : "+"}</span>
         </button>
@@ -396,7 +402,10 @@ export default function MarketPulse({
           <h2 id="market-pulse-rail-heading" className={headingClass}>
             Market tape
           </h2>
-          <p className="mt-0.5 text-[10px] text-text-muted">Context · not trading advice</p>
+          <p className="mt-0.5 text-[10px] text-text-muted">
+            Context · not trading advice
+            {pulseAge ? ` · snapshot ${pulseAge}` : ""}
+          </p>
         </div>
         {showStale ? (
           <span className="rounded-full border border-heat/40 bg-heat/10 px-1.5 py-0.5 text-[9px] font-semibold text-heat">

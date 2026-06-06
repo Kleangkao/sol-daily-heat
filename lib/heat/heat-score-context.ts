@@ -28,5 +28,5 @@ const BUCKET_INTEREST: Record<HeatScoreBucket, string> = {
 /** Display-only copy for topic detail header — does not affect scoring. */
 export function buildHeatScoreContext(score: number): string {
   const key = heatScoreBucket(score);
-  return `Heat ${score} (${HEAT_BUCKET_LABEL[key]}) means ${BUCKET_INTEREST[key]} scanner interest for this UTC snapshot; it is not confidence or price direction.`;
+  return `${HEAT_BUCKET_LABEL[key]} scanner interest for this UTC snapshot — not confidence or price direction.`;
 }

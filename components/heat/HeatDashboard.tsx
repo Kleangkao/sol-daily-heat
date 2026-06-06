@@ -197,12 +197,7 @@ export default function HeatDashboard() {
 
   return (
     <div className="min-h-screen">
-      <HeatHero
-        dataSource={dashboard?.dataSource}
-        isLoading={awaitingData}
-        archiveDate={archiveDate}
-      />
-      <IslandDaoSponsorsRail />
+      <HeatHero archiveDate={archiveDate} />
       {dashboard && dashboard.dataSource && dashboard.dataSource !== "live" ? (
         <DemoPreviewBanner
           dataSource={dashboard.dataSource}
@@ -224,6 +219,8 @@ export default function HeatDashboard() {
           <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_252px] lg:items-start lg:gap-8">
             <div className="min-w-0">
               <ExploreBar activeChip={activeExploreChip} onChipClick={onExploreChip} />
+
+              <IslandDaoSponsorsRail variant="embedded" />
 
               <HeatSection
                 title="| Top Heat"

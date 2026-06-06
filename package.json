@@ -14,6 +14,8 @@
     "audit:local": "npx tsx scripts/run-audit.ts",
     "audit:source-health": "npx tsx scripts/audit-source-health-detail.ts",
     "audit:source-impact": "npx tsx scripts/audit-source-impact.ts",
+    "apply:wave4d": "npx tsx scripts/apply-wave4d-official.ts",
+    "verify:wave4d": "npx tsx scripts/verify-wave4d-ready.ts",
     "audit:metric-history": "npx tsx scripts/audit-metric-history-feasibility.ts",
     "smoke:local": "npx tsx scripts/smoke-local-routes.ts",
     "pulse:local": "npx tsx scripts/run-pulse.ts"

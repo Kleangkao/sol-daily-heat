@@ -41,13 +41,24 @@ function FeaturedRow({
   );
 }
 
-export default function IslandDaoSponsorsRail() {
+type Props = {
+  /** Inline below explore chips (main column) vs full-width band under hero. */
+  variant?: "full" | "embedded";
+};
+
+export default function IslandDaoSponsorsRail({ variant = "full" }: Props) {
+  const embedded = variant === "embedded";
+
   return (
     <section
       aria-labelledby="islanddao-featured-heading"
-      className="border-b border-border/70 bg-bg-primary/55 px-4 py-6 backdrop-blur-[2px] sm:px-6 lg:px-8"
+      className={
+        embedded
+          ? "mb-2 mt-5"
+          : "bg-bg-primary/55 px-4 pb-5 pt-1 backdrop-blur-[2px] sm:px-6 lg:px-8"
+      }
     >
-      <div className="mx-auto max-w-6xl">
+      <div className={embedded ? undefined : "mx-auto max-w-6xl"}>
         <p
           id="islanddao-featured-heading"
           className="editorial-pipe text-[11px] font-semibold uppercase tracking-[0.2em] text-accent"
@@ -55,7 +66,7 @@ export default function IslandDaoSponsorsRail() {
           IslandDAO Featured
         </p>
 
-        <div className="featured-marquee-clip relative mt-4 w-full max-w-full overflow-hidden">
+        <div className="featured-marquee-clip relative mt-3 min-h-[76px] w-full max-w-full overflow-hidden py-1">
           <div
             className="featured-marquee-fade pointer-events-none absolute inset-y-0 left-0 z-10 w-10"
             aria-hidden

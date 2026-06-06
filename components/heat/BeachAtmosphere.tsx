@@ -20,6 +20,9 @@ export default function BeachAtmosphere() {
       <div className="beach-asset beach-asset--crab-peek" />
       <div className="beach-asset beach-asset--crab-float" />
       <div className="beach-asset beach-asset--coconut" />
+      <div className="beach-asset beach-asset--starfish" />
+      <div className="beach-asset beach-asset--palm-accent" />
+      <div className="beach-asset beach-asset--goose-surf" />
     </div>
   );
 }

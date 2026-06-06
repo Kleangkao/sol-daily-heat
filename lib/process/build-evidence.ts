@@ -122,7 +122,7 @@ function evidenceFromRawItem(item: RawItem & { sources?: Source }): EvidenceItem
       : snippet || title;
   if (!text) return null;
 
-  return { kind, label, text: text.slice(0, 320), url, sourceName };
+  return { kind, label, text, url, sourceName };
 }
 
 export function buildTopicEvidence(input: {

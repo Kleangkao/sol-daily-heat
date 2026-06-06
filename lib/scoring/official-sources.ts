@@ -8,6 +8,9 @@ export const OFFICIAL_SOURCE_SLUGS = new Set([
   "sanctum-medium",
   "drift-medium",
   "metaplex-medium",
+  "meteoraag-medium",
+  "kamino-blog",
+  "tensor-blog",
   "solana-status",
 ]);
 

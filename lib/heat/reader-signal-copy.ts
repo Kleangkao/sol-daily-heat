@@ -55,6 +55,7 @@ export type ReaderCopyInput = {
   sourceCount?: number;
   headlineOnly?: boolean;
   category?: string;
+  protocols?: Array<{ name: string; slug: string }>;
 };
 
 export type ReaderDisplayCopy = {
@@ -632,6 +633,10 @@ export function readerCopyInputFromCard(item: HeatCardView): ReaderCopyInput {
     rankingSignals: item.rankingSignals,
     sourceCount: item.sourceCount,
     category: item.category,
+    protocols: item.relatedProjects.map((p) => ({
+      name: p.name,
+      slug: p.slug ?? p.name.toLowerCase().replace(/\s+/g, "-"),
+    })),
   };
 }
 
@@ -647,6 +652,7 @@ export function readerCopyInputFromTopic(topic: TopicDetailView): ReaderCopyInpu
     summary: topic.summary,
     whyHot: topic.whyHot,
     scoreBreakdown: topic.scoreBreakdown,
+    protocols: topic.protocols.map((p) => ({ name: p.name, slug: p.slug })),
     evidence: topic.evidence ?? undefined,
     interpretationType: topic.interpretationType,
     sourceSlugs,

@@ -29,10 +29,16 @@ export const RSS_INGEST_ITEM_CAPS: Record<string, number> = {
   "decrypt-rss": 10,
   "coindesk-rss": 8,
   "cointelegraph-solana-rss": 10,
+  "utoday-rss": 8,
+  "thedefiant-rss": 8,
   "agave-releases": 5,
   "firedancer-releases": 5,
   "jito-solana-releases": 5,
   "marginfi-releases": 5,
+  "meteoraag-medium": 10,
+  "kamino-blog": 10,
+  "tensor-blog": 8,
+  "kamino-releases": 5,
 };
 
 /** GitHub release Atom feeds (builder / infra; no GitHub API). */
@@ -41,6 +47,7 @@ export const GITHUB_RELEASE_SOURCE_SLUGS = new Set([
   "firedancer-releases",
   "jito-solana-releases",
   "marginfi-releases",
+  "kamino-releases",
 ]);
 
 export function isGithubReleaseSourceSlug(slug: string): boolean {
@@ -74,6 +81,12 @@ export const PROJECT_OFFICIAL_BLOG_SLUGS = new Set([
   "drift-medium",
 
   "metaplex-medium",
+
+  "meteoraag-medium",
+
+  "kamino-blog",
+
+  "tensor-blog",
 
 ]);
 
@@ -137,6 +150,14 @@ export const PROJECT_RSS_STALE_GUARD_SLUGS = new Set([
 
   "marginfi-releases",
 
+  "kamino-releases",
+
+  "meteoraag-medium",
+
+  "kamino-blog",
+
+  "tensor-blog",
+
 ]);
 
 /** Filtered broad RSS: 30d published_at skip at ingest only (not official-source ranking bonus). */
@@ -145,6 +166,8 @@ export const FILTERED_BROAD_RSS_STALE_GUARD_SLUGS = new Set([
   "decrypt-rss",
   "coindesk-rss",
   "cointelegraph-solana-rss",
+  "utoday-rss",
+  "thedefiant-rss",
 ]);
 
 /** Drop price-prediction listicles at ingest (tag feed noise). */
@@ -195,10 +218,14 @@ export function topicCategoryForSourceSlug(slug: string): TopicCategory | null {
     case "raydium-medium":
 
     case "drift-medium":
+    case "kamino-blog":
+    case "meteoraag-medium":
+    case "kamino-releases":
 
       return "defi";
 
     case "metaplex-medium":
+    case "tensor-blog":
 
       return "nft";
 
@@ -207,6 +234,9 @@ export function topicCategoryForSourceSlug(slug: string): TopicCategory | null {
     case "solana-status":
 
     case "magiceden-status":
+
+    case "solana-blog":
+      return "ecosystem";
 
     case "helius-blog":
     case "agave-releases":

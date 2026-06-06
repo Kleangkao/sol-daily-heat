@@ -84,6 +84,39 @@ export function formatStoryTimestampLine(kind: StoryTimeKind, iso: string): stri
   return `${storyTimePrefix(kind)} ${relative}`;
 }
 
+/** Absolute date for compact card footers (e.g. Published May 11). */
+export function formatStoryDateShort(kind: StoryTimeKind, iso: string): string {
+  const d = new Date(iso);
+  const formatted = d.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    timeZone: "UTC",
+  });
+  return `${storyTimePrefix(kind)} ${formatted}`;
+}
+
+export function formatDetailDate(iso: string): string {
+  const d = new Date(iso);
+  return d.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    timeZone: "UTC",
+  });
+}
+
+export function formatDetailDateTime(iso: string): string {
+  const d = new Date(iso);
+  return d.toLocaleString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    timeZone: "UTC",
+  });
+}
+
 export function pickPrimaryRawItem(
   items: Array<RawItem & { sources?: Source }>
 ): (RawItem & { sources?: Source }) | undefined {

@@ -16,7 +16,11 @@ import type {
   Protocol,
   RawItem,
 } from "@/lib/types/db";
-import type { TopicDetailView, TopicTimelineEntry } from "@/lib/types/topic-detail";
+import type {
+  TopicDetailView,
+  TopicSourceSnippet,
+  TopicTimelineEntry,
+} from "@/lib/types/topic-detail";
 
 function todayDate(): string {
   return new Date().toISOString().slice(0, 10);
@@ -157,6 +161,7 @@ export async function getTopicDetail(
   );
 
   const timelineMap = new Map<string, TopicTimelineEntry>();
+  const sourceSnippets: TopicSourceSnippet[] = [];
   for (const ts of topic.topic_sources ?? []) {
     const raw = ts.raw_items;
     const src = ts.sources;
@@ -183,6 +188,15 @@ export async function getTopicDetail(
       isPrimary: Boolean(ts.is_primary),
     };
     timelineMap.set(key, entry);
+
+    const snippet = raw?.snippet?.trim();
+    if (snippet && snippet.length > 20) {
+      sourceSnippets.push({
+        sourceName: src?.name ?? "Source",
+        text: snippet,
+        isPrimary: Boolean(ts.is_primary),
+      });
+    }
   }
 
   const timeline = Array.from(timelineMap.values()).sort((a, b) => {
@@ -272,6 +286,7 @@ export async function getTopicDetail(
     tokens,
     protocols,
     timeline,
+    sourceSnippets,
     headlineOnlySources,
     rankingDate: date,
     uniqueSourceCount: sourceSlugs.length,

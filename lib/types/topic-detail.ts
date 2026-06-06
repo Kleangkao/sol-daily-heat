@@ -29,6 +29,12 @@ export type TopicDetailProtocol = {
   websiteUrl: string | null;
 };
 
+export type TopicSourceSnippet = {
+  sourceName: string;
+  text: string;
+  isPrimary: boolean;
+};
+
 export type TopicTimelineEntry = {
   id: string;
   sourceName: string;
@@ -74,6 +80,8 @@ export type TopicDetailView = {
   tokens: TopicDetailToken[];
   protocols: TopicDetailProtocol[];
   timeline: TopicTimelineEntry[];
+  /** Full ingested snippet text per linked source (not pipeline-truncated summary). */
+  sourceSnippets: TopicSourceSnippet[];
   headlineOnlySources: boolean;
   rankingDate: string;
   /** Distinct linked sources (topic_sources), used for score explanation copy */

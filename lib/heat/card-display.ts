@@ -6,30 +6,20 @@ import {
 } from "@/lib/sources/rss-ingest-policy";
 import { SITEMAP_DISCOVERY_SLUGS } from "@/lib/sources/sitemap-ingest-policy";
 
-const OFFICIAL_SLUGS = new Set([
-  "solana-blog",
-  "helius-blog",
-  "raydium-medium",
-  "marinade-blog",
-  "orca-medium",
-  "sanctum-medium",
-  "drift-medium",
-  "metaplex-medium",
-  "solana-status",
-]);
+import { OFFICIAL_SOURCE_SLUGS } from "@/lib/scoring/official-sources";
 
-const EDITORIAL_SLUGS = new Set([
-  "solana-blog",
-  "helius-blog",
-  "raydium-medium",
-  "marinade-blog",
-  "orca-medium",
-  "sanctum-medium",
-  "drift-medium",
-  "metaplex-medium",
+/** Third-party media / analysis — not project-owned announcement feeds. */
+const THIRD_PARTY_EDITORIAL_SLUGS = new Set([
   "the-block-news",
   "dlnews-rss",
   "decrypt-rss",
+  "coindesk-rss",
+  "cointelegraph-solana-rss",
+  "utoday-rss",
+  "thedefiant-rss",
+]);
+
+const STATUS_AND_DISCOVERY_SLUGS = new Set([
   "solana-status",
   "pyth-status",
   "magiceden-status",
@@ -70,9 +60,21 @@ function breakdownNum(
   return typeof v === "number" ? v : 0;
 }
 
-function hasEditorialType(itemTypes: string[], slugs: string[]): boolean {
-  if (itemTypes.some((t) => t === "news" || t === "manual")) return true;
-  return slugs.some((s) => EDITORIAL_SLUGS.has(s));
+function hasNewsItemType(itemTypes: string[]): boolean {
+  return itemTypes.some((t) => t === "news" || t === "manual");
+}
+
+function isThirdPartyEditorial(slugs: string[], itemTypes: string[]): boolean {
+  if (!hasNewsItemType(itemTypes)) return false;
+  if (slugs.some((s) => THIRD_PARTY_EDITORIAL_SLUGS.has(s))) return true;
+  return slugs.some(
+    (s) =>
+      !OFFICIAL_SOURCE_SLUGS.has(s) &&
+      !SITEMAP_DISCOVERY_SLUGS.has(s) &&
+      !GITHUB_RELEASE_SOURCE_SLUGS.has(s) &&
+      !STATUS_SOURCE_SLUGS.has(s) &&
+      (s.includes("rss") || s.includes("news"))
+  );
 }
 
 function isBoostOnly(
@@ -83,7 +85,7 @@ function isBoostOnly(
 ): boolean {
   if (title.startsWith("DexScreener boost")) return true;
   if (signals.length > 0 && signals.every((s) => s === "boost")) {
-    return !hasEditorialType(itemTypes, slugs);
+    return !hasNewsItemType(itemTypes);
   }
   return false;
 }
@@ -91,7 +93,7 @@ function isBoostOnly(
 function isMetricOnly(itemTypes: string[], slugs: string[]): boolean {
   if (itemTypes.length === 0) {
     return (
-      !slugs.some((s) => EDITORIAL_SLUGS.has(s)) &&
+      !slugs.some((s) => OFFICIAL_SOURCE_SLUGS.has(s) || THIRD_PARTY_EDITORIAL_SLUGS.has(s)) &&
       (slugs.some((s) => s.includes("defillama")) || slugs.some((s) => s.includes("dexscreener")))
     );
   }
@@ -109,11 +111,9 @@ export function buildCardBadges(input: CardDisplayInput): SignalBadge[] {
   const signals = input.rankingSignals ?? [];
   const evidenceItems = input.evidence?.evidenceItems ?? [];
 
-  const hasOfficialSlug = slugs.some((s) => OFFICIAL_SLUGS.has(s));
+  const hasOfficialSlug = slugs.some((s) => OFFICIAL_SOURCE_SLUGS.has(s));
   const hasSitemapDiscovery = slugs.some((s) => SITEMAP_DISCOVERY_SLUGS.has(s));
-  const hasEditorialSlug = slugs.some(
-    (s) => EDITORIAL_SLUGS.has(s) && !SITEMAP_DISCOVERY_SLUGS.has(s)
-  );
+  const thirdPartyEditorial = isThirdPartyEditorial(slugs, itemTypes);
   const boost = isBoostOnly(input.title, signals, itemTypes, slugs);
   const metricOnly = isMetricOnly(itemTypes, slugs);
 
@@ -142,21 +142,23 @@ export function buildCardBadges(input: CardDisplayInput): SignalBadge[] {
     !hasSitemapDiscovery &&
     (breakdownNum(b, "official_source_bonus") > 0 || hasOfficialSlug)
   ) {
-    badges.push({ id: "official", label: "Official source", tone: "official" });
-  }
-  if (!hasSitemapDiscovery && breakdownNum(b, "editorial_confirmation") > 0) {
+    badges.push({ id: "official", label: "Primary source", tone: "official" });
+    if (hasNewsItemType(itemTypes) && !boost && !metricOnly) {
+      badges.push({ id: "ecosystem-update", label: "Ecosystem update", tone: "protocol" });
+    }
+  } else if (!hasSitemapDiscovery && breakdownNum(b, "editorial_confirmation") > 0) {
     badges.push({
       id: "editorial-confirmation",
-      label: "Editorial confirmation",
+      label: "Multi-source coverage",
       tone: "editorial",
     });
+  } else if (!hasSitemapDiscovery && thirdPartyEditorial && !boost) {
+    badges.push({ id: "editorial", label: "News / editorial", tone: "editorial" });
   } else if (
     !hasSitemapDiscovery &&
-    hasEditorialSlug &&
-    hasEditorialType(itemTypes, slugs) &&
-    !boost
+    slugs.some((s) => STATUS_AND_DISCOVERY_SLUGS.has(s))
   ) {
-    badges.push({ id: "editorial", label: "News / editorial", tone: "editorial" });
+    badges.push({ id: "status-feed", label: "Status feed", tone: "caution" });
   }
 
   if (breakdownNum(b, "cross_type_corroboration") > 0) {

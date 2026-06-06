@@ -45,6 +45,8 @@ const FILTER_LOG_SLUGS = new Set([
   "decrypt-rss",
   "coindesk-rss",
   "cointelegraph-solana-rss",
+  "utoday-rss",
+  "thedefiant-rss",
 ]);
 
 
@@ -228,7 +230,7 @@ export class RssAdapter implements SourceAdapter {
 
         title,
 
-        snippet: description.slice(0, 500),
+        snippet: description.trim().slice(0, 8000),
 
         canonical_url: link,
 

@@ -167,7 +167,7 @@ a {
     right: -3%;
     width: min(440px, 40vw);
     height: min(340px, 28vh);
-    background-image: url("/beach/2.png");
+    background-image: url("/beach/2.webp");
     background-position: right top;
     opacity: 0.09;
   }
@@ -177,7 +177,7 @@ a {
     left: -3%;
     width: min(380px, 34vw);
     height: min(300px, 24vh);
-    background-image: url("/beach/2.png");
+    background-image: url("/beach/2.webp");
     background-position: left top;
     transform: scaleX(-1);
     opacity: 0.07;
@@ -188,7 +188,7 @@ a {
     left: -2%;
     width: min(300px, 24vw);
     height: min(520px, 58vh);
-    background-image: url("/beach/7.png");
+    background-image: url("/beach/7.webp");
     background-position: left bottom;
     opacity: 0.12;
   }
@@ -198,7 +198,7 @@ a {
     right: -2%;
     width: min(280px, 22vw);
     height: min(500px, 55vh);
-    background-image: url("/beach/7.png");
+    background-image: url("/beach/7.webp");
     background-position: right bottom;
     transform: scaleX(-1);
     opacity: 0.11;
@@ -211,7 +211,7 @@ a {
     margin-inline: auto;
     width: min(360px, 34vw);
     height: min(280px, 22vh);
-    background-image: url("/beach/1.png");
+    background-image: url("/beach/1.webp");
     background-position: center bottom;
     opacity: 0.08;
   }
@@ -221,7 +221,7 @@ a {
     left: 5%;
     width: min(210px, 17vw);
     height: min(260px, 24vh);
-    background-image: url("/beach/4.png");
+    background-image: url("/beach/4.webp");
     background-position: left bottom;
     opacity: 0.07;
   }
@@ -231,7 +231,7 @@ a {
     left: -1%;
     width: min(190px, 15vw);
     height: min(190px, 18vh);
-    background-image: url("/beach/3.png");
+    background-image: url("/beach/3.webp");
     background-position: left center;
     opacity: 0.06;
   }
@@ -241,7 +241,7 @@ a {
     right: 7%;
     width: min(130px, 11vw);
     height: min(130px, 12vh);
-    background-image: url("/beach/6.png");
+    background-image: url("/beach/6.webp");
     background-position: center;
     opacity: 0.05;
     transform: rotate(-10deg);
@@ -252,16 +252,50 @@ a {
     right: 4%;
     width: min(110px, 9vw);
     height: min(150px, 14vh);
-    background-image: url("/beach/5.png");
+    background-image: url("/beach/5.webp");
     background-position: center bottom;
     opacity: 0.06;
+  }
+
+  .beach-asset--starfish {
+    bottom: 12vh;
+    left: 18%;
+    width: min(150px, 13vw);
+    height: min(120px, 10vh);
+    background-image: url("/beach/8.webp");
+    background-position: center;
+    opacity: 0.055;
+  }
+
+  .beach-asset--palm-accent {
+    top: 6%;
+    right: 10%;
+    width: min(200px, 16vw);
+    height: min(280px, 30vh);
+    background-image: url("/beach/9.webp");
+    background-position: right top;
+    opacity: 0.08;
+  }
+
+  .beach-asset--goose-surf {
+    bottom: 24vh;
+    right: 14%;
+    width: min(210px, 18vw);
+    height: min(190px, 17vh);
+    background-image: url("/beach/10.webp");
+    background-position: center;
+    opacity: 0.05;
+    transform: rotate(-6deg);
   }
 
   @media (max-width: 768px) {
     .beach-asset--fronds-tl,
     .beach-asset--umbrella,
     .beach-asset--coconut,
-    .beach-asset--crab-float {
+    .beach-asset--crab-float,
+    .beach-asset--starfish,
+    .beach-asset--palm-accent,
+    .beach-asset--goose-surf {
       display: none;
     }
 
@@ -292,6 +326,7 @@ a {
   .featured-marquee-track {
     animation: featured-marquee 36s linear infinite;
     will-change: transform;
+    padding-block: 2px;
   }
 
   .featured-marquee-clip:hover .featured-marquee-track {

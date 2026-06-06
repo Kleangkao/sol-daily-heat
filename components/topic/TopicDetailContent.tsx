@@ -7,7 +7,20 @@ import HeatScoreBadge from "@/components/heat/HeatScoreBadge";
 import ScoreBreakdown from "@/components/heat/ScoreBreakdown";
 import { explainScoreBreakdown } from "@/lib/heat/score-breakdown-explainer";
 import { buildTopicNarrativeBrief } from "@/lib/heat/topic-narrative-brief";
+import {
+  relevantPersonaRoles,
+  resolveTopicTimelineEntries,
+} from "@/lib/heat/topic-evidence-depth";
+import { resolveTopicDisplayCategory } from "@/lib/heat/topic-display-category";
+import {
+  buildEvidenceExcerpt,
+  normalizeCopyText,
+  textsOverlapAny,
+} from "@/lib/heat/topic-copy-layers";
+import { classifyReaderSignal } from "@/lib/heat/reader-signal-copy";
 import { buildHeatScoreContext } from "@/lib/heat/heat-score-context";
+import { buildHeatDrivers } from "@/lib/heat/heat-score-drivers";
+import { resolveProtocolDisplayRoles } from "@/lib/heat/protocol-display-roles";
 import {
   buildTopicMetricEvidence,
   type TopicMetricEvidence,
@@ -17,7 +30,7 @@ import {
   buildPersonaDisplayNote,
   personaInputFromTopic,
 } from "@/lib/heat/persona-display-copy";
-import { formatStoryTimestampLine } from "@/lib/heat/story-timestamp";
+import { formatDetailDate, formatDetailDateTime } from "@/lib/heat/story-timestamp";
 type DisplayEvidenceKind = EvidenceKind | "status_incident";
 
 function MetricEvidenceRow({
@@ -52,8 +65,15 @@ function formatSectionRanks(
   appearances: TopicDetailView["sectionAppearancesToday"]
 ): string {
   return appearances
-    .map((s) => `${s.sectionLabel}${s.rankPosition != null ? ` #${s.rankPosition}` : ""}`)
+    .filter((s) => s.rankPosition != null)
+    .map((s) => `${s.sectionLabel} #${s.rankPosition}`)
     .join(" · ");
+}
+
+function formatAppearsIn(
+  appearances: TopicDetailView["sectionAppearancesToday"]
+): string {
+  return appearances.map((s) => s.sectionLabel).join(", ");
 }
 
 function formatTime(iso: string): string {
@@ -78,7 +98,7 @@ function itemDisplayKind(item: EvidenceItem): DisplayEvidenceKind {
 }
 
 function normalizeEvidenceSnippet(text: string): string {
-  return text.trim().toLowerCase().replace(/\s+/g, " ");
+  return normalizeCopyText(text);
 }
 
 function pickMetricSourceSnippet(
@@ -158,6 +178,84 @@ export default function TopicDetailContent({ topic }: Props) {
   const dedupedEvidenceItems = metricEvidence
     ? dedupeEvidenceItemsAgainstSnippet(metricSourceSnippet, flatEvidenceItems)
     : flatEvidenceItems;
+  const timelineEntries = resolveTopicTimelineEntries(topic);
+  const showTimeline = timelineEntries.length >= 2;
+  const avoidEvidenceTexts = [
+    ...brief.paragraphs,
+    ...timelineEntries.map((entry) => entry.title),
+    ...(topic.sourceSnippets ?? []).map((s) => s.text),
+    topic.evidence?.whatHappened ?? "",
+    topic.summary,
+    topic.title,
+  ].filter(Boolean);
+
+  function dedupeEvidenceByText(items: EvidenceItem[]): EvidenceItem[] {
+    const seen = new Set<string>();
+    const out: EvidenceItem[] = [];
+    for (const item of items) {
+      const key = normalizeCopyText(item.text);
+      if (!key || seen.has(key)) continue;
+      seen.add(key);
+      out.push(item);
+    }
+    return out;
+  }
+
+  function mapEvidenceForDisplay(items: EvidenceItem[]): EvidenceItem[] {
+    return dedupeEvidenceByText(items)
+      .map((item) => {
+        const excerpt = buildEvidenceExcerpt(item, avoidEvidenceTexts);
+        return excerpt ? { ...item, text: excerpt } : null;
+      })
+      .filter((item): item is EvidenceItem => Boolean(item));
+  }
+
+  const evidenceItemsForDisplay = showTimeline
+    ? dedupedEvidenceItems.filter((item) => item.kind !== "fact")
+    : dedupedEvidenceItems;
+  const displayEvidenceItems = mapEvidenceForDisplay(evidenceItemsForDisplay);
+  const signalKind = classifyReaderSignal(personaInput);
+  const personaRoles = relevantPersonaRoles(signalKind);
+  const angleNotes = [
+    personaRoles.includes("creator") && creatorPersona
+      ? { role: "Creator", text: creatorPersona }
+      : null,
+    personaRoles.includes("investor") && investorPersona
+      ? { role: "Investor", text: investorPersona }
+      : null,
+    personaRoles.includes("builder") && builderPersona
+      ? { role: "Builder", text: builderPersona }
+      : null,
+  ].filter((n): n is { role: string; text: string } => Boolean(n));
+  const hasRelated = topic.tokens.length > 0 || topic.protocols.length > 0;
+  const sourceSlugs = Array.from(new Set(topic.timeline.map((t) => t.sourceSlug)));
+  const protocolRoles = resolveProtocolDisplayRoles(
+    topic.protocols.map((p) => ({ name: p.name, slug: p.slug })),
+    sourceSlugs,
+    topic.title,
+    topic.summary
+  );
+  const displayCategory = resolveTopicDisplayCategory({
+    category: topic.category,
+    sourceSlugs,
+    title: topic.title,
+    summary: topic.summary,
+    itemTypes: topic.timeline.map((t) => t.itemType),
+  });
+  const heatDrivers = buildHeatDrivers({
+    scoreBreakdown: topic.scoreBreakdown,
+    sourceSlugs,
+    category: displayCategory,
+    uniqueSourceCount: topic.uniqueSourceCount,
+  });
+  const rankedLine = formatSectionRanks(topic.sectionAppearancesToday);
+  const appearsIn = formatAppearsIn(topic.sectionAppearancesToday);
+  const hasSourceLinks = (topic.evidence?.sourceLinks.length ?? 0) > 0;
+  const showEvidenceItems = displayEvidenceItems.length > 0;
+  /** Timeline cards already list sources + links; skip redundant evidence block. */
+  const showEvidenceSection =
+    Boolean(topic.evidence) &&
+    (metricEvidence || showEvidenceItems || (hasSourceLinks && !showTimeline));
 
   return (
     <div className="min-h-screen">
@@ -184,6 +282,7 @@ export default function TopicDetailContent({ topic }: Props) {
                 <p className="text-[11px] leading-snug text-text-muted">
                   {buildHeatScoreContext(topic.heatScore)}
                 </p>
+                <p className="text-[11px] leading-snug text-text-muted">{heatDrivers}</p>
               </div>
             ) : (
               <span
@@ -196,26 +295,33 @@ export default function TopicDetailContent({ topic }: Props) {
           </div>
           <div className="mt-4 flex flex-wrap items-center gap-2">
             <span className="inline-flex rounded-full bg-bg-secondary px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-accent">
-              {CATEGORY_LABELS[topic.category]}
+              {CATEGORY_LABELS[displayCategory]}
             </span>
             {sectionCount > 0 ? (
               <span className="inline-flex rounded-full border border-border px-2.5 py-0.5 text-[11px] text-text-secondary">
-                Ranked in {sectionCount} section{sectionCount !== 1 ? "s" : ""}
+                Appears in {sectionCount} section{sectionCount !== 1 ? "s" : ""}
               </span>
             ) : null}
           </div>
           {sectionCount > 0 ? (
             <p className="mt-2 text-[11px] text-text-muted">
-              {formatSectionRanks(topic.sectionAppearancesToday)}
+              {rankedLine || `Sections: ${appearsIn}`}
             </p>
           ) : null}
-          <p className="mt-3 text-[12px] text-text-muted">
-            {formatStoryTimestampLine(topic.storyTimeKind, topic.storyAt)} · First seen{" "}
-            {formatTime(topic.firstSeenAt)} · Snapshot {topic.rankingDate}
-          </p>
-          <p className="mt-1 text-[11px] text-text-muted/80">
-            Scanner refreshed {formatTime(topic.lastUpdatedAt)}
-          </p>
+          <dl className="mt-3 grid gap-1 text-[12px] text-text-muted sm:grid-cols-2">
+            <div>
+              <dt className="inline font-semibold text-text-secondary">Published: </dt>
+              <dd className="inline">{formatDetailDate(topic.storyAt)}</dd>
+            </div>
+            <div>
+              <dt className="inline font-semibold text-text-secondary">Detected by scanner: </dt>
+              <dd className="inline">{formatDetailDateTime(topic.firstSeenAt)}</dd>
+            </div>
+            <div>
+              <dt className="inline font-semibold text-text-secondary">Snapshot: </dt>
+              <dd className="inline">{formatDetailDate(`${topic.rankingDate}T12:00:00.000Z`)}</dd>
+            </div>
+          </dl>
           <p className="mt-2 text-[12px] italic text-text-muted">
             Context only. Not investment advice. Verify primary sources before acting.
           </p>
@@ -347,9 +453,6 @@ export default function TopicDetailContent({ topic }: Props) {
           {brief.caution ? (
             <p className="mt-4 text-[12px] leading-relaxed text-amber-200/90">{brief.caution}</p>
           ) : null}
-          {brief.confidenceNote ? (
-            <p className="mt-3 text-[12px] leading-relaxed text-text-muted">{brief.confidenceNote}</p>
-          ) : null}
         </section>
 
         {metricEvidence ? (
@@ -393,15 +496,15 @@ export default function TopicDetailContent({ topic }: Props) {
           </details>
         ) : null}
 
-        {topic.evidence ? (
+        {showEvidenceSection ? (
           <section className="mt-6 rounded-[10px] border border-border bg-bg-card p-5">
             <h2 className="font-heading text-[18px] font-bold uppercase tracking-wide text-text-primary">
-              Evidence & sources
+              {showEvidenceItems || metricEvidence ? "Evidence & sources" : "Sources"}
             </h2>
 
-            {topic.evidence.sourceLinks.length > 0 ? (
+            {hasSourceLinks ? (
               <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5">
-                {topic.evidence.sourceLinks.map((link) => (
+                {topic.evidence!.sourceLinks.map((link) => (
                   <li key={link.url}>
                     <a
                       href={link.url}
@@ -416,41 +519,15 @@ export default function TopicDetailContent({ topic }: Props) {
               </ul>
             ) : null}
 
-            {metricEvidence ? (
-              metricSourceSnippet ? (
-                <p className="mt-3 text-[13px] leading-relaxed text-text-secondary">
-                  {metricSourceSnippet}
-                </p>
-              ) : null
-            ) : (
+            {metricEvidence && metricSourceSnippet ? (
               <p className="mt-3 text-[13px] leading-relaxed text-text-secondary">
-                {topic.evidence.whatHappened}
+                {metricSourceSnippet}
               </p>
-            )}
-
-            {!metricEvidence && flatEvidenceItems.length > 0 ? (
-              <ul className="mt-4 space-y-2">
-                {flatEvidenceItems.map((item, i) => (
-                  <li
-                    key={`ev-${i}`}
-                    className="rounded-[8px] border border-border/50 bg-bg-secondary/40 px-3 py-2 text-[13px]"
-                  >
-                    <span className="text-text-primary">
-                      {item.sourceName ? (
-                        <span className="font-semibold text-text-secondary">
-                          {item.sourceName}:{" "}
-                        </span>
-                      ) : null}
-                      {item.text}
-                    </span>
-                  </li>
-                ))}
-              </ul>
             ) : null}
 
-            {metricEvidence && dedupedEvidenceItems.length > 0 ? (
-              <ul className="mt-4 space-y-2">
-                {dedupedEvidenceItems.map((item, i) => (
+            {showEvidenceItems ? (
+              <ul className={`space-y-2${hasSourceLinks ? " mt-4" : " mt-3"}`}>
+                {displayEvidenceItems.map((item, i) => (
                   <li
                     key={`ev-${i}`}
                     className="rounded-[8px] border border-border/50 bg-bg-secondary/40 px-3 py-2 text-[13px]"
@@ -470,13 +547,11 @@ export default function TopicDetailContent({ topic }: Props) {
           </section>
         ) : null}
 
+        {hasRelated ? (
         <section className="mt-6 rounded-[10px] border border-border bg-bg-card p-5">
           <h2 className="font-heading text-[18px] font-bold uppercase tracking-wide text-text-primary">
             Related tokens & protocols
           </h2>
-          {topic.tokens.length === 0 && topic.protocols.length === 0 ? (
-            <p className="mt-3 text-[13px] text-text-muted">No linked tokens or protocols yet.</p>
-          ) : (
             <div className="mt-3 space-y-4">
               {topic.tokens.length > 0 ? (
                 <ul className="space-y-2">
@@ -528,83 +603,105 @@ export default function TopicDetailContent({ topic }: Props) {
                   })}
                 </ul>
               ) : null}
-              {topic.protocols.length > 0 ? (
-                <ul className="space-y-2">
-                  {topic.protocols.map((p) => (
-                    <li key={p.slug} className="text-[13px]">
-                      <span className="font-semibold text-accent">{p.name}</span>
-                      {p.category ? (
-                        <span className="text-text-muted"> · {p.category}</span>
-                      ) : null}
-                      {p.websiteUrl ? (
-                        <>
-                          {" "}
-                          <a
-                            href={p.websiteUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-accent hover:underline"
-                          >
-                            Website
-                          </a>
-                        </>
-                      ) : null}
-                    </li>
-                  ))}
-                </ul>
+              {protocolRoles.primary.length > 0 ? (
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-text-muted">
+                    Primary
+                  </p>
+                  <ul className="mt-1 space-y-2">
+                    {protocolRoles.primary.map((p) => {
+                      const full = topic.protocols.find((x) => x.slug === p.slug);
+                      return (
+                        <li key={p.slug} className="text-[13px]">
+                          <span className="font-semibold text-accent">{p.name}</span>
+                          {full?.category ? (
+                            <span className="text-text-muted"> · {full.category}</span>
+                          ) : null}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              ) : null}
+              {protocolRoles.mentioned.length > 0 ? (
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-text-muted">
+                    Mentioned
+                  </p>
+                  <ul className="mt-1 space-y-2">
+                    {protocolRoles.mentioned.map((p) => {
+                      const full = topic.protocols.find((x) => x.slug === p.slug);
+                      return (
+                        <li key={p.slug} className="text-[13px]">
+                          <span className="font-semibold text-text-secondary">{p.name}</span>
+                          {full?.websiteUrl ? (
+                            <>
+                              {" "}
+                              <a
+                                href={full.websiteUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-accent hover:underline"
+                              >
+                                Website
+                              </a>
+                            </>
+                          ) : null}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
               ) : null}
             </div>
-          )}
         </section>
+        ) : null}
 
+        {angleNotes.length > 0 ? (
+          <details className="group mt-6 rounded-[10px] border border-border bg-bg-card">
+            <summary className="cursor-pointer list-none p-5 font-heading text-[16px] font-bold uppercase tracking-wide text-text-primary marker:content-none [&::-webkit-details-marker]:hidden">
+              <span className="flex items-center justify-between gap-3">
+                Angles
+                <span className="text-[11px] font-semibold normal-case tracking-normal text-text-muted group-open:hidden">
+                  Show
+                </span>
+                <span className="hidden text-[11px] font-semibold normal-case tracking-normal text-text-muted group-open:inline">
+                  Hide
+                </span>
+              </span>
+            </summary>
+            <div className="border-t border-border px-5 pb-5 pt-4">
+              <div className="space-y-3">
+                {angleNotes.map((note) => (
+                  <div
+                    key={note.role}
+                    className="rounded-[8px] bg-bg-secondary/50 px-3 py-2.5"
+                  >
+                    <p className="text-[11px] font-semibold uppercase text-text-muted">
+                      {note.role}
+                    </p>
+                    <p className="mt-1 text-[13px] text-text-primary">{note.text}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </details>
+        ) : null}
+
+        {showTimeline ? (
         <section className="mt-6 rounded-[10px] border border-border bg-bg-card p-5">
           <h2 className="font-heading text-[18px] font-bold uppercase tracking-wide text-text-primary">
-            Persona notes
+            {signalKind === "status_incident" && topic.timeline.length < 2
+              ? "Status updates"
+              : "Source timeline"}
           </h2>
-          <div className="mt-3 space-y-3">
-            {creatorPersona ? (
-              <div className="rounded-[8px] bg-bg-secondary/50 px-3 py-2.5">
-                <p className="text-[11px] font-semibold uppercase text-text-muted">Creator angle</p>
-                <p className="mt-1 text-[13px] text-text-primary">{creatorPersona}</p>
-              </div>
-            ) : null}
-            {investorPersona ? (
-              <div className="rounded-[8px] bg-bg-secondary/50 px-3 py-2.5">
-                <p className="text-[11px] font-semibold uppercase text-text-muted">
-                  Investor watch context
-                </p>
-                <p className="mt-1 text-[13px] text-text-primary">{investorPersona}</p>
-              </div>
-            ) : null}
-            {builderPersona ? (
-              <div className="rounded-[8px] bg-bg-secondary/50 px-3 py-2.5">
-                <p className="text-[11px] font-semibold uppercase text-text-muted">
-                  Builder / infra
-                </p>
-                <p className="mt-1 text-[13px] text-text-primary">{builderPersona}</p>
-              </div>
-            ) : null}
-            {!creatorPersona && !investorPersona && !builderPersona ? (
-              <p className="text-[13px] text-text-muted">No persona-specific notes stored.</p>
-            ) : null}
-          </div>
-        </section>
-
-        <section className="mt-6 rounded-[10px] border border-border bg-bg-card p-5">
-          <h2 className="font-heading text-[18px] font-bold uppercase tracking-wide text-text-primary">
-            Source timeline
-          </h2>
-          {topic.timeline.length === 0 ? (
-            <p className="mt-3 text-[13px] text-text-muted">No source timeline rows linked yet.</p>
-          ) : (
-            <>
-              {topic.timeline.length > 1 ? (
-                <p className="mt-2 text-[12px] text-text-muted">
-                  Multiple sources contributed to this topic cluster.
-                </p>
-              ) : null}
+              <p className="mt-2 text-[12px] text-text-muted">
+                {signalKind === "status_incident" && topic.timeline.length < 2
+                  ? "Multiple status updates were detected in this incident cluster."
+                  : "Multiple sources contributed to this topic cluster."}
+              </p>
               <ol className="mt-4 space-y-3">
-                {topic.timeline.map((entry) => (
+                {timelineEntries.map((entry) => (
                   <li
                     key={entry.id}
                     className="rounded-[8px] border border-border/60 bg-bg-secondary/40 px-3 py-2.5"
@@ -642,17 +739,11 @@ export default function TopicDetailContent({ topic }: Props) {
                         Open source
                       </a>
                     ) : null}
-                    {entry.headlineOnly ? (
-                      <p className="mt-2 text-[11px] text-amber-200/90">
-                        Headline-only discovery. Article body was not ingested.
-                      </p>
-                    ) : null}
                   </li>
                 ))}
               </ol>
-            </>
-          )}
         </section>
+        ) : null}
 
         <details className="mt-6 rounded-[10px] border border-border bg-bg-card group">
           <summary className="cursor-pointer list-none px-5 py-4 text-[13px] font-semibold text-text-secondary transition-colors hover:text-accent [&::-webkit-details-marker]:hidden">
@@ -670,8 +761,9 @@ export default function TopicDetailContent({ topic }: Props) {
             <p className="mt-1 text-[13px] text-text-secondary">
               {topic.heatScore != null ? (
                 <>
-                  Rule-based heat {topic.heatScore} for {topic.rankingDate}. Components only
-                  appear when they affected the score.
+                  Scanner heat {topic.heatScore} for {topic.rankingDate}. Last refreshed{" "}
+                  {formatDetailDateTime(topic.lastUpdatedAt)}. Components only appear when they
+                  affected the score.
                 </>
               ) : (
                 <>

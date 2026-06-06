@@ -1,11 +1,13 @@
+"use client";
+
 import type { ReactNode } from "react";
 import HeatCard from "./HeatCard";
-import { alsoInSections } from "@/lib/heat/topic-section-appearances";
 import type {
   HeatCardPersonaHighlight,
   HeatCardView,
   SectionDataSource,
 } from "@/lib/types/heat";
+import { alsoInSections } from "@/lib/heat/topic-section-appearances";
 
 type Props = {
   title: string;

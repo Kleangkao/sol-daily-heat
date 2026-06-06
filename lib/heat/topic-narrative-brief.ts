@@ -1,6 +1,9 @@
 import { stripEmDash } from "@/lib/heat/copy-format";
 import type { TopicDetailView } from "@/lib/types/topic-detail";
 import { isGenericRiskNote } from "@/lib/heat/risk-note";
+import { resolveTopicEvidenceDepth } from "@/lib/heat/topic-evidence-depth";
+import { sourcePublicationParagraphs } from "@/lib/heat/source-presented-copy";
+import { filterSpecificWatchNext } from "@/lib/heat/generic-watch-next";
 import {
   buildReaderDisplayCopy,
   classifyReaderSignal,
@@ -15,7 +18,7 @@ import {
 
 export type TopicNarrativeBrief = {
   mode: "signal_brief" | "narrative_brief";
-  heading: "Signal brief" | "Brief";
+  heading: "Signal brief" | "Publication";
   paragraphs: string[];
   watchNext: string[];
   caution?: string;
@@ -102,82 +105,19 @@ function defaultMarketWatchNext(): string[] {
 }
 
 function defaultEditorialWatchNext(topic: TopicDetailView): string[] {
-  const bullets = topic.evidence?.watchNext
-    ? splitWatchText(topic.evidence.watchNext)
-    : [];
-  if (bullets.length > 0) return bullets;
-  return [
-    "Watch for follow-up reporting or official announcements on the same story.",
-    "Check whether on-chain or ecosystem signals align with the coverage.",
-  ];
+  const stored = topic.evidence?.watchNext?.trim() ?? "";
+  if (!stored) return [];
+  return filterSpecificWatchNext(splitWatchText(stored));
 }
 
-function narrativeParagraphs(
-  topic: TopicDetailView,
-  kind: ReaderSignalKind
-): string[] {
-  const stored = topic.summary?.trim();
-  const whatHappened =
-    stored && stored.length > 40 && !/adapter signal|fees move/i.test(stored)
-      ? stored
-      : topic.evidence?.whatHappened?.trim() || topic.title;
-
-  if (kind === "multi_editorial") {
-    return [
-      whatHappened,
-      `Multiple sources are covering "${topic.title.slice(0, 120)}" today, which increases narrative visibility in the scanner.`,
-      "Cross-source repetition suggests an ecosystem story worth tracking. Still verify primary sources and on-chain context.",
-    ];
-  }
-
-  if (kind === "single_editorial") {
-    return [
-      whatHappened,
-      "This is early editorial coverage from a single source. The scanner treats it as a narrative signal, not confirmed momentum.",
-      "Follow-up reporting, official posts, or on-chain evidence would strengthen confidence in the story.",
-    ];
-  }
-
-  if (kind === "status_incident") {
-    return [
-      whatHappened,
-      "Operational status changes can affect builders and users quickly.",
-      "Confirm current resolution and impact on the official status page linked in evidence.",
-    ];
-  }
-
-  if (kind === "github_release") {
-    return [
-      whatHappened,
-      "Release activity can shift builder attention when it touches performance, tooling, or client behavior.",
-      "See release notes in evidence for version scope and deployment implications.",
-    ];
-  }
-
-  return [
-    whatHappened,
-    "The scanner clustered related signals for today's UTC snapshot.",
-    "Use evidence and source links below to verify before acting on this context.",
-  ];
+function narrativeParagraphs(topic: TopicDetailView): string[] {
+  return sourcePublicationParagraphs(topic);
 }
 
-function buildConfidenceNote(
-  topic: TopicDetailView,
-  kind: ReaderSignalKind
-): string | undefined {
-  if (topic.headlineOnlySources) {
-    return "Headline-only discovery. Article body was not ingested. Open source links to verify.";
-  }
-  if (kind === "metric_fee" || kind === "metric_tvl") {
-    return undefined;
-  }
-  if (kind === "single_editorial") {
-    return "Early coverage from one source. Follow-up reporting would strengthen confidence.";
-  }
-  if (kind === "promoted_boost" || kind === "pump_style") {
-    return "Market-discovery signal only. Not validation or investment advice.";
-  }
-  return undefined;
+function buildConfidenceNote(topic: TopicDetailView): string | undefined {
+  const depth = resolveTopicEvidenceDepth(topic);
+  if (depth.kind === "metric_only") return undefined;
+  return depth.confidenceNote;
 }
 
 function buildCaution(
@@ -226,7 +166,7 @@ export function buildTopicNarrativeBrief(topic: TopicDetailView): TopicNarrative
       "Watch for follow-up coverage from primary or official sources.",
     ];
   } else {
-    paragraphs = narrativeParagraphs(topic, kind);
+    paragraphs = narrativeParagraphs(topic);
     watchNext = defaultEditorialWatchNext(topic);
   }
 
@@ -235,11 +175,8 @@ export function buildTopicNarrativeBrief(topic: TopicDetailView): TopicNarrative
     metricParagraphKind === "tvl" ||
     kind === "metric_fee" ||
     kind === "metric_tvl";
-  const evidenceWatch = topic.evidence?.watchNext
-    ? splitWatchText(topic.evidence.watchNext)
-    : [];
-  if (evidenceWatch.length > 0 && !isMetricTopic) {
-    watchNext = uniqueBullets([...watchNext, ...evidenceWatch]);
+  if (!isMetricTopic) {
+    watchNext = filterSpecificWatchNext(uniqueBullets(watchNext));
   }
 
   if (mixedNote) {
@@ -247,13 +184,13 @@ export function buildTopicNarrativeBrief(topic: TopicDetailView): TopicNarrative
   }
 
   const caution = buildCaution(topic, readerCopy.pctCaution);
-  const confidenceNote = buildConfidenceNote(topic, kind);
+  const confidenceNote = buildConfidenceNote(topic);
 
   return {
     mode: signalBrief ? "signal_brief" : "narrative_brief",
-    heading: signalBrief ? "Signal brief" : "Brief",
+    heading: signalBrief ? "Signal brief" : "Publication",
     paragraphs: paragraphs.map(stripEmDash),
-    watchNext: uniqueBullets(watchNext).map(stripEmDash),
+    watchNext: filterSpecificWatchNext(uniqueBullets(watchNext)).map(stripEmDash),
     caution: caution ? stripEmDash(caution) : undefined,
     confidenceNote: confidenceNote ? stripEmDash(confidenceNote) : undefined,
   };

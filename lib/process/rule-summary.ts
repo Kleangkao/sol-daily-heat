@@ -1,5 +1,6 @@
 import type { TopicCategory } from "@/lib/types/db";
 import type { Source } from "@/lib/types/db";
+import { uniqueSnippets } from "@/lib/heat/unique-snippets";
 import { formatSignalLabels, type ClusterMetrics } from "./cluster-metrics";
 
 type SummaryItem = {
@@ -14,19 +15,7 @@ export type SummaryContext = {
   items: SummaryItem[];
 };
 
-export function uniqueSnippets(snippets: string[]): string[] {
-  const seen = new Set<string>();
-  const out: string[] = [];
-  for (const raw of snippets) {
-    const s = raw.trim();
-    if (!s) continue;
-    const key = s.toLowerCase();
-    if (seen.has(key)) continue;
-    seen.add(key);
-    out.push(s);
-  }
-  return out;
-}
+export { uniqueSnippets };
 
 function formatUsd(n: number): string {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
@@ -126,11 +115,10 @@ export function buildRuleSummary(
   }
 
   if (deduped.length === 1) {
-    return deduped[0].slice(0, 280) + (deduped[0].length > 280 ? "…" : "");
+    return deduped[0];
   }
   if (deduped.length > 1) {
-    const joined = deduped.slice(0, 2).join(" · ");
-    return joined.slice(0, 280) + (joined.length > 280 ? "…" : "");
+    return deduped.slice(0, 2).join("\n\n");
   }
 
   return `${title}. Clustered from ${items.length || 1} source signal(s).`;
@@ -150,7 +138,7 @@ export function inferCategory(
   if (/game|star atlas|gaming/i.test(t)) return "gaming";
   if (/firedancer|validator|infra|rpc|oracle|status|incident|pyth/i.test(t)) return "infra";
   if (/marinade|orca|sanctum|lst|restaking|liquid stake/i.test(t)) return "defi";
-  if (/ai|inference|gpu/i.test(t)) return "ai";
+  if (/\b(ai|inference|gpus?)\b/i.test(t)) return "ai";
   if (/sec|regulat|compliance/i.test(t)) return "regulatory";
   if (/solana|ecosystem|foundation/i.test(t)) return "ecosystem";
   return "other";
