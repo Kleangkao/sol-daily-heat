@@ -168,30 +168,34 @@ async function hydrateRankingRows(
   }
   if (sourcesRes.error) throw new Error(`topic_sources hydrate failed: ${sourcesRes.error.message}`);
 
-  const tokensByTopic = new Map<string, RankingRow["topics"]["topic_tokens"]>();
+  type TokenLink = NonNullable<RankingRow["topics"]["topic_tokens"]>[number];
+  type ProtocolLink = NonNullable<RankingRow["topics"]["topic_protocols"]>[number];
+  type SourceLink = NonNullable<RankingRow["topics"]["topic_sources"]>[number];
+
+  const tokensByTopic = new Map<string, TokenLink[]>();
   for (const row of tokensRes.data ?? []) {
     const topicId = row.topic_id as string;
     const bucket = tokensByTopic.get(topicId) ?? [];
-    bucket.push({ tokens: row.tokens as Token | null });
+    bucket.push({ tokens: (row.tokens as unknown as Token | null) ?? null });
     tokensByTopic.set(topicId, bucket);
   }
 
-  const protocolsByTopic = new Map<string, RankingRow["topics"]["topic_protocols"]>();
+  const protocolsByTopic = new Map<string, ProtocolLink[]>();
   for (const row of protocolsRes.data ?? []) {
     const topicId = row.topic_id as string;
     const bucket = protocolsByTopic.get(topicId) ?? [];
-    bucket.push({ protocols: row.protocols as Protocol | null });
+    bucket.push({ protocols: (row.protocols as unknown as Protocol | null) ?? null });
     protocolsByTopic.set(topicId, bucket);
   }
 
-  const sourcesByTopic = new Map<string, RankingRow["topics"]["topic_sources"]>();
+  const sourcesByTopic = new Map<string, SourceLink[]>();
   for (const row of sourcesRes.data ?? []) {
     const topicId = row.topic_id as string;
     const bucket = sourcesByTopic.get(topicId) ?? [];
     bucket.push({
       source_id: row.source_id as string,
       source_url: row.source_url as string | null,
-      sources: row.sources as { name: string; slug: string } | null,
+      sources: (row.sources as unknown as { name: string; slug: string } | null) ?? null,
     });
     sourcesByTopic.set(topicId, bucket);
   }
