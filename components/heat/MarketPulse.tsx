@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import useSWR from "swr";
@@ -32,9 +33,32 @@ type Layout = "rail" | "mobile";
 type Props = {
   heatDataSource?: string;
   layout?: Layout;
-  /** Mints featured in New Tokens — de-emphasize duplicate scanner rows */
+  /** Mints featured in New Tokens. De-emphasize duplicate scanner rows. */
   newTokenMints?: Set<string>;
 };
+
+function TokenLogo({
+  mint,
+  logoUrl,
+  size = 20,
+}: {
+  mint: string;
+  logoUrl?: string | null;
+  size?: number;
+}) {
+  const src = logoUrl ?? `https://dd.dexscreener.com/ds-data/tokens/solana/${mint}.png`;
+  return (
+    <Image
+      src={src}
+      alt=""
+      width={size}
+      height={size}
+      className="shrink-0 rounded-full bg-bg-secondary object-cover"
+      aria-hidden
+      unoptimized
+    />
+  );
+}
 
 function TokenChip({
   row,
@@ -58,15 +82,18 @@ function TokenChip({
 
   const inner = (
     <>
-      <span
-        className={
-          prominent
-            ? "text-[12px] font-bold uppercase tracking-wide text-accent"
-            : "text-[10px] font-semibold uppercase tracking-wide text-text-secondary"
-        }
-      >
-        {display.primaryLabel}
-      </span>
+      <div className="flex items-center gap-1.5">
+        {row.mint ? <TokenLogo mint={row.mint} logoUrl={row.logoUrl} size={prominent ? 22 : 18} /> : null}
+        <span
+          className={
+            prominent
+              ? "text-[12px] font-bold uppercase tracking-wide text-accent"
+              : "text-[10px] font-semibold uppercase tracking-wide text-text-secondary"
+          }
+        >
+          {display.primaryLabel}
+        </span>
+      </div>
       {display.secondaryLabel ? (
         <span className="mt-0.5 font-mono text-[9px] text-text-muted">{display.secondaryLabel}</span>
       ) : null}
@@ -126,7 +153,10 @@ function TapeRow({
 
   const inner = (
     <div className="flex min-h-0 flex-col gap-0.5">
-      <div className="flex items-baseline gap-1.5">
+      <div className="flex items-center gap-1.5">
+        {item.mint ? (
+          <TokenLogo mint={item.mint} logoUrl={item.logoUrl} size={16} />
+        ) : null}
         <span className="shrink-0 text-[11px] font-semibold text-text-primary">
           {display.primaryLabel}
         </span>

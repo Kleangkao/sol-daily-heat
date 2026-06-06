@@ -25,11 +25,17 @@ export type TopicMetricEvidence = {
   limitations?: string[];
 };
 
+export type TopicWhatToCheckNext = {
+  possibleCauses: string[];
+  confirmationSignals: string[];
+};
+
 export type TopicMetricEvidenceDisplay = {
   evidence: TopicMetricEvidence;
   confirmedFacts: string[];
   possibleInterpretations: string[];
   needsConfirmation: string[];
+  whatToCheckNext: TopicWhatToCheckNext;
 };
 
 type ParsedMetricMove = {
@@ -255,7 +261,7 @@ function buildLimitations(
     limitations.push("Large % moves can be exaggerated when the previous baseline was low.");
   }
   if (derivedFields.includes("previousValueLabel")) {
-    limitations.push("Previous value is approximated from current value and % change — not directly sourced.");
+    limitations.push("Previous value is approximated from current value and % change. Not directly sourced.");
   }
   return limitations;
 }
@@ -280,7 +286,7 @@ function buildConfirmedFacts(
     facts.push("Multiple sources contributed to this metric cluster.");
   }
   if (kind === "metric_fee" || kind === "metric_tvl") {
-    facts.push("Scanner flagged a protocol-activity threshold — not editorial confirmation.");
+    facts.push("Scanner flagged a protocol-activity threshold. Not editorial confirmation.");
   }
   return facts;
 }
@@ -341,5 +347,9 @@ export function buildTopicMetricEvidence(
     confirmedFacts: buildConfirmedFacts(evidence, kind),
     possibleInterpretations: POSSIBLE_INTERPRETATIONS,
     needsConfirmation: NEEDS_CONFIRMATION,
+    whatToCheckNext: {
+      possibleCauses: POSSIBLE_INTERPRETATIONS,
+      confirmationSignals: NEEDS_CONFIRMATION,
+    },
   };
 }

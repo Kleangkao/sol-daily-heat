@@ -33,6 +33,6 @@ export function snapshotFreshnessFromFetchedAt(fetchedAt: string): SnapshotFresh
   return {
     stale: false,
     headline: `Snapshot updated ${at}`,
-    detail: "Stored market context from Market Pulse — not a live quote",
+    detail: "Stored market context from Market Pulse. Not a live quote",
   };
 }

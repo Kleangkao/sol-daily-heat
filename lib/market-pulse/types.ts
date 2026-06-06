@@ -20,6 +20,9 @@ export type PulseTokenRow = {
   liquidityUsd?: number | null;
   labels: PulseTokenLabel[];
   canonicalUrl?: string | null;
+  /** Resolved from DexScreener when symbol is mint-like. */
+  name?: string | null;
+  logoUrl?: string | null;
 };
 
 /** V2 watchlist snapshot stored in Supabase. */
@@ -42,6 +45,8 @@ export type HotTapeItem = {
   liquidityUsd?: number | null;
   canonicalUrl?: string | null;
   fetchedAt: string;
+  name?: string | null;
+  logoUrl?: string | null;
 };
 
 export type MarketPulseDataSource = "live" | "mock" | "empty";

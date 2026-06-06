@@ -51,7 +51,7 @@ export default function ScoreBreakdown({ breakdown, score, inline = false }: Pro
   return (
     <details className="mt-2 group">
       <summary className="cursor-pointer text-[11px] font-semibold text-accent hover:text-accent-hover">
-        Heat {score} — why this score
+        Heat {score}: why this score
       </summary>
       <div className="mt-2">{list}</div>
     </details>

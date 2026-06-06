@@ -90,7 +90,7 @@ export default function TokenDetailContent({ token }: Props) {
             </p>
           ) : null}
           <p className="mt-2 text-[12px] italic text-text-muted">
-            Token context only — not investment advice.
+            Token context only. Not investment advice.
           </p>
         </div>
       </header>

@@ -106,7 +106,7 @@ export function buildRuleSummary(
     items.length > 0 &&
     items.every((i) => i.metadata_json?.sitemap_discovery === true);
   if (headlineOnly) {
-    return `Headline-only discovery (SolanaFloor sitemap): "${title}". Open the article URL for full story — body not ingested.`.slice(
+    return `Headline-only discovery (SolanaFloor sitemap): "${title}". Open the article URL for full story. Body not ingested.`.slice(
       0,
       280
     );
@@ -184,13 +184,13 @@ export function buildWhyHot(metrics: ClusterMetrics): string {
 }
 
 export function defaultRiskNote(): string {
-  return "Context and signal only — not investment advice. Verify primary sources.";
+  return "Context and signal only. Not investment advice. Verify primary sources.";
 }
 
 export function buildCreatorAngle(title: string, category: TopicCategory): string {
-  return `Creator angle (${category}): Break down "${title.slice(0, 60)}" with on-chain proof and official links — avoid price calls.`;
+  return `Creator angle (${category}): Break down "${title.slice(0, 60)}" with on-chain proof and official links. Avoid price calls.`;
 }
 
 export function buildInvestorWatchline(title: string): string {
-  return `Watchlist context: Monitor "${title.slice(0, 50)}" for follow-through volume and governance updates — not a buy/sell signal.`;
+  return `Watchlist context: Monitor "${title.slice(0, 50)}" for follow-through volume and governance updates. Not a buy/sell signal.`;
 }

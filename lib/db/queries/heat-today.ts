@@ -115,7 +115,7 @@ function fallbackEvidence(
     interpretationNote:
       t.interpretation_type === "ai"
         ? "AI-assisted summary when configured; rank is rule-based."
-        : "Rule-based summary and heat rank — not investment advice.",
+        : "Rule-based summary and heat rank. Not investment advice.",
     watchNext: "Watch for follow-up signals and primary-source confirmation.",
     factVsInterpretation: {
       facts: [t.title],

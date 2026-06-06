@@ -23,8 +23,8 @@ export default function DemoPreviewBanner({ dataSource, snapshotDate }: Props) {
       <div className="mx-auto max-w-6xl">
         <p className="text-[13px] font-semibold text-heat">
           {isFullDemo
-            ? "Demo preview — no live snapshot for this date"
-            : "Partial demo — some sections have no live rows for this UTC date"}
+            ? "Demo preview. No live snapshot for this date"
+            : "Partial demo. Some sections have no live rows for this UTC date"}
         </p>
         <p className="mt-1 text-[12px] text-text-secondary">
           {formatSnapshotHeroLine(snapshotDate)}. Cards marked{" "}

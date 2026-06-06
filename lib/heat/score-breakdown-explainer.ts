@@ -125,7 +125,7 @@ const ROWS: Array<{
     label: "Small-base fees discount",
     explain: (n) =>
       n < 0
-        ? "Small absolute fee base reduced heat — noisy percentage spike discounted."
+        ? "Small absolute fee base reduced heat. Noisy percentage spike discounted."
         : "No small-base fee discount applied.",
   },
   {

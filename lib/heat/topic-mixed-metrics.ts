@@ -33,8 +33,8 @@ const FEE_SIGNALS = new Set(["fees_move", "chain_fees"]);
 const TVL_SIGNALS = new Set(["tvl_move", "chain_tvl"]);
 
 const SOURCE_BY_SLUG: Record<string, string> = {
-  "defillama-fees-solana": "DefiLlama — Solana Fees",
-  "defillama-solana": "DefiLlama — Solana TVL",
+  "defillama-fees-solana": "DefiLlama Solana Fees",
+  "defillama-solana": "DefiLlama Solana TVL",
 };
 
 function parsePct(raw: string): number | null {
@@ -100,7 +100,7 @@ function entryTimestamp(entry: TopicTimelineEntry): number {
 function resolveSourceName(entry: TopicTimelineEntry, kind: TopicMetricSignalKind): string {
   if (entry.sourceName?.trim()) return entry.sourceName.trim();
   if (SOURCE_BY_SLUG[entry.sourceSlug]) return SOURCE_BY_SLUG[entry.sourceSlug];
-  return kind === "fee" ? "DefiLlama — Solana Fees" : "DefiLlama — Solana TVL";
+  return kind === "fee" ? "DefiLlama Solana Fees" : "DefiLlama Solana TVL";
 }
 
 function protocolNameFromTopic(topic: TopicDetailView): string {
@@ -246,7 +246,7 @@ export function resolveMetricSourceName(
 ): string | undefined {
   const entry = pickLatestEntry(topic.timeline, kind);
   if (entry) return resolveSourceName(entry, kind);
-  return kind === "fee" ? "DefiLlama — Solana Fees" : "DefiLlama — Solana TVL";
+  return kind === "fee" ? "DefiLlama Solana Fees" : "DefiLlama Solana TVL";
 }
 
 const NON_MIXED_CARD_KINDS = new Set([

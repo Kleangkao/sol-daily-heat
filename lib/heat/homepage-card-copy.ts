@@ -7,6 +7,7 @@ import {
   type ReaderCopyInput,
   type ReaderSignalKind,
 } from "@/lib/heat/reader-signal-copy";
+import { excerptForCard, stripEmDash } from "@/lib/heat/copy-format";
 import { buildHomepageMixedMetricHint } from "@/lib/heat/topic-mixed-metrics";
 
 export type HomepageCardCopy = {
@@ -148,23 +149,23 @@ function briefForKind(kind: ReaderSignalKind, input: ReaderCopyInput): string {
     }
     case "single_editorial":
       if (stored && stored.length > 40 && !/adapter signal|fees move/i.test(stored)) {
-        return `${stored.slice(0, 200)} Watch for follow-up coverage or on-chain evidence.`;
+        return `${excerptForCard(stored)} Watch for follow-up coverage or on-chain evidence.`;
       }
       return "Primary-source or editorial coverage matched the scanner. Watch for follow-up coverage or on-chain evidence.";
     case "multi_editorial":
       if (stored && stored.length > 40 && !/adapter signal/i.test(stored)) {
-        return `${stored.slice(0, 200)} Multiple sources covered the same story today.`;
+        return `${excerptForCard(stored)} Multiple sources covered the same story today.`;
       }
       return "Multiple sources covered the same Solana-related story, making it more likely to be worth tracking.";
     case "headline_only":
-      return `SolanaFloor headline discovery only — full article text was not ingested. Open the source link before relying on this summary.`;
+      return "SolanaFloor headline discovery only. Full article text was not ingested. Open the source link before relying on this summary.";
     case "promoted_boost": {
       const token = input.title.replace(/^DexScreener boost:\s*/i, "").trim();
       return `This token (${token || "mint"}) appeared through paid DexScreener visibility. Promotion increases discoverability, not fundamental validation.`;
     }
     case "pump_style": {
       const token = input.title.replace(/^DexScreener boost:\s*/i, "").trim();
-      return `Early visibility on a pump-style or thin-liquidity mint (${token || "mint"}). High risk — not validation.`;
+      return `Early visibility on a pump-style or thin-liquidity mint (${token || "mint"}). High risk. Not validation.`;
     }
     case "status_incident":
       return stored && stored.length > 20
@@ -174,7 +175,7 @@ function briefForKind(kind: ReaderSignalKind, input: ReaderCopyInput): string {
       return "A client or infrastructure release was detected. Builders should check compatibility, release notes, and downstream impact.";
     default:
       if (stored && stored.length > 30 && !/^Clustered from|adapter signal/i.test(stored)) {
-        return stored.slice(0, 220);
+        return excerptForCard(stored, 200);
       }
       return "Clustered Solana signals surfaced this topic in today's UTC snapshot.";
   }
@@ -184,10 +185,13 @@ function briefForKind(kind: ReaderSignalKind, input: ReaderCopyInput): string {
 export function buildHomepageCardCopy(input: ReaderCopyInput): HomepageCardCopy {
   const kind = classifyReaderSignal(input);
   const mixedMetricHint = buildHomepageMixedMetricHint(input) ?? undefined;
+  const brief = briefForKind(kind, input);
+  const caution = largePctCaution(input);
+
   return {
     signalLabel: signalLabelForKind(kind, input),
-    brief: briefForKind(kind, input),
-    caution: largePctCaution(input),
-    mixedMetricHint,
+    brief: stripEmDash(brief),
+    caution: caution ? stripEmDash(caution) : undefined,
+    mixedMetricHint: mixedMetricHint ? stripEmDash(mixedMetricHint) : undefined,
   };
 }

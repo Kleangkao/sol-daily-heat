@@ -195,18 +195,34 @@ export function buildTokenCardHeadline(
 export function resolvePulseTokenDisplay(row: PulseTokenRow): TokenDisplayIdentity {
   const sym = row.symbol.trim();
   const mint = row.mint.trim();
+  const name = row.name?.trim();
+
   if (!isMintLikeLabel(sym)) {
     return {
       primaryLabel: sym.toUpperCase(),
       secondaryLabel: shortMintAddress(mint),
       symbol: sym,
+      name,
       mint,
       isMintFallback: false,
     };
   }
+
+  if (name && !isMintLikeLabel(name)) {
+    return {
+      primaryLabel: name,
+      secondaryLabel: shortMintAddress(mint),
+      symbol: sym,
+      name,
+      mint,
+      isMintFallback: false,
+    };
+  }
+
   return {
     primaryLabel: shortMintAddress(mint),
     symbol: sym,
+    name,
     mint,
     isMintFallback: true,
   };
@@ -216,6 +232,7 @@ export function resolveHotTapeDisplay(item: HotTapeItem): TokenDisplayIdentity {
   const pairSym = item.title.match(/^New pair:\s*([^/]+)/i)?.[1];
   const sym = item.symbol.trim();
   const mint = item.mint?.trim();
+  const name = item.name?.trim();
 
   if (pairSym && !isMintLikeLabel(cleanSymbol(pairSym))) {
     return {
@@ -238,6 +255,15 @@ export function resolveHotTapeDisplay(item: HotTapeItem): TokenDisplayIdentity {
   }
 
   if (mint) {
+    if (name && !isMintLikeLabel(name)) {
+      return {
+        primaryLabel: name,
+        secondaryLabel: shortMintAddress(mint),
+        name,
+        mint,
+        isMintFallback: false,
+      };
+    }
     return {
       primaryLabel: shortMintAddress(mint),
       mint,

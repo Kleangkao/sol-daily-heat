@@ -63,7 +63,7 @@ export function storyTimePrefix(kind: StoryTimeKind): string {
     case "reported":
       return "Reported";
     case "metric_window":
-      return "24h window";
+      return "Updated";
   }
 }
 
@@ -79,7 +79,7 @@ export function formatStoryRelative(iso: string): string {
 export function formatStoryTimestampLine(kind: StoryTimeKind, iso: string): string {
   const relative = formatStoryRelative(iso);
   if (kind === "metric_window") {
-    return `${storyTimePrefix(kind)} · ${relative}`;
+    return `${storyTimePrefix(kind)} ${relative}`;
   }
   return `${storyTimePrefix(kind)} ${relative}`;
 }

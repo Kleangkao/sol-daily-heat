@@ -25,9 +25,9 @@ import { SECTION_LIMITS } from "@/lib/process/section-limits";
 import { sectionItemsMetricHeavy } from "@/lib/heat/card-display";
 import DashboardLoadingShell from "./DashboardLoadingShell";
 import DemoPreviewBanner from "./DemoPreviewBanner";
-import DisclaimerBar from "./DisclaimerBar";
 import ExploreBar from "./ExploreBar";
 import HeatHero from "./HeatHero";
+import IslandDaoSponsorsRail from "./IslandDaoSponsorsRail";
 import HeatSection from "./HeatSection";
 import MarketPulse from "./MarketPulse";
 import PastSnapshotsNav from "./PastSnapshotsNav";
@@ -202,7 +202,7 @@ export default function HeatDashboard() {
         isLoading={awaitingData}
         archiveDate={archiveDate}
       />
-      <DisclaimerBar dataSource={dashboard?.dataSource} isLoading={awaitingData} />
+      <IslandDaoSponsorsRail />
       {dashboard && dashboard.dataSource && dashboard.dataSource !== "live" ? (
         <DemoPreviewBanner
           dataSource={dashboard.dataSource}
@@ -230,7 +230,7 @@ export default function HeatDashboard() {
                 sectionId="top-heat"
                 sectionLabel="Top Heat"
                 topicSections={topicSections}
-                description="Highest rule-based heat scores for the selected UTC snapshot — deduplicated for that day."
+                description="Highest rule-based heat scores for the selected UTC snapshot, deduplicated for that day."
                 items={topFiltered}
                 emptyMessage={topHeatEmptyMessage}
                 sectionDataSource={sectionSource("topHeat")}
@@ -275,7 +275,7 @@ export default function HeatDashboard() {
                     ? "Only builder-relevant infra, tooling, and status signals are shown."
                     : undefined
                 }
-                sectionDisclaimer="Operational and ecosystem context — not investment advice."
+                sectionDisclaimer="Operational and ecosystem context. Not investment advice."
                 isOpen={sectionOpen.builder}
                 onToggle={() => toggleSection("builder")}
               />
@@ -285,7 +285,7 @@ export default function HeatDashboard() {
                 sectionId="creator"
                 sectionLabel="Creator"
                 topicSections={topicSections}
-                description="Thread and clip starting points derived from the UTC snapshot — add your own verification."
+                description="Thread and clip starting points derived from the UTC snapshot. Add your own verification."
                 items={dashboard.creatorAngles}
                 sectionDataSource={sectionSource("creatorAngles")}
                 personaHighlight="creator"

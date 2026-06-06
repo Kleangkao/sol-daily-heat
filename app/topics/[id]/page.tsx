@@ -44,7 +44,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
 
   const description =
     topic.summary?.trim().slice(0, 160) ||
-    "Rule-based topic intelligence from Solana Daily Heat — not investment advice.";
+    "Rule-based topic intelligence from Solana Daily Heat. Not investment advice.";
 
   return {
     title: `${topic.title} · Solana Daily Heat`,

@@ -50,6 +50,8 @@ function normalizeTokenRow(raw: Record<string, unknown>): PulseTokenRow {
         : typeof raw.canonical_url === "string"
           ? raw.canonical_url
           : null,
+    name: typeof raw.name === "string" ? raw.name : null,
+    logoUrl: typeof raw.logoUrl === "string" ? raw.logoUrl : null,
   };
 }
 
@@ -119,5 +121,7 @@ export function normalizeHotTapePayload(raw: unknown): HotTapeItem[] {
           ? row.canonical_url
           : null,
     fetchedAt: String(row.fetchedAt ?? row.fetched_at ?? new Date().toISOString()),
+    name: typeof row.name === "string" ? row.name : null,
+    logoUrl: typeof row.logoUrl === "string" ? row.logoUrl : null,
   }));
 }

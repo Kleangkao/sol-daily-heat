@@ -4,6 +4,10 @@ import {
   PULSE_STALE_MINUTES,
   SOL_MINT,
 } from "@/lib/market-pulse/constants";
+import {
+  enrichHotTapeItems,
+  enrichPulseTokenRows,
+} from "@/lib/market-pulse/enrich-token-display";
 import { flattenWatchlistSnapshot } from "@/lib/market-pulse/normalize-payload";
 import { readHotTapeSnapshot, readWatchlistSnapshot } from "@/lib/market-pulse/snapshots";
 import { SOL_SYMBOL } from "@/lib/market-pulse/watchlist-mints";
@@ -120,7 +124,11 @@ export async function fetchMarketPulse(
   let v2 = watchRow?.payload_json ?? emptyV2();
   if (expired) v2 = stripPricesIfExpired(v2);
 
-  const hotTape = hotRow?.payload_json ?? [];
+  const enrichedAnchor = (await enrichPulseTokenRows([v2.anchor]))[0];
+  const enrichedHot = await enrichPulseTokenRows(v2.hotTokens);
+  v2 = { anchor: enrichedAnchor, hotTokens: enrichedHot };
+
+  const hotTape = await enrichHotTapeItems(hotRow?.payload_json ?? []);
 
   const hasWatchPrices =
     (v2.anchor.priceUsd != null || v2.hotTokens.some((t) => t.priceUsd != null)) &&

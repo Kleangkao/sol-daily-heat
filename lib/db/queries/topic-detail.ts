@@ -58,7 +58,7 @@ function buildBuilderNoteFromMeta(
   sourceSlugs: string[]
 ): string | null {
   if (sectionAppearances.includes("builder_watch")) {
-    return "Builder context: this topic appears in Builder / Infra Watch — monitor infrastructure, tooling, or operational impact.";
+    return "Builder context: this topic appears in Builder / Infra Watch. Monitor infrastructure, tooling, or operational impact.";
   }
   const hasStatus = sourceSlugs.some((s) => STATUS_SOURCE_SLUGS.has(s));
   if (category === "infra" || hasStatus) {
@@ -245,7 +245,7 @@ export async function getTopicDetail(
     summary: topic.summary ?? "",
     category: topic.category,
     whyHot: topic.why_hot ?? "Clustered signals from today's scanner window.",
-    riskNote: topic.risk_note ?? "Context only — not investment advice.",
+    riskNote: topic.risk_note ?? "Context only. Not investment advice.",
     interpretationType: topic.interpretation_type,
     confidence: Number(
       heatRankingRow?.confidence_score ?? topic.confidence_score ?? 0

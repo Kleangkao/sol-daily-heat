@@ -32,7 +32,7 @@ const topHeat: HeatCardView[] = [
       "Cross-source coverage within 6h, high-reliability RSS hits, and keyword cluster match on “Firedancer” + “testnet”.",
     relatedTokens: [],
     relatedProjects: [{ name: "Solana Labs", type: "project" }],
-    riskNote: "Context only — not investment advice. Verify official release notes.",
+    riskNote: "Context only. Not investment advice. Verify official release notes.",
     interpretationType: "rule_based",
     confidence: 0.88,
     scoreBreakdown: {
@@ -63,7 +63,7 @@ const topHeat: HeatCardView[] = [
     id: "t3",
     title: "Memecoin launch cluster: 12 new pairs in 24h",
     summary:
-      "DexScreener flagged a burst of new Solana pairs with sub-$500k liquidity — typical launch-day pattern.",
+      "DexScreener flagged a burst of new Solana pairs with sub-$500k liquidity. Typical launch-day pattern.",
     category: "meme",
     heatScore: 79,
     sourceCount: 2,
@@ -92,7 +92,7 @@ const topHeat: HeatCardView[] = [
     whyHot: "Official blog + two RSS mirrors; creator-angle tag applied.",
     relatedTokens: [],
     relatedProjects: [{ name: "Phantom", type: "app" }],
-    riskNote: "Pre-release feature — timeline may shift.",
+    riskNote: "Pre-release feature. Timeline may shift.",
     interpretationType: "rule_based",
     confidence: 0.79,
   }),
@@ -101,7 +101,7 @@ const topHeat: HeatCardView[] = [
 const newTokens: HeatCardView[] = [
   card({
     id: "nt1",
-    title: "$PULSE — new pair on Raydium (4h old)",
+    title: "$PULSE new pair on Raydium (4h old)",
     summary: "First liquidity add detected via DexScreener; thin book, high slippage.",
     category: "meme",
     heatScore: 68,
@@ -117,7 +117,7 @@ const newTokens: HeatCardView[] = [
   }),
   card({
     id: "nt2",
-    title: "$GRID — infra token listing",
+    title: "$GRID infra token listing",
     summary: "Small-cap infra narrative token gaining mentions in Solana dev Discord mirrors.",
     category: "infra",
     heatScore: 61,
@@ -127,7 +127,7 @@ const newTokens: HeatCardView[] = [
     whyHot: "Keyword “validator” + new mint within 48h.",
     relatedTokens: [{ symbol: "GRID" }],
     relatedProjects: [],
-    riskNote: "Low float — watch for concentrated wallets.",
+    riskNote: "Low float. Watch for concentrated wallets.",
     interpretationType: "rule_based",
     confidence: 0.58,
   }),
@@ -174,7 +174,7 @@ const builderWatch: HeatCardView[] = [
     id: "b1",
     title: "Firedancer testnet milestone drives infra narrative",
     summary:
-      "Ecosystem outlets report a new Firedancer testnet cut with improved throughput benchmarks — builder-relevant client upgrade signal.",
+      "Ecosystem outlets report a new Firedancer testnet cut with improved throughput benchmarks. Builder-relevant client upgrade signal.",
     category: "infra",
     heatScore: 92,
     sourceCount: 5,
@@ -184,7 +184,7 @@ const builderWatch: HeatCardView[] = [
       "Cross-source coverage; keyword cluster on Firedancer, testnet, and validator client path.",
     relatedTokens: [],
     relatedProjects: [{ name: "Solana Labs", type: "project" }],
-    riskNote: "Infrastructure context only — not investment advice.",
+    riskNote: "Infrastructure context only. Not investment advice.",
     interpretationType: "rule_based",
     confidence: 0.88,
     sourceSlugs: ["helius-blog", "solana-blog"],
@@ -211,7 +211,7 @@ const builderWatch: HeatCardView[] = [
   }),
   card({
     id: "b3",
-    title: "Pyth oracle feed latency incident — resolved",
+    title: "Pyth oracle feed latency incident resolved",
     summary:
       "Status feed documents a short Hermes latency spike; relevant for apps depending on Pyth price updates.",
     category: "infra",
@@ -235,7 +235,7 @@ const creatorAngles: HeatCardView[] = [
     id: "c1",
     title: "Thread hook: “Solana infra week” recap format",
     summary:
-      "Template: 5-bullet recap of Firedancer + Phantom + one DeFi signal — good for educational threads.",
+      "Template: 5-bullet recap of Firedancer + Phantom + one DeFi signal. Good for educational threads.",
     category: "ecosystem",
     heatScore: 70,
     sourceCount: 1,
@@ -244,14 +244,14 @@ const creatorAngles: HeatCardView[] = [
     whyHot: "Rule-based creator template matched top infra + wallet stories.",
     relatedTokens: [],
     relatedProjects: [],
-    riskNote: "Creator templates are starting points — add your own verification.",
+    riskNote: "Creator templates are starting points. Add your own verification.",
     interpretationType: "rule_based",
     confidence: 0.7,
   }),
   card({
     id: "c2",
     title: "Clip angle: Jupiter perps UI walkthrough",
-    summary: "Short-form demo of limit vs market perps on Solana — ties to volume spike story.",
+    summary: "Short-form demo of limit vs market perps on Solana. Ties to volume spike story.",
     category: "defi",
     heatScore: 66,
     sourceCount: 2,

@@ -14,13 +14,14 @@ const outfit = Outfit({
   variable: "--font-outfit",
 });
 
+import BeachAtmosphere from "@/components/heat/BeachAtmosphere";
 import { SITE_URL } from "@/lib/site";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: "Solana Daily Heat",
   description:
-    "Daily intelligence dashboard for the Solana ecosystem — what is hot, why, and what to watch.",
+    "Daily intelligence dashboard for the Solana ecosystem. What is hot, why, and what to watch.",
   alternates: {
     canonical: "/",
   },
@@ -36,7 +37,8 @@ export default function RootLayout({
       <body
         className={`${barlow.variable} ${outfit.variable} bg-bg-primary text-text-primary font-body antialiased`}
       >
-        {children}
+        <BeachAtmosphere />
+        <div className="relative z-10">{children}</div>
       </body>
     </html>
   );

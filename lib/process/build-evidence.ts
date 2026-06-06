@@ -58,9 +58,9 @@ function buildWatchNext(
 ): string {
   if (itemTypes.includes("market")) {
     if (uniqueSignals.includes("boost")) {
-      return "Paid DexScreener boost signal — watch persistence, liquidity, and independent coverage beyond promotion.";
+      return "Paid DexScreener boost signal. Watch persistence, liquidity, and independent coverage beyond promotion.";
     }
-    return "Watch 24h volume, liquidity depth, and pair age — context only, not a trade signal.";
+    return "Watch 24h volume, liquidity depth, and pair age. Context only, not a trade signal.";
   }
   if (itemTypes.includes("protocol") || category === "defi") {
     return "Watch TVL trend over the next 24–48h and any protocol governance or audit announcements.";
@@ -82,7 +82,7 @@ function buildInterpretationNote(
   if (interpretationType === "ai") {
     return "Summary may include AI-assisted text when keys are configured; heat rank remains rule-based.";
   }
-  return "Summary and heat rank are rule-based interpretations of ingested signals — not investment advice.";
+  return "Summary and heat rank are rule-based interpretations of ingested signals. Not investment advice.";
 }
 
 export function buildSignalBreakdown(
@@ -118,7 +118,7 @@ function evidenceFromRawItem(item: RawItem & { sources?: Source }): EvidenceItem
 
   const text =
     item.metadata_json?.sitemap_discovery === true
-      ? `${title} — Article body was not ingested. Open source to verify.`
+      ? `${title}. Article body was not ingested. Open source to verify.`
       : snippet || title;
   if (!text) return null;
 

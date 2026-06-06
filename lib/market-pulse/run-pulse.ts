@@ -3,6 +3,10 @@ import { applyPricesToSnapshot } from "@/lib/market-pulse/apply-prices";
 import { buildHotTapeFromRawItems } from "@/lib/market-pulse/hot-tape";
 import { fetchJupiterPrices } from "@/lib/market-pulse/jupiter-price";
 import {
+  enrichHotTapeItems,
+  enrichPulseTokenRows,
+} from "@/lib/market-pulse/enrich-token-display";
+import {
   buildScannerHotTokens,
   mintsForPricing,
 } from "@/lib/market-pulse/scanner-hot-tokens";
@@ -37,9 +41,12 @@ export async function runMarketPulseRefresh(
   sourceMix.ranking_date_used = d.ranking_date_used;
   sourceMix.filter_note = d.filter_note;
 
+  const enrichedAnchor = (await enrichPulseTokenRows([scanner.anchor]))[0];
+  const enrichedHot = await enrichPulseTokenRows(scanner.hotTokens);
+
   let snapshot: WatchlistSnapshotV2 = {
-    anchor: scanner.anchor,
-    hotTokens: scanner.hotTokens,
+    anchor: enrichedAnchor,
+    hotTokens: enrichedHot,
   };
 
   const mintIds = mintsForPricing(snapshot.anchor, snapshot.hotTokens);
@@ -79,7 +86,9 @@ export async function runMarketPulseRefresh(
     snapshot.anchor.mint,
     ...snapshot.hotTokens.map((t) => t.mint),
   ]);
-  let hotTape = await buildHotTapeFromRawItems(db, { excludeMints });
+  let hotTape = await enrichHotTapeItems(
+    await buildHotTapeFromRawItems(db, { excludeMints })
+  );
   sourceMix.hot_tape = "ok";
 
   try {

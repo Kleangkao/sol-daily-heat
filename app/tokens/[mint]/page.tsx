@@ -47,7 +47,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   const contextLine = token.scannerContext?.join(" ").trim();
   const description =
     (contextLine ? contextLine.slice(0, 160) : null) ||
-    `Market and scanner context for ${titleLabel} on Solana — not investment advice.`;
+    `Market and scanner context for ${titleLabel} on Solana. Not investment advice.`;
 
   return {
     title: `${titleLabel} · Solana Daily Heat`,

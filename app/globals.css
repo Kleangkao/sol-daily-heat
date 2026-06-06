@@ -54,4 +54,258 @@ a {
     color: var(--crystal-teal);
     font-weight: 600;
   }
+
+  .beach-atmosphere {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .beach-atmosphere__sky {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 90% 55% at 50% 0%, rgba(116, 166, 145, 0.1) 0%, transparent 52%),
+      linear-gradient(180deg, #031414 0%, #041616 30%, #051c1c 55%, #062222 100%);
+  }
+
+  .beach-atmosphere__horizon {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 52%;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(144, 184, 163, 0.2) 18%,
+      rgba(144, 184, 163, 0.32) 50%,
+      rgba(144, 184, 163, 0.2) 82%,
+      transparent 100%
+    );
+    box-shadow: 0 0 48px 10px rgba(116, 166, 145, 0.1);
+  }
+
+  .beach-atmosphere__ocean {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 52%;
+    bottom: 0;
+    background:
+      radial-gradient(ellipse 70% 12% at 50% 0%, rgba(116, 166, 145, 0.1) 0%, transparent 72%),
+      linear-gradient(
+        180deg,
+        rgba(6, 36, 34, 0.9) 0%,
+        rgba(5, 32, 30, 0.95) 38%,
+        rgba(4, 28, 26, 0.98) 62%,
+        rgba(4, 22, 20, 1) 100%
+      );
+  }
+
+  .beach-atmosphere__wave {
+    position: absolute;
+    left: -50%;
+    width: 200%;
+    border-radius: 50%;
+    opacity: 0.18;
+  }
+
+  .beach-atmosphere__wave--1 {
+    top: 0;
+    height: 36px;
+    background: rgba(144, 184, 163, 0.1);
+    animation: beach-wave-drift 22s linear infinite;
+  }
+
+  .beach-atmosphere__wave--2 {
+    top: 2.5%;
+    height: 26px;
+    background: rgba(116, 166, 145, 0.08);
+    animation: beach-wave-drift 32s linear infinite reverse;
+    opacity: 0.14;
+  }
+
+  .beach-atmosphere__sand {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 16vh;
+    background: linear-gradient(
+      180deg,
+      transparent 0%,
+      rgba(34, 48, 40, 0.28) 28%,
+      rgba(46, 56, 38, 0.45) 100%
+    );
+  }
+
+  .beach-atmosphere__vignette {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      ellipse 72% 58% at 50% 42%,
+      transparent 0%,
+      rgba(4, 22, 22, 0.42) 100%
+    );
+  }
+
+  .beach-asset {
+    position: absolute;
+    pointer-events: none;
+    background-repeat: no-repeat;
+    background-size: contain;
+    filter: grayscale(100%) brightness(0.38) contrast(0.92);
+    opacity: 0.1;
+    mix-blend-mode: soft-light;
+  }
+
+  .beach-asset--fronds-tr {
+    top: -1%;
+    right: -3%;
+    width: min(440px, 40vw);
+    height: min(340px, 28vh);
+    background-image: url("/beach/2.png");
+    background-position: right top;
+    opacity: 0.09;
+  }
+
+  .beach-asset--fronds-tl {
+    top: -1%;
+    left: -3%;
+    width: min(380px, 34vw);
+    height: min(300px, 24vh);
+    background-image: url("/beach/2.png");
+    background-position: left top;
+    transform: scaleX(-1);
+    opacity: 0.07;
+  }
+
+  .beach-asset--palm-left {
+    bottom: -1%;
+    left: -2%;
+    width: min(300px, 24vw);
+    height: min(520px, 58vh);
+    background-image: url("/beach/7.png");
+    background-position: left bottom;
+    opacity: 0.12;
+  }
+
+  .beach-asset--palm-right {
+    bottom: -1%;
+    right: -2%;
+    width: min(280px, 22vw);
+    height: min(500px, 55vh);
+    background-image: url("/beach/7.png");
+    background-position: right bottom;
+    transform: scaleX(-1);
+    opacity: 0.11;
+  }
+
+  .beach-asset--surfboards {
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin-inline: auto;
+    width: min(360px, 34vw);
+    height: min(280px, 22vh);
+    background-image: url("/beach/1.png");
+    background-position: center bottom;
+    opacity: 0.08;
+  }
+
+  .beach-asset--umbrella {
+    bottom: 14vh;
+    left: 5%;
+    width: min(210px, 17vw);
+    height: min(260px, 24vh);
+    background-image: url("/beach/4.png");
+    background-position: left bottom;
+    opacity: 0.07;
+  }
+
+  .beach-asset--crab-peek {
+    bottom: 30vh;
+    left: -1%;
+    width: min(190px, 15vw);
+    height: min(190px, 18vh);
+    background-image: url("/beach/3.png");
+    background-position: left center;
+    opacity: 0.06;
+  }
+
+  .beach-asset--crab-float {
+    bottom: 10vh;
+    right: 7%;
+    width: min(130px, 11vw);
+    height: min(130px, 12vh);
+    background-image: url("/beach/6.png");
+    background-position: center;
+    opacity: 0.05;
+    transform: rotate(-10deg);
+  }
+
+  .beach-asset--coconut {
+    bottom: 38vh;
+    right: 4%;
+    width: min(110px, 9vw);
+    height: min(150px, 14vh);
+    background-image: url("/beach/5.png");
+    background-position: center bottom;
+    opacity: 0.06;
+  }
+
+  @media (max-width: 768px) {
+    .beach-asset--fronds-tl,
+    .beach-asset--umbrella,
+    .beach-asset--coconut,
+    .beach-asset--crab-float {
+      display: none;
+    }
+
+    .beach-asset--surfboards {
+      width: min(260px, 70vw);
+      opacity: 0.06;
+    }
+  }
+
+  @keyframes beach-wave-drift {
+    0% {
+      transform: translate3d(0, 0, 0);
+    }
+    100% {
+      transform: translate3d(25%, 0, 0);
+    }
+  }
+
+  @keyframes featured-marquee {
+    0% {
+      transform: translate3d(0, 0, 0);
+    }
+    100% {
+      transform: translate3d(-50%, 0, 0);
+    }
+  }
+
+  .featured-marquee-track {
+    animation: featured-marquee 36s linear infinite;
+    will-change: transform;
+  }
+
+  .featured-marquee-clip:hover .featured-marquee-track {
+    animation-play-state: paused;
+  }
+
+  .featured-marquee-fade {
+    background: linear-gradient(90deg, var(--deep-900) 0%, transparent 100%);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .beach-atmosphere__wave--1,
+    .beach-atmosphere__wave--2 {
+      animation: none;
+    }
+  }
 }

@@ -77,6 +77,28 @@ function itemDisplayKind(item: EvidenceItem): DisplayEvidenceKind {
   return item.kind;
 }
 
+function normalizeEvidenceSnippet(text: string): string {
+  return text.trim().toLowerCase().replace(/\s+/g, " ");
+}
+
+function pickMetricSourceSnippet(
+  topic: TopicDetailView,
+  items: EvidenceItem[]
+): string | null {
+  const what = topic.evidence?.whatHappened?.trim();
+  if (what) return what;
+  return items[0]?.text?.trim() ?? null;
+}
+
+function dedupeEvidenceItemsAgainstSnippet(
+  snippet: string | null,
+  items: EvidenceItem[]
+): EvidenceItem[] {
+  if (!snippet) return items;
+  const key = normalizeEvidenceSnippet(snippet);
+  return items.filter((item) => normalizeEvidenceSnippet(item.text) !== key);
+}
+
 function groupEvidence(items: TopicDetailView["evidence"]) {
   const groups: Record<DisplayEvidenceKind, EvidenceItem[]> = {
     fact: [],
@@ -130,6 +152,12 @@ export default function TopicDetailContent({ topic }: Props) {
     "interpretation",
   ];
   const flatEvidenceItems = displayOrder.flatMap((kind) => evidenceGroups[kind]);
+  const metricSourceSnippet = metricEvidence
+    ? pickMetricSourceSnippet(topic, flatEvidenceItems)
+    : null;
+  const dedupedEvidenceItems = metricEvidence
+    ? dedupeEvidenceItemsAgainstSnippet(metricSourceSnippet, flatEvidenceItems)
+    : flatEvidenceItems;
 
   return (
     <div className="min-h-screen">
@@ -189,7 +217,7 @@ export default function TopicDetailContent({ topic }: Props) {
             Scanner refreshed {formatTime(topic.lastUpdatedAt)}
           </p>
           <p className="mt-2 text-[12px] italic text-text-muted">
-            Context only — not investment advice. Verify primary sources before acting.
+            Context only. Not investment advice. Verify primary sources before acting.
           </p>
         </div>
       </header>
@@ -231,7 +259,66 @@ export default function TopicDetailContent({ topic }: Props) {
           </section>
         ) : null}
 
-        <section className="rounded-[10px] border border-border bg-bg-card p-5">
+        {metricEvidence ? (
+          <section className="rounded-[10px] border border-border bg-bg-card p-5">
+            <h2 className="font-heading text-[18px] font-bold uppercase tracking-wide text-text-primary">
+              Metric evidence
+            </h2>
+            <div className="mt-3 space-y-2">
+              <MetricEvidenceRow
+                label="Metric"
+                value={metricEvidence.evidence.metricLabel}
+              />
+              {metricEvidence.evidence.currentValueLabel ? (
+                <MetricEvidenceRow
+                  label="Current"
+                  value={metricEvidence.evidence.currentValueLabel}
+                />
+              ) : null}
+              {metricEvidence.evidence.previousValueLabel ? (
+                <MetricEvidenceRow
+                  label="Previous"
+                  value={metricEvidence.evidence.previousValueLabel}
+                  muted={metricEvidence.evidence.derivedFields?.includes("previousValueLabel")}
+                />
+              ) : null}
+              {metricEvidence.evidence.changePctLabel ? (
+                <MetricEvidenceRow
+                  label="Change"
+                  value={metricEvidence.evidence.changePctLabel}
+                />
+              ) : null}
+              {metricEvidence.evidence.sourceName ? (
+                <MetricEvidenceRow
+                  label="Source"
+                  value={metricEvidence.evidence.sourceName}
+                />
+              ) : null}
+              {metricEvidence.evidence.snapshotLabel ? (
+                <MetricEvidenceRow
+                  label="Snapshot"
+                  value={metricEvidence.evidence.snapshotLabel}
+                />
+              ) : null}
+              <MetricEvidenceRow
+                label="Depth"
+                value={evidenceDepthLabel(metricEvidence.evidence.evidenceDepth)}
+              />
+            </div>
+            {metricEvidence.evidence.limitations &&
+            metricEvidence.evidence.limitations.length > 0 ? (
+              <ul className="mt-4 space-y-1 text-[12px] leading-relaxed text-text-muted">
+                {metricEvidence.evidence.limitations.map((note, i) => (
+                  <li key={`lim-${i}`}>{note}</li>
+                ))}
+              </ul>
+            ) : null}
+          </section>
+        ) : null}
+
+        <section
+          className={`rounded-[10px] border border-border bg-bg-card p-5${metricEvidence ? " mt-6" : ""}`}
+        >
           <h2 className="font-heading text-[18px] font-bold uppercase tracking-wide text-text-primary">
             {brief.heading}
           </h2>
@@ -245,7 +332,7 @@ export default function TopicDetailContent({ topic }: Props) {
               </p>
             ))}
           </div>
-          {brief.watchNext.length > 0 ? (
+          {!metricEvidence && brief.watchNext.length > 0 ? (
             <div className="mt-4">
               <p className="text-[11px] font-semibold uppercase tracking-wide text-text-muted">
                 Watch next
@@ -266,101 +353,44 @@ export default function TopicDetailContent({ topic }: Props) {
         </section>
 
         {metricEvidence ? (
-          <>
-            <section className="mt-6 rounded-[10px] border border-border bg-bg-card p-5">
-              <h2 className="font-heading text-[18px] font-bold uppercase tracking-wide text-text-primary">
-                Metric evidence
-              </h2>
-              <div className="mt-3 space-y-2">
-                <MetricEvidenceRow
-                  label="Metric"
-                  value={metricEvidence.evidence.metricLabel}
-                />
-                {metricEvidence.evidence.currentValueLabel ? (
-                  <MetricEvidenceRow
-                    label="Current"
-                    value={metricEvidence.evidence.currentValueLabel}
-                  />
-                ) : null}
-                {metricEvidence.evidence.previousValueLabel ? (
-                  <MetricEvidenceRow
-                    label="Previous"
-                    value={metricEvidence.evidence.previousValueLabel}
-                    muted={metricEvidence.evidence.derivedFields?.includes("previousValueLabel")}
-                  />
-                ) : null}
-                {metricEvidence.evidence.changePctLabel ? (
-                  <MetricEvidenceRow
-                    label="Change"
-                    value={metricEvidence.evidence.changePctLabel}
-                  />
-                ) : null}
-                {metricEvidence.evidence.sourceName ? (
-                  <MetricEvidenceRow
-                    label="Source"
-                    value={metricEvidence.evidence.sourceName}
-                  />
-                ) : null}
-                {metricEvidence.evidence.snapshotLabel ? (
-                  <MetricEvidenceRow
-                    label="Snapshot"
-                    value={metricEvidence.evidence.snapshotLabel}
-                  />
-                ) : null}
-                <MetricEvidenceRow
-                  label="Depth"
-                  value={evidenceDepthLabel(metricEvidence.evidence.evidenceDepth)}
-                />
-              </div>
-              {metricEvidence.evidence.limitations &&
-              metricEvidence.evidence.limitations.length > 0 ? (
-                <ul className="mt-4 space-y-1 text-[12px] leading-relaxed text-text-muted">
-                  {metricEvidence.evidence.limitations.map((note, i) => (
-                    <li key={`lim-${i}`}>{note}</li>
-                  ))}
-                </ul>
-              ) : null}
-            </section>
-
-            <section className="mt-6 rounded-[10px] border border-border bg-bg-card p-5">
+          <details className="group mt-6 rounded-[10px] border border-border bg-bg-card">
+            <summary className="cursor-pointer list-none p-5 font-heading text-[16px] font-bold uppercase tracking-wide text-text-primary marker:content-none [&::-webkit-details-marker]:hidden">
+              <span className="flex items-center justify-between gap-3">
+                What to check next
+                <span className="text-[11px] font-semibold normal-case tracking-normal text-text-muted group-open:hidden">
+                  Show
+                </span>
+                <span className="hidden text-[11px] font-semibold normal-case tracking-normal text-text-muted group-open:inline">
+                  Hide
+                </span>
+              </span>
+            </summary>
+            <div className="border-t border-border px-5 pb-5 pt-4">
               <div className="grid gap-5 sm:grid-cols-2">
                 <div>
                   <h3 className="text-[11px] font-semibold uppercase tracking-wide text-text-muted">
-                    Confirmed facts
+                    Possible causes
                   </h3>
+                  <p className="mt-1 text-[11px] text-text-muted">Not confirmed. Hypotheses only.</p>
                   <ul className="mt-2 list-disc space-y-1.5 pl-5 text-[13px] leading-relaxed text-text-secondary">
-                    {metricEvidence.confirmedFacts.map((fact, i) => (
-                      <li key={`fact-${i}`}>{fact}</li>
+                    {metricEvidence.whatToCheckNext.possibleCauses.map((item, i) => (
+                      <li key={`cause-${i}`}>{item}</li>
                     ))}
                   </ul>
                 </div>
                 <div>
                   <h3 className="text-[11px] font-semibold uppercase tracking-wide text-text-muted">
-                    Possible interpretations
+                    Confirmation signals
                   </h3>
-                  <p className="mt-1 text-[11px] text-text-muted">
-                    Not confirmed — hypotheses only.
-                  </p>
                   <ul className="mt-2 list-disc space-y-1.5 pl-5 text-[13px] leading-relaxed text-text-secondary">
-                    {metricEvidence.possibleInterpretations.map((item, i) => (
-                      <li key={`interp-${i}`}>{item}</li>
+                    {metricEvidence.whatToCheckNext.confirmationSignals.map((item, i) => (
+                      <li key={`signal-${i}`}>{item}</li>
                     ))}
                   </ul>
                 </div>
               </div>
-            </section>
-
-            <section className="mt-6 rounded-[10px] border border-border bg-bg-card p-5">
-              <h2 className="font-heading text-[16px] font-bold uppercase tracking-wide text-text-primary">
-                Needs confirmation from
-              </h2>
-              <ul className="mt-3 list-disc space-y-1.5 pl-5 text-[13px] leading-relaxed text-text-secondary">
-                {metricEvidence.needsConfirmation.map((item, i) => (
-                  <li key={`confirm-${i}`}>{item}</li>
-                ))}
-              </ul>
-            </section>
-          </>
+            </div>
+          </details>
         ) : null}
 
         {topic.evidence ? (
@@ -386,26 +416,54 @@ export default function TopicDetailContent({ topic }: Props) {
               </ul>
             ) : null}
 
-            <p className="mt-3 text-[13px] leading-relaxed text-text-secondary">
-              {topic.evidence.whatHappened}
-            </p>
+            {metricEvidence ? (
+              metricSourceSnippet ? (
+                <p className="mt-3 text-[13px] leading-relaxed text-text-secondary">
+                  {metricSourceSnippet}
+                </p>
+              ) : null
+            ) : (
+              <p className="mt-3 text-[13px] leading-relaxed text-text-secondary">
+                {topic.evidence.whatHappened}
+              </p>
+            )}
 
-            {flatEvidenceItems.length > 0 ? (
+            {!metricEvidence && flatEvidenceItems.length > 0 ? (
               <ul className="mt-4 space-y-2">
                 {flatEvidenceItems.map((item, i) => (
-                    <li
-                      key={`ev-${i}`}
-                      className="rounded-[8px] border border-border/50 bg-bg-secondary/40 px-3 py-2 text-[13px]"
-                    >
-                      <span className="text-text-primary">
-                        {item.sourceName ? (
-                          <span className="font-semibold text-text-secondary">
-                            {item.sourceName}:{" "}
-                          </span>
-                        ) : null}
-                        {item.text}
-                      </span>
-                    </li>
+                  <li
+                    key={`ev-${i}`}
+                    className="rounded-[8px] border border-border/50 bg-bg-secondary/40 px-3 py-2 text-[13px]"
+                  >
+                    <span className="text-text-primary">
+                      {item.sourceName ? (
+                        <span className="font-semibold text-text-secondary">
+                          {item.sourceName}:{" "}
+                        </span>
+                      ) : null}
+                      {item.text}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+
+            {metricEvidence && dedupedEvidenceItems.length > 0 ? (
+              <ul className="mt-4 space-y-2">
+                {dedupedEvidenceItems.map((item, i) => (
+                  <li
+                    key={`ev-${i}`}
+                    className="rounded-[8px] border border-border/50 bg-bg-secondary/40 px-3 py-2 text-[13px]"
+                  >
+                    <span className="text-text-primary">
+                      {item.sourceName ? (
+                        <span className="font-semibold text-text-secondary">
+                          {item.sourceName}:{" "}
+                        </span>
+                      ) : null}
+                      {item.text}
+                    </span>
+                  </li>
                 ))}
               </ul>
             ) : null}
@@ -586,7 +644,7 @@ export default function TopicDetailContent({ topic }: Props) {
                     ) : null}
                     {entry.headlineOnly ? (
                       <p className="mt-2 text-[11px] text-amber-200/90">
-                        Headline-only discovery — article body was not ingested.
+                        Headline-only discovery. Article body was not ingested.
                       </p>
                     ) : null}
                   </li>

@@ -79,7 +79,7 @@ export default function HeatCard({
     (!isGenericRiskNote(item.riskNote) ? item.riskNote : undefined);
 
   return (
-    <article className="group flex flex-col overflow-hidden rounded-[12px] border border-border bg-bg-card p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-accent/60 hover:shadow-lg hover:shadow-black/20">
+    <article className="group flex flex-col overflow-hidden rounded-[12px] border border-border/80 bg-bg-card/82 p-4 backdrop-blur-[3px] transition-all duration-200 hover:-translate-y-0.5 hover:border-accent/60 hover:shadow-lg hover:shadow-black/20">
       <div className="flex items-start justify-between gap-3">
         <div className="flex flex-wrap gap-2">
           <span className="inline-flex rounded-full bg-bg-secondary px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-accent">

@@ -491,7 +491,7 @@ function readerWhyHot(kind: ReaderSignalKind, _input: ReaderCopyInput): string {
     case "github_release":
       return "Release notes can shift builder attention when they touch performance, tooling, or validator/client behavior.";
     default:
-      return "Worth monitoring for follow-up signals and primary-source confirmation — context only, not investment advice.";
+      return "Worth monitoring for follow-up signals and primary-source confirmation. Context only, not investment advice.";
   }
 }
 
@@ -521,7 +521,7 @@ function readerSummary(kind: ReaderSignalKind, input: ReaderCopyInput): string {
     case "metric_tvl": {
       const name = input.title.split(":")[0]?.trim() || "This protocol";
       if (stored && /tvl/i.test(stored) && !/adapter signal/i.test(stored)) {
-        return `${name} registered a notable TVL move in the last 24h. The scanner treats it as protocol-activity context — verify magnitude and drivers in evidence.`;
+        return `${name} registered a notable TVL move in the last 24h. The scanner treats it as protocol-activity context. Verify magnitude and drivers in evidence.`;
       }
       return `${name} registered a notable TVL move in the last 24h. Check evidence for the underlying DefiLlama values.`;
     }
@@ -538,11 +538,11 @@ function readerSummary(kind: ReaderSignalKind, input: ReaderCopyInput): string {
       return `Several outlets are covering the same story: ${input.title.slice(0, 140)}. Cross-source repetition increases narrative visibility in today's scanner.`;
     }
     case "headline_only":
-      return `SolanaFloor headline: "${input.title.slice(0, 120)}". Full article text was not ingested — open the source link before relying on this summary.`;
+      return `SolanaFloor headline: "${input.title.slice(0, 120)}". Full article text was not ingested. Open the source link before relying on this summary.`;
     case "promoted_boost":
       return `DexScreener paid visibility surfaced this token (${input.title.replace(/^DexScreener boost:\s*/i, "").trim()}). Promotion increases discoverability, not fundamental validation.`;
     case "pump_style":
-      return `Early market visibility on a pump-style or thin-liquidity mint (${input.title.replace(/^DexScreener boost:\s*/i, "").trim()}). High risk — verify liquidity, holders, and independent coverage.`;
+      return `Early market visibility on a pump-style or thin-liquidity mint (${input.title.replace(/^DexScreener boost:\s*/i, "").trim()}). High risk. Verify liquidity, holders, and independent coverage.`;
     case "status_incident":
       return stored && stored.length > 20
         ? stored

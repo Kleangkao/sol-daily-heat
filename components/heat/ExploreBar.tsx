@@ -9,7 +9,7 @@ type Props = {
 
 export default function ExploreBar({ activeChip, onChipClick }: Props) {
   return (
-    <div className="sticky top-0 z-30 -mx-1 border-b border-border bg-bg-primary/95 py-2 backdrop-blur-sm">
+    <div className="sticky top-0 z-30 -mx-1 border-b border-border/70 bg-bg-primary/60 py-2 backdrop-blur-[3px]">
       <nav
         className="flex gap-1.5 overflow-x-auto px-1 pb-0.5 [scrollbar-width:thin]"
         aria-label="Explore dashboard"

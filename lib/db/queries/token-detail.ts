@@ -329,7 +329,7 @@ function buildScannerContext(input: {
     lines.push(`Mentioned in ${input.relatedTopicCount} ranked topic(s) in Solana Daily Heat.`);
   }
   if (lines.length === 0) {
-    lines.push("No stored scanner placement for this mint yet — verify on external explorers.");
+    lines.push("No stored scanner placement for this mint yet. Verify on external explorers.");
   }
   return lines;
 }
@@ -351,7 +351,7 @@ function buildRiskNotes(input: {
   if (input.uniqueSourceCount <= 1) {
     notes.push("Single-source signal; verify before acting.");
   }
-  notes.push("Token context only — not investment advice.");
+  notes.push("Token context only. Not investment advice.");
   return notes;
 }
 

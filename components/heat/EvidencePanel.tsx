@@ -47,7 +47,7 @@ export default function EvidencePanel({ evidence }: Props) {
   return (
     <details className="mt-2 group/ev">
       <summary className="cursor-pointer text-[11px] font-semibold text-accent hover:text-accent-hover">
-        Evidence — why this is ranked
+        Evidence: why this is ranked
       </summary>
       <div className="mt-2 space-y-3 rounded-[8px] border border-border/60 bg-bg-secondary/40 px-3 py-2.5">
         <div>

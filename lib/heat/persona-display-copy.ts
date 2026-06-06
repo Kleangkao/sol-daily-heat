@@ -38,7 +38,7 @@ function creatorCopy(kind: ReaderSignalKind): string {
     case "pump_style":
       return "Frame this as market-discovery/risk context, not alpha.";
     default:
-      return "Turn this into a concise explainer with primary-source links — avoid price calls.";
+      return "Turn this into a concise explainer with primary-source links. Avoid price calls.";
   }
 }
 
@@ -58,7 +58,7 @@ function investorCopy(kind: ReaderSignalKind): string {
     case "pump_style":
       return "Do not treat paid visibility as validation; check liquidity, source quality, and risk labels first.";
     default:
-      return "Monitor for follow-through signals and primary-source confirmation — not a buy/sell signal.";
+      return "Monitor for follow-through signals and primary-source confirmation. Not a buy/sell signal.";
   }
 }
 
