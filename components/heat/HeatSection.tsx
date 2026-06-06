@@ -58,7 +58,7 @@ export default function HeatSection({
     <>
       <div className="flex flex-1 items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
-          <h2 className="font-heading text-[22px] font-bold uppercase tracking-wide text-text-primary">
+          <h2 className="font-heading text-[18px] font-bold uppercase tracking-wide text-text-primary sm:text-[22px]">
             {headerTitle}
           </h2>
           <p className="mt-1 text-[12px] text-text-muted">
@@ -79,7 +79,7 @@ export default function HeatSection({
   );
 
   return (
-    <section id={sectionId} className="mt-10 scroll-mt-[4.5rem]">
+    <section id={sectionId} className="mt-8 scroll-mt-[6.5rem] sm:mt-10 sm:scroll-mt-[5rem]">
       <div className="mb-4 rounded-[12px] border border-border bg-bg-card/40">
         {collapsible ? (
           <button
@@ -116,7 +116,7 @@ export default function HeatSection({
               {emptyMessage}
             </p>
           ) : (
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
               {items.map((item) => (
                 <HeatCard
                   key={item.id}

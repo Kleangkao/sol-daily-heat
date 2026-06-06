@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Barlow_Condensed, Outfit } from "next/font/google";
 import "./globals.css";
 
@@ -16,6 +16,12 @@ const outfit = Outfit({
 
 import BeachAtmosphere from "@/components/heat/BeachAtmosphere";
 import { SITE_URL } from "@/lib/site";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -38,7 +44,7 @@ export default function RootLayout({
         className={`${barlow.variable} ${outfit.variable} bg-bg-primary text-text-primary font-body antialiased`}
       >
         <BeachAtmosphere />
-        <div className="relative z-10">{children}</div>
+        <div className="relative z-10 min-w-0 overflow-x-clip">{children}</div>
       </body>
     </html>
   );

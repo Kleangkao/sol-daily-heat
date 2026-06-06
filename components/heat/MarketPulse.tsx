@@ -365,7 +365,7 @@ export default function MarketPulse({
       >
         <button
           type="button"
-          className="flex w-full items-center justify-between gap-2 px-3 py-2.5 text-left"
+          className="flex min-h-[48px] w-full items-center justify-between gap-2 px-3 py-3 text-left"
           onClick={() => setMobileOpen((o) => !o)}
           aria-expanded={mobileOpen}
         >
@@ -376,7 +376,7 @@ export default function MarketPulse({
             >
               Market tape
             </h2>
-            <p className="text-[10px] text-text-muted">
+            <p className="text-[11px] text-text-muted">
               SOL · movers · risk context{pulseAge ? ` · ${pulseAge}` : ""}
             </p>
           </div>

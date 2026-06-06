@@ -86,8 +86,8 @@ export default function HeatCard({
   });
 
   return (
-    <article className="group flex flex-col overflow-hidden rounded-[12px] border border-border/80 bg-bg-card/50 p-4 backdrop-blur-[4px] transition-all duration-200 hover:-translate-y-0.5 hover:border-accent/60 hover:bg-bg-card/60 hover:shadow-lg hover:shadow-black/20">
-      <div className="flex items-start justify-between gap-3">
+    <article className="group flex min-w-0 flex-col overflow-hidden rounded-[12px] border border-border/80 bg-bg-card/50 p-4 backdrop-blur-[4px] transition-all duration-200 hover:border-accent/60 hover:bg-bg-card/60 sm:hover:-translate-y-0.5 sm:hover:shadow-lg sm:hover:shadow-black/20">
+      <div className="flex min-w-0 items-start justify-between gap-3">
         <div className="flex flex-wrap gap-2">
           <span className="inline-flex rounded-full bg-bg-secondary px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-accent">
             {CATEGORY_LABELS[displayCategory]}
@@ -102,7 +102,7 @@ export default function HeatCard({
       </div>
 
       {detailHref ? (
-        <h3 className={`mt-2 font-heading font-bold leading-[1.25] ${titleSize}`}>
+        <h3 className={`mt-2 min-w-0 break-words font-heading font-bold leading-[1.25] ${titleSize}`}>
           <Link
             href={detailHref}
             className="text-text-primary transition-colors hover:text-accent"
@@ -173,7 +173,7 @@ export default function HeatCard({
               <Link
                 key={t.symbol + t.mintAddress}
                 href={tokenHref}
-                className="inline-flex items-center rounded-full border border-border bg-bg-primary px-2 py-0.5 text-[11px] font-medium text-heat transition-colors hover:border-accent hover:text-accent"
+                className="inline-flex min-h-[40px] items-center rounded-full border border-border bg-bg-primary px-3 py-2 text-[12px] font-medium text-heat transition-colors hover:border-accent hover:text-accent"
               >
                 ${t.symbol}
               </Link>
@@ -206,7 +206,7 @@ export default function HeatCard({
       {detailHref ? (
         <Link
           href={detailHref}
-          className="mt-3 inline-flex text-[12px] font-semibold text-heat hover:text-heat-hover"
+          className="mt-3 inline-flex min-h-[44px] w-full items-center justify-center rounded-[8px] border border-heat/35 bg-heat/5 px-3 py-2.5 text-[13px] font-semibold text-heat transition-colors hover:bg-heat/10 hover:text-heat-hover sm:w-auto sm:justify-start sm:border-transparent sm:bg-transparent sm:px-0 sm:py-0 sm:text-[12px]"
         >
           Open brief →
         </Link>

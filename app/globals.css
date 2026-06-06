@@ -28,15 +28,18 @@
   --danger: #f87171;
 }
 
-html,
-body {
+html {
   height: 100%;
+  overflow-x: clip;
 }
 
 body {
+  min-height: 100%;
+  overflow-x: clip;
   background-color: var(--bg-primary);
   color: var(--text-primary);
   font-family: "Outfit", system-ui, sans-serif;
+  -webkit-tap-highlight-color: transparent;
 }
 
 a {
@@ -329,8 +332,15 @@ a {
     padding-block: 2px;
   }
 
-  .featured-marquee-clip:hover .featured-marquee-track {
+  .featured-marquee-clip:hover .featured-marquee-track,
+  .featured-marquee-clip:focus-within .featured-marquee-track {
     animation-play-state: paused;
+  }
+
+  @media (max-width: 767px) {
+    .featured-marquee-track {
+      animation: none;
+    }
   }
 
   .featured-marquee-fade {
@@ -339,7 +349,8 @@ a {
 
   @media (prefers-reduced-motion: reduce) {
     .beach-atmosphere__wave--1,
-    .beach-atmosphere__wave--2 {
+    .beach-atmosphere__wave--2,
+    .featured-marquee-track {
       animation: none;
     }
   }

@@ -56,21 +56,21 @@ export default function TokenDetailContent({ token }: Props) {
   const snapshotFreshness = snap ? snapshotFreshnessFromFetchedAt(snap.fetchedAt) : null;
 
   return (
-    <div className="min-h-screen">
-      <header className="border-b border-border bg-bg-secondary/40 px-4 py-8 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-4xl">
+    <div className="min-h-screen min-w-0 overflow-x-clip">
+      <header className="border-b border-border bg-bg-secondary/40 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+        <div className="mx-auto max-w-4xl min-w-0">
           <Link
             href="/"
-            className="text-[12px] font-semibold text-heat hover:text-heat-hover"
+            className="inline-flex min-h-[44px] items-center text-[13px] font-semibold text-heat hover:text-heat-hover"
           >
             ← Back to Daily Heat
           </Link>
-          <div className="mt-4 flex flex-wrap items-start justify-between gap-4">
-            <div>
+          <div className="mt-2 flex flex-wrap items-start justify-between gap-4 sm:mt-4">
+            <div className="min-w-0 flex-1">
               <p className="editorial-pipe text-[11px] font-semibold uppercase tracking-[0.2em] text-accent">
                 Token context
               </p>
-              <h1 className="mt-2 font-heading text-[28px] font-bold leading-tight text-text-primary sm:text-[34px]">
+              <h1 className="mt-2 break-words font-heading text-[24px] font-bold leading-tight text-text-primary sm:text-[34px]">
                 ${token.symbol.replace(/^\$/, "")}
               </h1>
               <p className="mt-1 text-[15px] text-text-secondary">
@@ -95,7 +95,7 @@ export default function TokenDetailContent({ token }: Props) {
         </div>
       </header>
 
-      <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+      <main className="mx-auto max-w-4xl min-w-0 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
         <section className="rounded-[10px] border border-border bg-bg-card p-5">
           <h2 className="font-heading text-[18px] font-bold uppercase tracking-wide text-text-primary">
             Market snapshot
