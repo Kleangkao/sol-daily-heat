@@ -24,9 +24,15 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.schedule == '0 */3 * * *' || github.event_name == 'workflow_dispatch'
     steps:
-      - name: POST /api/cron/pipeline
+      # Split ingest + process — combined /api/cron/pipeline can exceed Vercel's 300s limit (504).
+      - name: POST /api/cron/ingest
         run: |
-          curl -fsS -X POST "https://sol-daily-heat.vercel.app/api/cron/pipeline" \
+          curl -fsS --max-time 540 -X POST "https://sol-daily-heat.vercel.app/api/cron/ingest" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json"
+      - name: POST /api/cron/process
+        run: |
+          curl -fsS --max-time 540 -X POST "https://sol-daily-heat.vercel.app/api/cron/process" \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
             -H "Content-Type: application/json"
 
