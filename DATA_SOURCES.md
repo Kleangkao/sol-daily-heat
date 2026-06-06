@@ -18,7 +18,8 @@ Solana Daily Heat Scanner uses **free-first** adapters. Missing API keys never b
 | Magic Eden — Status | `magiceden-status` | RSS | Free | No | **Enabled** | NFT marketplace incidents (10/run, status rules) | — |
 | DL News — RSS | `dlnews-rss` | RSS | Free | No | **Enabled** | DeFi / ecosystem news, **Solana-filtered at ingest** (10/run) | — |
 | Decrypt — RSS | `decrypt-rss` | RSS | Free | No | **Enabled** | Ecosystem / NFT / gaming news, **Solana-filtered at ingest** (10/run) | — |
-| CoinDesk — RSS | `coindesk-rss` | RSS | Free | No | **Enabled (trial)** | Broad crypto editorial, **Solana-filtered at ingest** (5/run, Wave 3 trial) | — |
+| CoinDesk — RSS | `coindesk-rss` | RSS | Free | No | **Enabled (trial)** | Broad crypto editorial, **Solana-filtered at ingest** (8/run, Wave 3 trial) | — |
+| Cointelegraph — Solana tag | `cointelegraph-solana-rss` | RSS | Free | No | **Enabled** | Solana-tagged editorial + secondary filter (10/run, Wave 4A) | — |
 | Agave — GitHub Releases | `agave-releases` | RSS (Atom) | Free | No | **Enabled** | Anza/Agave validator client releases (5/run, 30d ingest) | — |
 | Firedancer — GitHub Releases | `firedancer-releases` | RSS (Atom) | Free | No | **Enabled** | Firedancer/Frankendancer releases (5/run, 30d ingest) | — |
 | Jito Solana — GitHub Releases | `jito-solana-releases` | RSS (Atom) | Free | No | **Enabled** | Jito validator/MEV client releases (5/run, 30d ingest) | — |
@@ -102,11 +103,23 @@ Public **Atom only** (`releases.atom`) — no GitHub API, no release HTML scrapi
 - **Coverage:** ecosystem, NFT, gaming, AI when Solana-related. Logs same filter stats as DL News.
 - **Risk:** high global volume — strict allowlist only; broad non-Solana stories rejected.
 
+### Cointelegraph — Solana tag (`cointelegraph-solana-rss`) — Wave 4A
+
+- Feed: `https://cointelegraph.com/rss/tag/solana` (tag page HTML not ingested).
+- **Free / no API key.** Solana-focused Cointelegraph editorial; **secondary** `matchesSolanaFeedFilter()` at ingest (tag pre-filters most noise).
+- **Caps:** **10** items/run; reliability **0.75**; 30d ingest stale guard (filtered broad RSS).
+- **Not official:** excluded from `OFFICIAL_SOURCE_SLUGS`.
+- Ingest logs: `[rss:cointelegraph-solana-rss] fetched=… passed_filter=… rejected=… stored=…`.
+- **Impact audit:** `npx tsx scripts/audit-source-impact.ts cointelegraph-solana-rss`.
+- **Enable:** `npx tsx scripts/apply-wave4a.ts` or migration `012_wave4a_cointelegraph_coindesk.sql`.
+- **Ingest guard:** `Price predictions …` listicles dropped at ingest (see `FILTERED_BROAD_RSS_SKIP_PRICE_PREDICTION_SLUGS`).
+- **Risk:** generic market templates (OI / funding) may still pass — monitor vs The Block / Decrypt overlap.
+
 ### CoinDesk — RSS (`coindesk-rss`) — Wave 3 trial
 
 - Feed: `https://www.coindesk.com/arc/outboundfeeds/rss/` (Arc outbound; same pattern as DL News).
 - **Free / no API key.** Broad crypto editorial with **Solana keyword filter** at ingest.
-- **Trial caps:** **5** items/run; reliability **0.78**; 30d ingest stale guard (filtered broad RSS).
+- **Trial caps:** **8** items/run (raised Wave 4A); reliability **0.78**; 30d ingest stale guard (filtered broad RSS).
 - **Not official:** excluded from `OFFICIAL_SOURCE_SLUGS` — no official-source heat bonus.
 - Ingest logs: `[rss:coindesk-rss] fetched=… passed_filter=… rejected=… stored=…`.
 - **Impact audit:** `npx tsx scripts/audit-source-impact.ts coindesk-rss`.
@@ -114,7 +127,7 @@ Public **Atom only** (`releases.atom`) — no GitHub API, no release HTML scrapi
 
 ### Solana relevance filter (general news)
 
-Used for `the-block-news`, `dlnews-rss`, `decrypt-rss`, `coindesk-rss`, and any source with `metadata_json.requires_solana_filter: true`.
+Used for `the-block-news`, `dlnews-rss`, `decrypt-rss`, `coindesk-rss`, `cointelegraph-solana-rss`, and any source with `metadata_json.requires_solana_filter: true`.
 
 Keywords (title + snippet): ecosystem phrases and word-boundary matches for short tickers (`sol`, `spl`, `wif`, `bonk`, `pump.fun` / `pump fun` / `$PUMP` — not bare `pump` inside unrelated words, and not `spl` inside words like “splashy”). Named projects: Jupiter, Jito, Kamino, Drift, Phantom, Metaplex, etc.
 
@@ -144,7 +157,7 @@ Broad BTC/ETH-only stories are dropped unless they mention Solana or a listed ec
 ## Top Heat composition rules
 
 - Max 2 boost-only, max 4 Dex-only, max 5 metric-only; prefer ≥2 fresh editorial/official when eligible.
-- Per-source ingest caps: Helius/Marinade **15**, Orca/Drift/Metaplex/ME status **10**, Pyth status **10**, Sanctum **5**, DL News/Decrypt **10**, GitHub releases **5** each, The Block **15**; official/GitHub RSS older than **30d** skipped at ingest.
+- Per-source ingest caps: Helius/Marinade **15**, Orca/Drift/Metaplex/ME status **10**, Pyth status **10**, Sanctum **5**, DL News/Decrypt **10**, CoinDesk **8**, Cointelegraph Solana tag **10**, GitHub releases **5** each, The Block **15**; official/GitHub RSS older than **30d** skipped at ingest.
 
 ## Supabase RLS
 

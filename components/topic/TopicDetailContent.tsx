@@ -17,6 +17,7 @@ import {
   buildPersonaDisplayNote,
   personaInputFromTopic,
 } from "@/lib/heat/persona-display-copy";
+import { formatStoryTimestampLine } from "@/lib/heat/story-timestamp";
 type DisplayEvidenceKind = EvidenceKind | "status_incident";
 
 function MetricEvidenceRow({
@@ -181,8 +182,11 @@ export default function TopicDetailContent({ topic }: Props) {
             </p>
           ) : null}
           <p className="mt-3 text-[12px] text-text-muted">
-            First seen {formatTime(topic.firstSeenAt)} · Last updated{" "}
-            {formatTime(topic.lastUpdatedAt)} · Snapshot {topic.rankingDate}
+            {formatStoryTimestampLine(topic.storyTimeKind, topic.storyAt)} · First seen{" "}
+            {formatTime(topic.firstSeenAt)} · Snapshot {topic.rankingDate}
+          </p>
+          <p className="mt-1 text-[11px] text-text-muted/80">
+            Scanner refreshed {formatTime(topic.lastUpdatedAt)}
           </p>
           <p className="mt-2 text-[12px] italic text-text-muted">
             Context only — not investment advice. Verify primary sources before acting.

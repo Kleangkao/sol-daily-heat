@@ -222,7 +222,7 @@ function resolveSourceName(
 
 function resolveSnapshotLabel(topic: TopicDetailView): string | undefined {
   const primary = topic.timeline.find((t) => t.isPrimary) ?? topic.timeline[0];
-  const iso = primary?.publishedAt ?? primary?.fetchedAt ?? topic.lastUpdatedAt;
+  const iso = primary?.publishedAt ?? primary?.fetchedAt ?? topic.storyAt;
   if (!iso) return topic.rankingDate ? `UTC snapshot ${topic.rankingDate}` : undefined;
   const d = new Date(iso);
   return d.toLocaleString("en-US", {

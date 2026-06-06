@@ -1,7 +1,7 @@
 [
   {
     "slug": "cointelegraph-solana-rss",
-    "name": "Cointelegraph — Solana tag",
+    "name": "Cointelegraph — Solana tag (shadow bench copy)",
     "source_type": "rss",
     "base_url": "https://cointelegraph.com/tags/solana",
     "feed_url": "https://cointelegraph.com/rss/tag/solana",
@@ -13,7 +13,7 @@
     "candidate_category": "solana_tag",
     "shadow_only": true,
     "metadata_json": {
-      "purpose": "Solana-tagged Cointelegraph editorial (shadow bench)",
+      "purpose": "Shadow bench copy — production row is migration 012 / apply-wave4a",
       "max_items_per_run": 10,
       "feed_verified": "2026-06-05"
     }

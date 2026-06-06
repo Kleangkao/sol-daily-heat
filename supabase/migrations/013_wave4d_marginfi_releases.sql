@@ -1,17 +1,17 @@
--- Broad RSS Wave 3: CoinDesk trial (Solana-filtered; not official source). Safe to re-run.
+-- Wave 4D.1: marginfi GitHub releases (verified Atom feed). Safe to re-run.
 INSERT INTO sources (slug, name, source_type, base_url, feed_url, reliability, is_enabled, requires_api_key, status, metadata_json)
 VALUES
   (
-    'coindesk-rss',
-    'CoinDesk — RSS',
+    'marginfi-releases',
+    'marginfi — GitHub Releases',
     'rss',
-    'https://www.coindesk.com',
-    'https://www.coindesk.com/arc/outboundfeeds/rss/',
-    0.78,
+    'https://github.com/mrgnlabs/marginfi-v2',
+    'https://github.com/mrgnlabs/marginfi-v2/releases.atom',
+    0.84,
     true,
     false,
     'active',
-    '{"purpose": "Broad crypto editorial (Solana-filtered at ingest) — Wave 3 trial", "requires_solana_filter": true, "max_items_per_run": 8, "coverage": "ecosystem_editorial", "broad_rss_trial": true, "official_source": false}'::jsonb
+    '{"purpose": "marginfi protocol CLI / SDK releases", "feed_format": "atom", "max_items_per_run": 5, "coverage": "defi_builder", "builder_source": true, "wave": "4d1"}'::jsonb
   )
 ON CONFLICT (slug) DO UPDATE SET
   name = EXCLUDED.name,

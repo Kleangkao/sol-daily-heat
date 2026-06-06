@@ -46,6 +46,7 @@ const SLUGS_REQUIRING_FILTER = new Set([
   "dlnews-rss",
   "decrypt-rss",
   "coindesk-rss",
+  "cointelegraph-solana-rss",
 ]);
 
 /** Word-boundary patterns for short tickers/symbols (avoid substring false positives). */

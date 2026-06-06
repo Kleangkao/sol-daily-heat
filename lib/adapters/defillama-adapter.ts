@@ -1,4 +1,5 @@
 import type { SourceAdapter, AdapterContext, RawItemDraft } from "./types";
+import { utcMetricDayStartIso } from "@/lib/heat/story-timestamp";
 import {
   evaluateChainFees,
   evaluateProtocolFees,
@@ -68,10 +69,11 @@ export class DefiLlamaAdapter implements SourceAdapter {
           title: `Solana chain fees ${change >= 0 ? "+" : ""}${change.toFixed(1)}% (24h)`,
           snippet: `Aggregate Solana fees 24h ~$${Math.round((data.total24h ?? 0) / 1e6)}M`,
           canonical_url: "https://defillama.com/fees/chain/solana",
-          published_at: new Date().toISOString(),
+          published_at: utcMetricDayStartIso(),
           item_type: "protocol",
           metadata_json: {
             signal: "chain_fees",
+            metric_window: "24h",
             change_1d: change,
             change_1d_raw: data.change_1d,
             total24h: data.total24h,
@@ -100,9 +102,10 @@ export class DefiLlamaAdapter implements SourceAdapter {
           title: `${name}: fees ${direction} ${Math.abs(change).toFixed(1)}% (24h)`,
           snippet: `${name} 24h fees ~$${Math.round((p.total24h ?? 0) / 1e3)}K (${p.category ?? "DeFi"}) · 24h ${direction} ${Math.abs(change).toFixed(1)}%`,
           canonical_url: `https://defillama.com/fees/${id}`,
-          published_at: new Date().toISOString(),
+          published_at: utcMetricDayStartIso(),
           item_type: "protocol",
           metadata_json: {
+            metric_window: "24h",
             defillama_id: id,
             change_1d: change,
             change_1d_raw: p.change_1d,
@@ -152,9 +155,10 @@ export class DefiLlamaAdapter implements SourceAdapter {
           title: `${p.name}: TVL ${direction} ${Math.abs(change).toFixed(1)}% (24h)`,
           snippet: `${p.name} TVL ~$${Math.round((p.tvl ?? 0) / 1e6)}M (${p.category ?? "DeFi"}) · 24h ${direction} ${Math.abs(change).toFixed(1)}%`,
           canonical_url: p.url ?? `https://defillama.com/protocol/${p.slug}`,
-          published_at: new Date().toISOString(),
+          published_at: utcMetricDayStartIso(),
           item_type: "protocol",
           metadata_json: {
+            metric_window: "24h",
             defillama_id: p.slug,
             tvl: p.tvl,
             change_1d: change,
@@ -185,9 +189,14 @@ export class DefiLlamaAdapter implements SourceAdapter {
             title: `Solana chain TVL ${sol.change_1d >= 0 ? "+" : ""}${sol.change_1d.toFixed(1)}% (24h)`,
             snippet: `Aggregate chain TVL ~$${Math.round((sol.tvl ?? 0) / 1e9)}B`,
             canonical_url: "https://defillama.com/chain/solana",
-            published_at: new Date().toISOString(),
+            published_at: utcMetricDayStartIso(),
             item_type: "protocol",
-            metadata_json: { signal: "chain_tvl", change_1d: sol.change_1d, tvl: sol.tvl },
+            metadata_json: {
+              signal: "chain_tvl",
+              metric_window: "24h",
+              change_1d: sol.change_1d,
+              tvl: sol.tvl,
+            },
           });
         }
       }

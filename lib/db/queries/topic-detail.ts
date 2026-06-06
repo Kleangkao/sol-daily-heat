@@ -1,5 +1,10 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { parseStoredEvidence } from "@/lib/process/build-evidence";
+import {
+  pickStoryTimestampFromSources,
+  readStoredStoryAt,
+  readStoredStoryTimeKind,
+} from "@/lib/heat/story-timestamp";
 import { STATUS_SOURCE_SLUGS } from "@/lib/sources/rss-ingest-policy";
 import { SECTION_LABELS } from "@/lib/types/heat";
 import type {
@@ -89,7 +94,7 @@ export async function getTopicDetail(
         source_url,
         is_primary,
         raw_item_id,
-        sources ( slug, name, source_type ),
+        sources ( slug, name, source_type, reliability ),
         raw_items (
           id,
           title,
@@ -211,6 +216,29 @@ export async function getTopicDetail(
       };
     }) ?? [];
 
+  const itemTypes = Array.isArray(meta.item_types)
+    ? (meta.item_types as string[])
+    : [];
+  const timelineSignals = timeline
+    .map((entry) => entry.signal)
+    .filter((s): s is string => Boolean(s));
+  const storedStoryAt = readStoredStoryAt(meta);
+  const storedStoryKind = readStoredStoryTimeKind(meta);
+  const storyPick = pickStoryTimestampFromSources(
+    timeline.map((entry) => ({
+      publishedAt: entry.publishedAt,
+      fetchedAt: entry.fetchedAt,
+      reliability:
+        topic.topic_sources?.find((ts) => ts.sources?.slug === entry.sourceSlug)?.sources
+          ?.reliability ?? null,
+      itemType: entry.itemType,
+      signal: entry.signal,
+    })),
+    itemTypes,
+    timelineSignals,
+    topic.first_seen_at
+  );
+
   return {
     id: topic.id,
     title: topic.title,
@@ -224,6 +252,8 @@ export async function getTopicDetail(
     ),
     firstSeenAt: topic.first_seen_at,
     lastUpdatedAt: topic.last_updated_at,
+    storyAt: storedStoryAt ?? storyPick.iso,
+    storyTimeKind: storedStoryKind ?? storyPick.kind,
     heatScore,
     scoreBreakdown,
     evidence,

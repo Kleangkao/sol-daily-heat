@@ -14,6 +14,7 @@ import {
 
 import { isWithinHours } from "@/lib/scoring/freshness";
 
+import { isPricePredictionItem } from "@/lib/sources/cointelegraph-shadow-patterns";
 import {
 
   rssIngestCap,
@@ -23,6 +24,8 @@ import {
   RSS_INGEST_FRESHNESS_HOURS,
 
   rssIngestUsesStaleGuard,
+
+  FILTERED_BROAD_RSS_SKIP_PRICE_PREDICTION_SLUGS,
 
   isGithubReleaseSourceSlug,
 
@@ -41,6 +44,7 @@ const FILTER_LOG_SLUGS = new Set([
   "dlnews-rss",
   "decrypt-rss",
   "coindesk-rss",
+  "cointelegraph-solana-rss",
 ]);
 
 
@@ -202,6 +206,14 @@ export class RssAdapter implements SourceAdapter {
 
         continue;
 
+      }
+
+      if (
+        FILTERED_BROAD_RSS_SKIP_PRICE_PREDICTION_SLUGS.has(ctx.source.slug) &&
+        isPricePredictionItem(title, link)
+      ) {
+        blockRejected += 1;
+        continue;
       }
 
 

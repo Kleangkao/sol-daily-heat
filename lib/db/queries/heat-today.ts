@@ -6,6 +6,12 @@ import { parseStoredEvidence } from "@/lib/process/build-evidence";
 import { DASHBOARD_SECTIONS } from "@/lib/db/dashboard-sections";
 import { utcAvailableDates, utcTodayIso } from "@/lib/heat/snapshot-date";
 import { SECTION_LIMITS } from "@/lib/process/section-limits";
+import {
+  pickStoryTimestampFromSources,
+  readStoredStoryAt,
+  readStoredStoryTimeKind,
+  resolveStoryTimeKind,
+} from "@/lib/heat/story-timestamp";
 
 type RankingRow = DailyRanking & {
   topics: Topic & {
@@ -14,7 +20,12 @@ type RankingRow = DailyRanking & {
     topic_sources?: Array<{
       source_id: string;
       source_url: string | null;
-      sources?: { name: string; slug: string } | null;
+      sources?: { name: string; slug: string; reliability?: number } | null;
+      raw_items?: {
+        published_at: string | null;
+        fetched_at: string;
+        metadata_json?: Record<string, unknown> | null;
+      } | null;
     }>;
   };
 };
@@ -27,10 +38,53 @@ function compareRankings(a: RankingRow, b: RankingRow): number {
   const scoreDiff = Number(b.heat_score) - Number(a.heat_score);
   if (scoreDiff !== 0) return scoreDiff;
 
-  return (
-    new Date(b.topics.last_updated_at).getTime() -
-    new Date(a.topics.last_updated_at).getTime()
+  const storyA = readStoredStoryAt(a.topics.metadata_json ?? {}) ?? a.topics.last_updated_at;
+  const storyB = readStoredStoryAt(b.topics.metadata_json ?? {}) ?? b.topics.last_updated_at;
+  return new Date(storyB).getTime() - new Date(storyA).getTime();
+}
+
+function resolveCardStory(
+  t: RankingRow["topics"],
+  meta: Record<string, unknown>,
+  itemTypes: string[],
+  rankingSignals: string[]
+): { storyAt: string; storyTimeKind: ReturnType<typeof resolveStoryTimeKind> } {
+  const storedAt = readStoredStoryAt(meta);
+  const storedKind = readStoredStoryTimeKind(meta);
+  if (storedAt && storedKind) {
+    return { storyAt: storedAt, storyTimeKind: storedKind };
+  }
+
+  const sourceInputs =
+    t.topic_sources?.map((ts) => {
+      const raw = ts.raw_items;
+      const signal =
+        typeof raw?.metadata_json?.signal === "string"
+          ? raw.metadata_json.signal
+          : null;
+      return {
+        publishedAt: raw?.published_at ?? null,
+        fetchedAt: raw?.fetched_at,
+        reliability: ts.sources?.reliability ?? null,
+        itemType:
+          typeof raw?.metadata_json?.item_type === "string"
+            ? raw.metadata_json.item_type
+            : null,
+        signal,
+      };
+    }) ?? [];
+
+  const picked = pickStoryTimestampFromSources(
+    sourceInputs,
+    itemTypes,
+    rankingSignals,
+    t.first_seen_at
   );
+
+  return {
+    storyAt: storedAt ?? picked.iso,
+    storyTimeKind: storedKind ?? picked.kind,
+  };
 }
 
 function fallbackEvidence(
@@ -90,6 +144,7 @@ function rankingToCard(row: RankingRow): HeatCardView {
   const rankingSignals = Array.isArray(rankingMeta.signals)
     ? (rankingMeta.signals as string[])
     : [];
+  const { storyAt, storyTimeKind } = resolveCardStory(t, meta, itemTypes, rankingSignals);
 
   return {
     id: t.id,
@@ -103,6 +158,8 @@ function rankingToCard(row: RankingRow): HeatCardView {
         : t.topic_sources?.length ?? 1,
     firstSeen: t.first_seen_at,
     lastUpdated: t.last_updated_at,
+    storyAt,
+    storyTimeKind,
     whyHot: t.why_hot ?? "Clustered signals.",
     relatedTokens:
       t.topic_tokens?.map((tt) => ({
@@ -158,7 +215,9 @@ async function hydrateRankingRows(
     db.from("topic_protocols").select("topic_id, protocols (*)").in("topic_id", topicIds),
     db
       .from("topic_sources")
-      .select("topic_id, source_id, source_url, sources ( name, slug )")
+      .select(
+        "topic_id, source_id, source_url, raw_items ( published_at, fetched_at, metadata_json ), sources ( name, slug, reliability )"
+      )
       .in("topic_id", topicIds),
   ]);
 
@@ -195,7 +254,14 @@ async function hydrateRankingRows(
     bucket.push({
       source_id: row.source_id as string,
       source_url: row.source_url as string | null,
-      sources: (row.sources as unknown as { name: string; slug: string } | null) ?? null,
+      sources:
+        (row.sources as unknown as {
+          name: string;
+          slug: string;
+          reliability?: number;
+        } | null) ?? null,
+      raw_items:
+        (row.raw_items as unknown as NonNullable<SourceLink["raw_items"]>) ?? null,
     });
     sourcesByTopic.set(topicId, bucket);
   }

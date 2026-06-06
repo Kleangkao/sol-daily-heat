@@ -103,7 +103,15 @@
     "feed_url": "https://www.coindesk.com/arc/outboundfeeds/rss/",
     "reliability": 0.78,
     "requires_solana_filter": true,
-    "max_items_per_run": 5
+    "max_items_per_run": 8
+  },
+  {
+    "slug": "cointelegraph-solana-rss",
+    "name": "Cointelegraph — Solana tag",
+    "feed_url": "https://cointelegraph.com/rss/tag/solana",
+    "reliability": 0.75,
+    "requires_solana_filter": true,
+    "max_items_per_run": 10
   },
   {
     "slug": "agave-releases",
@@ -126,6 +134,14 @@
     "name": "Jito Solana — GitHub Releases",
     "feed_url": "https://github.com/jito-foundation/jito-solana/releases.atom",
     "reliability": 0.86,
+    "feed_format": "atom",
+    "max_items_per_run": 5
+  },
+  {
+    "slug": "marginfi-releases",
+    "name": "marginfi — GitHub Releases",
+    "feed_url": "https://github.com/mrgnlabs/marginfi-v2/releases.atom",
+    "reliability": 0.84,
     "feed_format": "atom",
     "max_items_per_run": 5
   }

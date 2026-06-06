@@ -1,10 +1,20 @@
 import { utcAvailableDates } from "@/lib/heat/snapshot-date";
 import type { HeatCardView, HeatDashboardData } from "@/lib/types/heat";
+import type { StoryTimeKind } from "@/lib/heat/story-timestamp";
+
+type CardInput = Omit<HeatCardView, "storyAt" | "storyTimeKind"> & {
+  storyAt?: string;
+  storyTimeKind?: StoryTimeKind;
+};
 
 const dates = utcAvailableDates();
 
-function card(partial: HeatCardView): HeatCardView {
-  return partial;
+function card(partial: CardInput): HeatCardView {
+  return {
+    ...partial,
+    storyAt: partial.storyAt ?? partial.lastUpdated,
+    storyTimeKind: partial.storyTimeKind ?? "published",
+  };
 }
 
 const topHeat: HeatCardView[] = [

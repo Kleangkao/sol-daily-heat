@@ -33,6 +33,8 @@ export type CuratedCandidate = {
   is_carryover: boolean;
   uniqueSignals: string[];
   lastUpdatedAt: string;
+  /** Best-effort source event time (reliability-weighted). */
+  storyAt: string;
   newestPublishedAt: string | null;
   primarySourceSlug: string;
   diversityBucket: string;
@@ -71,7 +73,7 @@ export function compareCandidates(a: CuratedCandidate, b: CuratedCandidate): num
   const confDiff = b.confidence_score - a.confidence_score;
   if (confDiff !== 0) return confDiff;
 
-  return new Date(b.lastUpdatedAt).getTime() - new Date(a.lastUpdatedAt).getTime();
+  return new Date(b.storyAt).getTime() - new Date(a.storyAt).getTime();
 }
 
 function comparePlacement(a: CuratedCandidate, b: CuratedCandidate): number {

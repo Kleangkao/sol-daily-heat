@@ -2,23 +2,28 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { RankingSection } from "@/lib/types/db";
 import { DASHBOARD_SECTIONS } from "./dashboard-sections";
 import { SECTION_LIMITS } from "@/lib/process/section-limits";
+import { readStoredStoryAt } from "@/lib/heat/story-timestamp";
 
 type RowForSort = {
   id: string;
   heat_score: number;
   confidence_score: number;
-  topics: { last_updated_at: string } | { last_updated_at: string }[];
+  topics:
+    | { last_updated_at: string; metadata_json?: Record<string, unknown> | null }
+    | { last_updated_at: string; metadata_json?: Record<string, unknown> | null }[];
 };
 
-function lastUpdatedAt(row: RowForSort): string {
+function storyAt(row: RowForSort): string {
   const t = row.topics;
-  if (Array.isArray(t)) return t[0]?.last_updated_at ?? "";
-  return t?.last_updated_at ?? "";
+  const topic = Array.isArray(t) ? t[0] : t;
+  if (!topic) return "";
+  const stored = readStoredStoryAt(topic.metadata_json ?? {});
+  return stored ?? topic.last_updated_at ?? "";
 }
 
 /**
  * Assign rank_position 1..n per section for a given day.
- * Sort: heat_score desc → confidence_score desc → last_updated_at desc.
+ * Sort: heat_score desc → confidence_score desc → story_at desc.
  * builder_watch keeps rank_position from curation snapshot (status → editorial → GitHub).
  */
 export async function assignRankPositions(
@@ -29,7 +34,7 @@ export async function assignRankPositions(
     if (rankingSection === "builder_watch") continue;
     const { data, error } = await db
       .from("daily_rankings")
-      .select("id, heat_score, confidence_score, topics(last_updated_at)")
+      .select("id, heat_score, confidence_score, topics(last_updated_at, metadata_json)")
       .eq("ranking_date", rankingDate)
       .eq("section", rankingSection)
       .eq("status", "published");
@@ -45,7 +50,7 @@ export async function assignRankPositions(
       if (confDiff !== 0) return confDiff;
 
       return (
-        new Date(lastUpdatedAt(b)).getTime() - new Date(lastUpdatedAt(a)).getTime()
+        new Date(storyAt(b)).getTime() - new Date(storyAt(a)).getTime()
       );
     });
 

@@ -36,8 +36,8 @@ export default function HeatHero({ dataSource, isLoading, archiveDate }: Props) 
           Solana Daily Heat
         </h1>
         <p className="mt-3 max-w-2xl text-balance text-[15px] leading-relaxed text-text-secondary">
-          Find what is hot on Solana before it becomes obvious. Card timestamps show how
-          recently each story updated.
+          Find what is hot on Solana before it becomes obvious. Card timestamps show when
+          each story broke at the source — not when our scanner last refreshed.
         </p>
         <div className="mt-5 flex flex-col gap-2">
           <p className="text-[11px] text-text-muted">{statusLine(dataSource, isLoading)}</p>

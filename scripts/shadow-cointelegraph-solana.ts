@@ -213,7 +213,7 @@ async function main() {
   console.log(`DRY_RUN (no Supabase writes): ${DRY_RUN}`);
   console.log(`Source: ${cfg.slug}`);
   console.log(`Feed: ${cfg.feed_url}`);
-  console.log(`Cap/run: ${MAX_ITEMS} | requires_solana_filter: true | is_enabled: ${cfg.is_enabled}`);
+  console.log(`Cap/run: ${MAX_ITEMS} | requires_solana_filter: true | ingest_price_prediction_guard: true`);
   console.log("");
 
   const feedItems = await fetchFeedItems(cfg.feed_url);

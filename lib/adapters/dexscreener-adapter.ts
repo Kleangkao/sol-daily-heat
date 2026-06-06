@@ -41,7 +41,7 @@ export class DexScreenerAdapter implements SourceAdapter {
             title: `DexScreener boost: ${short}`,
             snippet: `Solana token ${short} on DexScreener paid boost leaderboard.`,
             canonical_url: b.url ?? `https://dexscreener.com/solana/${addr}`,
-            published_at: new Date().toISOString(),
+            published_at: undefined,
             item_type: "market",
             metadata_json: {
               chain: "solana",

@@ -18,7 +18,7 @@ const COINDESK_SOURCE = {
   metadata_json: {
     purpose: "Broad crypto editorial (Solana-filtered at ingest) — Wave 3 trial",
     requires_solana_filter: true,
-    max_items_per_run: 5,
+    max_items_per_run: 8,
     coverage: "ecosystem_editorial",
     broad_rss_trial: true,
     official_source: false,

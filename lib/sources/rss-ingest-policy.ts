@@ -27,10 +27,12 @@ export const RSS_INGEST_ITEM_CAPS: Record<string, number> = {
   "dlnews-rss": 10,
 
   "decrypt-rss": 10,
-  "coindesk-rss": 5,
+  "coindesk-rss": 8,
+  "cointelegraph-solana-rss": 10,
   "agave-releases": 5,
   "firedancer-releases": 5,
   "jito-solana-releases": 5,
+  "marginfi-releases": 5,
 };
 
 /** GitHub release Atom feeds (builder / infra; no GitHub API). */
@@ -38,6 +40,7 @@ export const GITHUB_RELEASE_SOURCE_SLUGS = new Set([
   "agave-releases",
   "firedancer-releases",
   "jito-solana-releases",
+  "marginfi-releases",
 ]);
 
 export function isGithubReleaseSourceSlug(slug: string): boolean {
@@ -132,6 +135,8 @@ export const PROJECT_RSS_STALE_GUARD_SLUGS = new Set([
 
   "jito-solana-releases",
 
+  "marginfi-releases",
+
 ]);
 
 /** Filtered broad RSS: 30d published_at skip at ingest only (not official-source ranking bonus). */
@@ -139,6 +144,12 @@ export const FILTERED_BROAD_RSS_STALE_GUARD_SLUGS = new Set([
   "dlnews-rss",
   "decrypt-rss",
   "coindesk-rss",
+  "cointelegraph-solana-rss",
+]);
+
+/** Drop price-prediction listicles at ingest (tag feed noise). */
+export const FILTERED_BROAD_RSS_SKIP_PRICE_PREDICTION_SLUGS = new Set([
+  "cointelegraph-solana-rss",
 ]);
 
 export function rssIngestUsesStaleGuard(slug: string): boolean {

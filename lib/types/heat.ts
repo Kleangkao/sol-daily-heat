@@ -2,6 +2,7 @@
 
 import type { InterpretationType, RankingSection, TopicCategory } from "./db";
 import type { TopicEvidence } from "./evidence";
+import type { StoryTimeKind } from "@/lib/heat/story-timestamp";
 
 export type HeatCategoryFilter = TopicCategory | "all";
 
@@ -28,7 +29,11 @@ export interface HeatCardView {
   heatScore: number;
   sourceCount: number;
   firstSeen: string;
+  /** Scanner refresh time (pipeline); not shown as the headline timestamp. */
   lastUpdated: string;
+  /** Source-weighted story time for card display. */
+  storyAt: string;
+  storyTimeKind: StoryTimeKind;
   whyHot: string;
   relatedTokens: RelatedToken[];
   relatedProjects: RelatedProject[];

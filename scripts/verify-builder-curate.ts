@@ -40,6 +40,10 @@ import {
 import { qualifiesForBuilder } from "../lib/process/builder-watch";
 import { classifySectionCard } from "../lib/audit/classify-section-card";
 import type { RawItem, Source } from "../lib/types/db";
+import {
+  pickStoryTimestampFromItems,
+  primarySourceSlug,
+} from "../lib/heat/story-timestamp";
 
 function itemTypeOf(item: RawItem): string {
   return (item.metadata_json?.item_type as string) ?? "news";
@@ -66,23 +70,6 @@ function clusterSourceSlugs(items: Array<RawItem & { sources?: Source }>): strin
     if (item.sources?.slug) slugs.add(item.sources.slug);
   }
   return Array.from(slugs);
-}
-
-function primarySourceSlug(items: Array<RawItem & { sources?: Source }>): string {
-  const counts = new Map<string, number>();
-  for (const item of items) {
-    const slug = item.sources?.slug ?? item.source_id;
-    counts.set(slug, (counts.get(slug) ?? 0) + 1);
-  }
-  let best = "unknown";
-  let max = 0;
-  for (const [slug, n] of Array.from(counts.entries())) {
-    if (n > max) {
-      max = n;
-      best = slug;
-    }
-  }
-  return best;
 }
 
 async function main() {
@@ -145,6 +132,7 @@ async function main() {
     if (isStaleRepeat(group.clustering_key, yesterdayKeys, hasFreshRaw)) continue;
 
     const primarySlug = primarySourceSlug(group.items);
+    const storyTimestamp = pickStoryTimestampFromItems(group.items, itemTypes);
     const textBlob = group.title;
     const category =
       topicCategoryForSourceSlug(primarySlug) ?? inferCategory(textBlob, itemTypes);
@@ -236,6 +224,7 @@ async function main() {
       is_carryover: false,
       uniqueSignals: clusterMetrics.uniqueSignals,
       lastUpdatedAt: new Date().toISOString(),
+      storyAt: storyTimestamp.iso,
       newestPublishedAt: newest,
       primarySourceSlug: primarySlug,
       diversityBucket: buildDiversityBucket(

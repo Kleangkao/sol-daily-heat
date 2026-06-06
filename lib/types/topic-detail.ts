@@ -5,6 +5,7 @@ import type {
   TopicCategory,
 } from "@/lib/types/db";
 import type { TopicEvidence } from "@/lib/types/evidence";
+import type { StoryTimeKind } from "@/lib/heat/story-timestamp";
 
 export type SectionAppearance = {
   section: RankingSection;
@@ -52,7 +53,10 @@ export type TopicDetailView = {
   interpretationType: InterpretationType;
   confidence: number;
   firstSeenAt: string;
+  /** Pipeline refresh time — separate from when the story broke. */
   lastUpdatedAt: string;
+  storyAt: string;
+  storyTimeKind: StoryTimeKind;
   /** Rule-based heat for rankingDate from daily_rankings; null when no published row that day. */
   heatScore: number | null;
   scoreBreakdown: ScoreBreakdown;

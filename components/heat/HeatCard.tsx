@@ -15,6 +15,7 @@ import { buildCardPersonaDisplay } from "@/lib/heat/persona-display-copy";
 import { isGenericRiskNote } from "@/lib/heat/risk-note";
 import SignalQualityBadges from "./SignalQualityBadges";
 import HeatScoreBadge from "./HeatScoreBadge";
+import { formatStoryTimestampLine } from "@/lib/heat/story-timestamp";
 
 type Props = {
   item: HeatCardView;
@@ -33,15 +34,6 @@ function PersonaHighlightBlock({ label, text }: { label: string; text: string })
       <p className="mt-1 text-[12px] leading-[1.4] text-text-primary">{text}</p>
     </div>
   );
-}
-
-function formatTime(iso: string): string {
-  const d = new Date(iso);
-  const diff = Date.now() - d.getTime();
-  const hours = Math.floor(diff / 3600000);
-  if (hours < 1) return `${Math.max(1, Math.floor(diff / 60000))}m ago`;
-  if (hours < 48) return `${hours}h ago`;
-  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
 export default function HeatCard({
@@ -209,7 +201,9 @@ export default function HeatCard({
           {item.sourceCount} source{item.sourceCount !== 1 ? "s" : ""}
         </span>
         <span>·</span>
-        <span>Updated {formatTime(item.lastUpdated)}</span>
+        <span>
+          {formatStoryTimestampLine(item.storyTimeKind, item.storyAt)}
+        </span>
         <SignalTypeBadge type={item.interpretationType} />
       </div>
 

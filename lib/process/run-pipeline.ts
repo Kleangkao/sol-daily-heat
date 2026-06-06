@@ -52,6 +52,11 @@ import {
 import { buildTopicEvidence } from "./build-evidence";
 import { toSlug } from "@/lib/text/normalize";
 import { topicCategoryForSourceSlug } from "@/lib/sources/rss-ingest-policy";
+import {
+  pickPrimaryRawItem,
+  pickStoryTimestampFromItems,
+  primarySourceSlug,
+} from "@/lib/heat/story-timestamp";
 
 function todayDate(): string {
   return new Date().toISOString().slice(0, 10);
@@ -84,23 +89,6 @@ function clusterSourceSlugs(items: Array<RawItem & { sources?: Source }>): strin
     if (item.sources?.slug) slugs.add(item.sources.slug);
   }
   return Array.from(slugs);
-}
-
-function primarySourceSlug(items: Array<RawItem & { sources?: Source }>): string {
-  const counts = new Map<string, number>();
-  for (const item of items) {
-    const slug = item.sources?.slug ?? item.source_id;
-    counts.set(slug, (counts.get(slug) ?? 0) + 1);
-  }
-  let best = "unknown";
-  let max = 0;
-  for (const [slug, n] of Array.from(counts.entries())) {
-    if (n > max) {
-      max = n;
-      best = slug;
-    }
-  }
-  return best;
 }
 
 export async function runPipeline(db: SupabaseClient): Promise<{
@@ -180,7 +168,9 @@ export async function runPipeline(db: SupabaseClient): Promise<{
       continue;
     }
 
+    const primaryItem = pickPrimaryRawItem(group.items);
     const primarySlug = primarySourceSlug(group.items);
+    const storyTimestamp = pickStoryTimestampFromItems(group.items, itemTypes);
     const category =
       topicCategoryForSourceSlug(primarySlug) ?? inferCategory(textBlob, itemTypes);
     let summary = buildRuleSummary(group.title, snippets, {
@@ -308,6 +298,9 @@ export async function runPipeline(db: SupabaseClient): Promise<{
         item_types: itemTypes,
         display_source_count: clusterMetrics.displaySourceCount,
         signal_count: clusterMetrics.signalCount,
+        story_at: storyTimestamp.iso,
+        story_time_kind: storyTimestamp.kind,
+        story_source_slug: storyTimestamp.sourceSlug,
         evidence,
       },
     };
@@ -340,7 +333,7 @@ export async function runPipeline(db: SupabaseClient): Promise<{
           raw_item_id: raw.id,
           source_id: raw.source_id,
           source_url: raw.canonical_url,
-          is_primary: raw.id === group.items[0].id,
+          is_primary: primaryItem != null && raw.id === primaryItem.id,
         },
         { onConflict: "topic_id,raw_item_id" }
       );
@@ -393,6 +386,7 @@ export async function runPipeline(db: SupabaseClient): Promise<{
       is_carryover,
       uniqueSignals: clusterMetrics.uniqueSignals,
       lastUpdatedAt: topicPayload.last_updated_at,
+      storyAt: storyTimestamp.iso,
       newestPublishedAt: newest,
       primarySourceSlug: primarySlug,
       diversityBucket: buildDiversityBucket(
