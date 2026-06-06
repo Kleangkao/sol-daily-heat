@@ -166,7 +166,9 @@ export async function fetchHeatDashboard(
     .eq("ranking_date", rankingDate)
     .eq("status", "published");
 
-  if (error) return null;
+  if (error) {
+    throw new Error(`fetchHeatDashboard failed: ${error.message}`);
+  }
   if (!data?.length) return null;
 
   const rows = data as RankingRow[];

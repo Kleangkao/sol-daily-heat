@@ -30,10 +30,13 @@ export async function GET(request: NextRequest) {
     const live = await fetchHeatDashboard(db, date ?? undefined);
     const merged = mergeDashboard(live, mock);
     return NextResponse.json(merged);
-  } catch {
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Heat dashboard fetch failed";
+    console.error("[api/heat/today]", message);
     return NextResponse.json({
       ...mock,
       dataSource: "mock" as const,
+      fetchError: message,
     });
   }
 }
