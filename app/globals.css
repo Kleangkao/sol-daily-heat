@@ -327,19 +327,15 @@ a {
   }
 
   .featured-marquee-track {
-    animation: featured-marquee 36s linear infinite;
+    animation: featured-marquee 28s linear infinite;
     will-change: transform;
     padding-block: 2px;
   }
 
-  .featured-marquee-clip:hover .featured-marquee-track,
-  .featured-marquee-clip:focus-within .featured-marquee-track {
-    animation-play-state: paused;
-  }
-
-  @media (max-width: 767px) {
-    .featured-marquee-track {
-      animation: none;
+  @media (hover: hover) and (pointer: fine) {
+    .featured-marquee-clip:hover .featured-marquee-track,
+    .featured-marquee-clip:focus-within .featured-marquee-track {
+      animation-play-state: paused;
     }
   }
 
@@ -349,9 +345,12 @@ a {
 
   @media (prefers-reduced-motion: reduce) {
     .beach-atmosphere__wave--1,
-    .beach-atmosphere__wave--2,
-    .featured-marquee-track {
+    .beach-atmosphere__wave--2 {
       animation: none;
+    }
+
+    .featured-marquee-track {
+      animation-duration: 48s;
     }
   }
 }

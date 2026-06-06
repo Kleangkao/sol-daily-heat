@@ -69,11 +69,13 @@ function TokenChip({
   prominent = false,
   compact = false,
   linkEnabled = false,
+  fullWidth = false,
 }: {
   row: PulseTokenRow;
   prominent?: boolean;
   compact?: boolean;
   linkEnabled?: boolean;
+  fullWidth?: boolean;
 }) {
   const display = resolvePulseTokenDisplay(row);
   const price = row.priceUsd ?? null;
@@ -125,11 +127,12 @@ function TokenChip({
     </>
   );
 
+  const widthClass = fullWidth ? "w-full min-w-0" : "";
   const className = prominent
-    ? "flex flex-col justify-center rounded-[10px] border border-accent/30 bg-bg-card px-3 py-2.5 transition-colors hover:border-accent"
+    ? `flex flex-col justify-center rounded-[10px] border border-accent/30 bg-bg-card px-3 py-2.5 transition-colors hover:border-accent ${widthClass}`
     : compact
-      ? "flex flex-col justify-center rounded-[8px] border border-border bg-bg-card px-2 py-1.5 transition-colors hover:border-accent/40"
-      : "flex min-w-[92px] flex-1 flex-col justify-center rounded-[10px] border border-border bg-bg-card px-2.5 py-2 transition-colors hover:border-accent/40 sm:max-w-[140px]";
+      ? `flex flex-col justify-center rounded-[8px] border border-border bg-bg-card px-2 py-1.5 transition-colors hover:border-accent/40 ${widthClass}`
+      : `flex min-w-[92px] flex-1 flex-col justify-center rounded-[10px] border border-border bg-bg-card px-2.5 py-2 transition-colors hover:border-accent/40 sm:max-w-[140px] ${widthClass}`;
 
   if (href) {
     return (
@@ -266,6 +269,9 @@ export default function MarketPulse({
       ? "editorial-pipe font-heading text-[14px] font-bold uppercase tracking-tight text-text-primary"
       : "editorial-pipe font-heading text-[16px] font-bold uppercase tracking-tight text-text-primary";
 
+  const tokenGroupClass =
+    layout === "rail" ? "space-y-1.5" : "grid grid-cols-2 gap-2";
+
   const body = (
     <>
       {isLoading && !pulse ? (
@@ -286,7 +292,13 @@ export default function MarketPulse({
             SOL anchor
           </p>
           <div className="mt-1.5">
-            <TokenChip row={anchor} prominent compact={layout === "rail"} linkEnabled={linkEnabled} />
+            <TokenChip
+              row={anchor}
+              prominent
+              compact={layout === "rail"}
+              fullWidth={layout === "mobile"}
+              linkEnabled={linkEnabled}
+            />
           </div>
         </div>
       ) : null}
@@ -296,9 +308,15 @@ export default function MarketPulse({
           <p className="text-[10px] font-semibold uppercase tracking-wide text-text-muted">
             Top movers
           </p>
-          <div className={`mt-1.5 ${layout === "rail" ? "space-y-1.5" : "flex flex-wrap gap-2"}`}>
+          <div className={`mt-1.5 ${tokenGroupClass}`}>
             {gainers.map((row) => (
-              <TokenChip key={row.mint} row={row} compact linkEnabled={linkEnabled} />
+              <TokenChip
+                key={row.mint}
+                row={row}
+                compact
+                fullWidth={layout === "mobile"}
+                linkEnabled={linkEnabled}
+              />
             ))}
           </div>
         </div>
@@ -309,9 +327,15 @@ export default function MarketPulse({
           <p className="text-[10px] font-semibold uppercase tracking-wide text-text-muted">
             Biggest drops
           </p>
-          <div className={`mt-1.5 ${layout === "rail" ? "space-y-1.5" : "flex flex-wrap gap-2"}`}>
+          <div className={`mt-1.5 ${tokenGroupClass}`}>
             {droppers.map((row) => (
-              <TokenChip key={`drop-${row.mint}`} row={row} compact linkEnabled={linkEnabled} />
+              <TokenChip
+                key={`drop-${row.mint}`}
+                row={row}
+                compact
+                fullWidth={layout === "mobile"}
+                linkEnabled={linkEnabled}
+              />
             ))}
           </div>
         </div>
@@ -322,9 +346,15 @@ export default function MarketPulse({
           <p className="text-[10px] font-semibold uppercase tracking-wide text-text-muted">
             High-risk / boosted
           </p>
-          <div className={`mt-1.5 ${layout === "rail" ? "space-y-1.5" : "flex flex-wrap gap-2"}`}>
+          <div className={`mt-1.5 ${tokenGroupClass}`}>
             {highRisk.map((row) => (
-              <TokenChip key={`risk-${row.mint}`} row={row} compact linkEnabled={linkEnabled} />
+              <TokenChip
+                key={`risk-${row.mint}`}
+                row={row}
+                compact
+                fullWidth={layout === "mobile"}
+                linkEnabled={linkEnabled}
+              />
             ))}
           </div>
         </div>
