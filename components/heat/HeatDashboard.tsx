@@ -208,11 +208,13 @@ export default function HeatDashboard() {
         <DashboardLoadingShell />
       ) : dashboard ? (
         <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-          <MarketPulse
-            layout="mobile"
-            heatDataSource={dashboard.dataSource}
-            newTokenMints={newTokenMints}
-          />
+          <div className="lg:hidden">
+            <MarketPulse
+              layout="mobile"
+              heatDataSource={dashboard.dataSource}
+              newTokenMints={newTokenMints}
+            />
+          </div>
 
           <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_252px] lg:items-start lg:gap-8">
             <div className="min-w-0">
