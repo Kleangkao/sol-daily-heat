@@ -1,25 +1,31 @@
 "use client";
 
-import DateSelector from "./DateSelector";
-import { formatSnapshotHeroLine } from "@/lib/heat/snapshot-date";
+import Link from "next/link";
+import { formatSnapshotArchiveHeading } from "@/lib/heat/snapshot-date";
 import type { DashboardDataSource } from "@/lib/types/heat";
 
 type Props = {
-  date: string;
-  dates: string[];
-  onDateChange: (date: string) => void;
   dataSource?: DashboardDataSource;
   isLoading?: boolean;
+  /** Set when viewing ?date= archive (not latest). */
+  archiveDate?: string;
 };
 
-function dataSourceLabel(dataSource?: DashboardDataSource): string {
-  if (dataSource === "live") return "Live data";
-  if (dataSource === "mixed") return "Mixed — some sections use demo data";
-  if (dataSource === "mock") return "Demo mock data";
-  return "";
+function statusLine(dataSource?: DashboardDataSource, isLoading?: boolean): string {
+  if (isLoading) return "Loading live scanner data…";
+  if (dataSource === "live") {
+    return "Live data · Rankings refresh about every 3 hours · Not investment advice";
+  }
+  if (dataSource === "mixed") {
+    return "Mixed live and demo sections · Not investment advice";
+  }
+  if (dataSource === "mock") {
+    return "Demo preview · Not investment advice";
+  }
+  return "Not investment advice";
 }
 
-export default function HeatHero({ date, dates, onDateChange, dataSource, isLoading }: Props) {
+export default function HeatHero({ dataSource, isLoading, archiveDate }: Props) {
   return (
     <header className="border-b border-border bg-bg-secondary/40 px-4 py-10 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-6xl">
@@ -30,22 +36,20 @@ export default function HeatHero({ date, dates, onDateChange, dataSource, isLoad
           Solana Daily Heat
         </h1>
         <p className="mt-3 max-w-2xl text-balance text-[15px] leading-relaxed text-text-secondary">
-          Find what is hot on Solana for the selected UTC snapshot before it becomes obvious.
+          Find what is hot on Solana before it becomes obvious. Card timestamps show how
+          recently each story updated.
         </p>
-        <div className="mt-6 flex flex-wrap items-end gap-4">
-          <DateSelector value={date} dates={dates} onChange={onDateChange} />
-          <div className="flex flex-col gap-0.5">
-            <span className="text-[11px] text-text-muted">
-              {isLoading
-                ? "Loading live scanner data…"
-                : dataSourceLabel(dataSource)
-                  ? `${dataSourceLabel(dataSource)} · Not investment advice`
-                  : "Not investment advice"}
-            </span>
-            <span className="text-[11px] font-medium text-text-secondary">
-              Snapshot date uses UTC. {formatSnapshotHeroLine(date)}
-            </span>
-          </div>
+        <div className="mt-5 flex flex-col gap-2">
+          <p className="text-[11px] text-text-muted">{statusLine(dataSource, isLoading)}</p>
+          {archiveDate ? (
+            <p className="text-[11px] text-text-secondary">
+              Archive snapshot · {formatSnapshotArchiveHeading(archiveDate)}
+              {" · "}
+              <Link href="/" className="font-medium text-accent hover:text-accent-hover">
+                Back to latest
+              </Link>
+            </p>
+          ) : null}
         </div>
       </div>
     </header>

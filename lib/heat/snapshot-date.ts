@@ -33,3 +33,25 @@ export function formatSnapshotDateOption(iso: string): string {
 export function formatSnapshotHeroLine(iso: string): string {
   return `Snapshot: ${iso} UTC`;
 }
+
+/** Long-form UTC label for archive banner (no "latest" suffix). */
+export function formatSnapshotArchiveHeading(iso: string): string {
+  const d = new Date(`${iso}T12:00:00.000Z`);
+  return d.toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    timeZone: "UTC",
+  });
+}
+
+/** Compact label for footer archive links (UTC). */
+export function formatSnapshotArchiveLabel(iso: string): string {
+  const d = new Date(`${iso}T12:00:00.000Z`);
+  return d.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    timeZone: "UTC",
+  });
+}

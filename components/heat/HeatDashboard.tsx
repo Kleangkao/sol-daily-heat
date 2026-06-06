@@ -30,6 +30,7 @@ import ExploreBar from "./ExploreBar";
 import HeatHero from "./HeatHero";
 import HeatSection from "./HeatSection";
 import MarketPulse from "./MarketPulse";
+import PastSnapshotsNav from "./PastSnapshotsNav";
 import { useSectionOpenState } from "./useSectionOpenState";
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
@@ -67,9 +68,6 @@ export default function HeatDashboard() {
     return () => window.removeEventListener("hashchange", onHashChange);
   }, [categoryFilter]);
 
-  const heroDate = date ?? utcTodayIso();
-  const heroDates = useMemo(() => utcAvailableDates(), []);
-
   const apiUrl = date ? `/api/heat/today?date=${date}` : "/api/heat/today";
 
   const { data, isLoading, isValidating } = useSWR<HeatDashboardData>(apiUrl, fetcher, {
@@ -81,12 +79,20 @@ export default function HeatDashboard() {
 
   const syncUrl = useCallback(
     (nextDate: string | undefined, nextCategory: TopicCategory | null) => {
-      const effectiveDate = nextDate ?? dashboard?.date ?? utcTodayIso();
-      const qs = buildDashboardQueryString(effectiveDate, nextCategory);
+      const qs = buildDashboardQueryString(nextDate, nextCategory);
       router.replace(`/${qs}`, { scroll: false });
     },
-    [router, dashboard?.date]
+    [router]
   );
+
+  useEffect(() => {
+    const raw = searchParams.get("date");
+    if (isValidDateParam(raw)) {
+      setDate(raw!);
+    } else if (!raw) {
+      setDate(undefined);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     if (!dashboard?.availableDates?.length) return;
@@ -99,14 +105,6 @@ export default function HeatDashboard() {
     }
   }, [dashboard, searchParams, categoryFilter, syncUrl]);
 
-  const onDateChange = useCallback(
-    (d: string) => {
-      setDate(d);
-      syncUrl(d, categoryFilter);
-    },
-    [categoryFilter, syncUrl]
-  );
-
   const onExploreChip = useCallback(
     (chipId: ExploreChipId) => {
       setActiveExploreChip(chipId);
@@ -115,7 +113,7 @@ export default function HeatDashboard() {
       switch (action.type) {
         case "clear-category":
           setCategoryFilter(null);
-          syncUrl(date ?? dashboard?.date, null);
+          syncUrl(date, null);
           navigateToSection(action.scrollTo);
           break;
         case "section-only":
@@ -123,18 +121,27 @@ export default function HeatDashboard() {
           break;
         case "category-lens":
           setCategoryFilter(action.category);
-          syncUrl(date ?? dashboard?.date, action.category);
+          syncUrl(date, action.category);
           navigateToSection(action.scrollTo);
           break;
         case "defi-hybrid":
           setCategoryFilter(action.category);
-          syncUrl(date ?? dashboard?.date, action.category);
+          syncUrl(date, action.category);
           navigateToSections(action.openSections, action.scrollTo);
           break;
       }
     },
-    [date, dashboard?.date, syncUrl, navigateToSection, navigateToSections]
+    [date, syncUrl, navigateToSection, navigateToSections]
   );
+
+  const archiveDate =
+    date != null && date !== utcTodayIso() ? date : undefined;
+
+  const pastSnapshotDates = useMemo(() => {
+    const today = utcTodayIso();
+    const source = dashboard?.availableDates ?? utcAvailableDates();
+    return source.filter((d) => d !== today);
+  }, [dashboard?.availableDates]);
 
   const topFiltered = useMemo(() => {
     if (!dashboard) return [];
@@ -191,11 +198,9 @@ export default function HeatDashboard() {
   return (
     <div className="min-h-screen">
       <HeatHero
-        date={dashboard?.date ?? heroDate}
-        dates={dashboard?.availableDates ?? heroDates}
-        onDateChange={onDateChange}
         dataSource={dashboard?.dataSource}
         isLoading={awaitingData}
+        archiveDate={archiveDate}
       />
       <DisclaimerBar dataSource={dashboard?.dataSource} isLoading={awaitingData} />
       {dashboard && dashboard.dataSource && dashboard.dataSource !== "live" ? (
@@ -312,7 +317,10 @@ export default function HeatDashboard() {
               />
 
               <footer className="mt-16 border-t border-border py-8 text-center text-[12px] text-text-muted">
-                {footerLabel} · <code className="text-accent">not investment advice</code>
+                <p>
+                  {footerLabel} · <code className="text-accent">not investment advice</code>
+                </p>
+                <PastSnapshotsNav dates={pastSnapshotDates} activeDate={date} />
               </footer>
             </div>
 
