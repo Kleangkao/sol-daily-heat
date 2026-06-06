@@ -146,6 +146,67 @@ function rowsForSection(rows: RankingRow[], section: RankingSection): HeatCardVi
  * Load live rankings for a date. Returns null only on DB error or zero rows.
  * Empty individual sections are returned as [] (caller merges mock per section).
  */
+async function hydrateRankingRows(
+  db: SupabaseClient,
+  rows: RankingRow[]
+): Promise<RankingRow[]> {
+  const topicIds = Array.from(new Set(rows.map((r) => r.topics?.id).filter(Boolean))) as string[];
+  if (topicIds.length === 0) return rows;
+
+  const [tokensRes, protocolsRes, sourcesRes] = await Promise.all([
+    db.from("topic_tokens").select("topic_id, tokens (*)").in("topic_id", topicIds),
+    db.from("topic_protocols").select("topic_id, protocols (*)").in("topic_id", topicIds),
+    db
+      .from("topic_sources")
+      .select("topic_id, source_id, source_url, sources ( name, slug )")
+      .in("topic_id", topicIds),
+  ]);
+
+  if (tokensRes.error) throw new Error(`topic_tokens hydrate failed: ${tokensRes.error.message}`);
+  if (protocolsRes.error) {
+    throw new Error(`topic_protocols hydrate failed: ${protocolsRes.error.message}`);
+  }
+  if (sourcesRes.error) throw new Error(`topic_sources hydrate failed: ${sourcesRes.error.message}`);
+
+  const tokensByTopic = new Map<string, RankingRow["topics"]["topic_tokens"]>();
+  for (const row of tokensRes.data ?? []) {
+    const topicId = row.topic_id as string;
+    const bucket = tokensByTopic.get(topicId) ?? [];
+    bucket.push({ tokens: row.tokens as Token | null });
+    tokensByTopic.set(topicId, bucket);
+  }
+
+  const protocolsByTopic = new Map<string, RankingRow["topics"]["topic_protocols"]>();
+  for (const row of protocolsRes.data ?? []) {
+    const topicId = row.topic_id as string;
+    const bucket = protocolsByTopic.get(topicId) ?? [];
+    bucket.push({ protocols: row.protocols as Protocol | null });
+    protocolsByTopic.set(topicId, bucket);
+  }
+
+  const sourcesByTopic = new Map<string, RankingRow["topics"]["topic_sources"]>();
+  for (const row of sourcesRes.data ?? []) {
+    const topicId = row.topic_id as string;
+    const bucket = sourcesByTopic.get(topicId) ?? [];
+    bucket.push({
+      source_id: row.source_id as string,
+      source_url: row.source_url as string | null,
+      sources: row.sources as { name: string; slug: string } | null,
+    });
+    sourcesByTopic.set(topicId, bucket);
+  }
+
+  return rows.map((row) => ({
+    ...row,
+    topics: {
+      ...row.topics,
+      topic_tokens: tokensByTopic.get(row.topics.id) ?? [],
+      topic_protocols: protocolsByTopic.get(row.topics.id) ?? [],
+      topic_sources: sourcesByTopic.get(row.topics.id) ?? [],
+    },
+  }));
+}
+
 export async function fetchHeatDashboard(
   db: SupabaseClient,
   date?: string
@@ -154,15 +215,7 @@ export async function fetchHeatDashboard(
 
   const { data, error } = await db
     .from("daily_rankings")
-    .select(
-      `*,
-      topics (
-        *,
-        topic_tokens ( tokens (*) ),
-        topic_protocols ( protocols (*) ),
-        topic_sources ( source_id, source_url, sources ( name, slug ) )
-      )`
-    )
+    .select(`*, topics (*)`)
     .eq("ranking_date", rankingDate)
     .eq("status", "published");
 
@@ -171,7 +224,7 @@ export async function fetchHeatDashboard(
   }
   if (!data?.length) return null;
 
-  const rows = data as RankingRow[];
+  const rows = await hydrateRankingRows(db, data as RankingRow[]);
 
   const topHeat = rowsForSection(rows, "top_heat");
   const newTokens = rowsForSection(rows, "new_tokens");
