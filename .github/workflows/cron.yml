@@ -24,17 +24,23 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.schedule == '0 */3 * * *' || github.event_name == 'workflow_dispatch'
     steps:
-      # Split ingest + process — combined /api/cron/pipeline can exceed Vercel's 300s limit (504).
-      - name: POST /api/cron/ingest
-        run: |
-          curl -fsS --max-time 540 -X POST "https://sol-daily-heat.vercel.app/api/cron/ingest" \
-            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
-            -H "Content-Type: application/json"
-      - name: POST /api/cron/process
-        run: |
-          curl -fsS --max-time 540 -X POST "https://sol-daily-heat.vercel.app/api/cron/process" \
-            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
-            -H "Content-Type: application/json"
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      # Run ingest + rankings on the runner — avoids Vercel 300s serverless timeouts (504).
+      - name: Ingest sources
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: npx tsx scripts/run-ingest.ts
+      - name: Process rankings
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: npx tsx scripts/run-pipeline.ts
 
   cleanup-dry-run:
     name: Cleanup (dry-run)
