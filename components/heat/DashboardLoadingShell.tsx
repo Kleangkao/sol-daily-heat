@@ -12,7 +12,7 @@ export default function DashboardLoadingShell() {
         {Array.from({ length: 6 }).map((_, i) => (
           <div
             key={i}
-            className="h-[220px] animate-pulse rounded-[10px] border border-border bg-bg-card/60"
+            className="h-[220px] animate-pulse rounded-[12px] border border-border bg-bg-card/60"
           />
         ))}
       </div>

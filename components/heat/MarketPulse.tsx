@@ -22,7 +22,7 @@ import type { HotTapeItem, MarketPulseResponse, PulseTokenRow } from "@/lib/mark
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
 const CHANGE_CLASS = {
-  up: "text-emerald-400",
+  up: "text-accent",
   down: "text-rose-400",
   flat: "text-text-muted",
 } as const;
@@ -229,8 +229,8 @@ export default function MarketPulse({
 
   const headingClass =
     layout === "rail"
-      ? "font-heading text-[14px] font-bold uppercase tracking-tight text-text-primary"
-      : "font-heading text-[16px] font-bold uppercase tracking-tight text-text-primary";
+      ? "editorial-pipe font-heading text-[14px] font-bold uppercase tracking-tight text-text-primary"
+      : "editorial-pipe font-heading text-[16px] font-bold uppercase tracking-tight text-text-primary";
 
   const body = (
     <>
@@ -326,7 +326,7 @@ export default function MarketPulse({
   if (layout === "mobile") {
     return (
       <section
-        className="mb-5 rounded-[10px] border border-border bg-bg-secondary/40"
+        className="mb-5 rounded-[12px] border border-border bg-bg-secondary/40"
         aria-labelledby="market-pulse-mobile-heading"
       >
         <button
@@ -348,7 +348,7 @@ export default function MarketPulse({
         </button>
         {mobileOpen ? <div className="border-t border-border px-3 pb-3">{body}</div> : null}
         {showStale ? (
-          <p className="border-t border-border px-3 py-1.5 text-[10px] text-amber-200/90">
+          <p className="border-t border-border px-3 py-1.5 text-[10px] text-heat/90">
             Prices delayed
           </p>
         ) : null}
@@ -358,7 +358,7 @@ export default function MarketPulse({
 
   return (
     <section
-      className="rounded-[10px] border border-border bg-bg-secondary/30 p-3"
+      className="rounded-[12px] border border-border bg-bg-secondary/30 p-3"
       aria-labelledby="market-pulse-rail-heading"
     >
       <div className="flex items-baseline justify-between gap-2">
@@ -369,7 +369,7 @@ export default function MarketPulse({
           <p className="mt-0.5 text-[10px] text-text-muted">Context · not trading advice</p>
         </div>
         {showStale ? (
-          <span className="rounded-full border border-amber-500/40 bg-amber-500/10 px-1.5 py-0.5 text-[9px] font-semibold text-amber-200">
+          <span className="rounded-full border border-heat/40 bg-heat/10 px-1.5 py-0.5 text-[9px] font-semibold text-heat">
             Delayed
           </span>
         ) : null}

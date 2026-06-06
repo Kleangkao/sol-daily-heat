@@ -31,7 +31,7 @@ export default function CopyMintButton({ mint }: Props) {
         role="status"
         aria-live="polite"
         className={`mt-1 inline-block text-[10px] font-semibold ${
-          copied ? "text-emerald-400" : "text-accent"
+          copied ? "text-accent" : "text-text-secondary"
         }`}
       >
         {copied ? "Copied" : "Copy mint"}

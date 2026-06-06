@@ -79,7 +79,7 @@ export default function HeatCard({
     (!isGenericRiskNote(item.riskNote) ? item.riskNote : undefined);
 
   return (
-    <article className="group flex flex-col overflow-hidden rounded-[10px] border border-border bg-bg-card p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-accent hover:shadow-xl">
+    <article className="group flex flex-col overflow-hidden rounded-[12px] border border-border bg-bg-card p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-accent/60 hover:shadow-lg hover:shadow-black/20">
       <div className="flex items-start justify-between gap-3">
         <div className="flex flex-wrap gap-2">
           <span className="inline-flex rounded-full bg-bg-secondary px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-accent">
@@ -210,7 +210,7 @@ export default function HeatCard({
       {detailHref ? (
         <Link
           href={detailHref}
-          className="mt-3 inline-flex text-[12px] font-semibold text-accent hover:text-accent-hover"
+          className="mt-3 inline-flex text-[12px] font-semibold text-heat hover:text-heat-hover"
         >
           Open brief →
         </Link>

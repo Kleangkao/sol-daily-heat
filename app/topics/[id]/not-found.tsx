@@ -3,7 +3,7 @@ import Link from "next/link";
 export default function TopicNotFound() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-4 text-center">
-      <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-accent">
+      <p className="editorial-pipe text-[12px] font-semibold uppercase tracking-[0.2em] text-accent">
         Solana Daily Heat
       </p>
       <h1 className="mt-3 font-heading text-[32px] font-bold text-text-primary">Topic not found</h1>
@@ -13,7 +13,7 @@ export default function TopicNotFound() {
       </p>
       <Link
         href="/"
-        className="mt-6 text-[14px] font-semibold text-accent hover:text-accent-hover"
+        className="mt-6 text-[14px] font-semibold text-heat hover:text-heat-hover"
       >
         ← Back to Daily Heat
       </Link>

@@ -29,7 +29,7 @@ export default function HeatHero({ dataSource, isLoading, archiveDate }: Props) 
   return (
     <header className="border-b border-border bg-bg-secondary/40 px-4 py-10 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-6xl">
-        <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-accent">
+        <p className="editorial-pipe text-[12px] font-semibold uppercase tracking-[0.2em] text-accent">
           Solana Radar
         </p>
         <h1 className="mt-2 font-heading text-[40px] font-bold uppercase leading-none tracking-tight text-text-primary sm:text-[52px]">
@@ -45,7 +45,7 @@ export default function HeatHero({ dataSource, isLoading, archiveDate }: Props) 
             <p className="text-[11px] text-text-secondary">
               Archive snapshot · {formatSnapshotArchiveHeading(archiveDate)}
               {" · "}
-              <Link href="/" className="font-medium text-accent hover:text-accent-hover">
+              <Link href="/" className="font-medium text-heat hover:text-heat-hover">
                 Back to latest
               </Link>
             </p>

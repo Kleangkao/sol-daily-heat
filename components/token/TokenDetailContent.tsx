@@ -14,7 +14,7 @@ import { shortMintAddress } from "@/lib/heat/token-display";
 import type { TokenDetailView } from "@/lib/types/token-detail";
 
 const CHANGE_CLASS = {
-  up: "text-emerald-400",
+  up: "text-accent",
   down: "text-rose-400",
   flat: "text-text-muted",
 } as const;
@@ -61,13 +61,13 @@ export default function TokenDetailContent({ token }: Props) {
         <div className="mx-auto max-w-4xl">
           <Link
             href="/"
-            className="text-[12px] font-semibold text-accent hover:text-accent-hover"
+            className="text-[12px] font-semibold text-heat hover:text-heat-hover"
           >
             ← Back to Daily Heat
           </Link>
           <div className="mt-4 flex flex-wrap items-start justify-between gap-4">
             <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-accent">
+              <p className="editorial-pipe text-[11px] font-semibold uppercase tracking-[0.2em] text-accent">
                 Token context
               </p>
               <h1 className="mt-2 font-heading text-[28px] font-bold leading-tight text-text-primary sm:text-[34px]">

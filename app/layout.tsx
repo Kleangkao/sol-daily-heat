@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Barlow_Condensed, DM_Sans } from "next/font/google";
+import { Barlow_Condensed, Outfit } from "next/font/google";
 import "./globals.css";
 
 const barlow = Barlow_Condensed({
@@ -8,10 +8,10 @@ const barlow = Barlow_Condensed({
   variable: "--font-barlow",
 });
 
-const dm = DM_Sans({
+const outfit = Outfit({
   subsets: ["latin"],
   weight: ["400", "500", "600"],
-  variable: "--font-dm",
+  variable: "--font-outfit",
 });
 
 import { SITE_URL } from "@/lib/site";
@@ -34,7 +34,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${barlow.variable} ${dm.variable} bg-bg-primary text-text-primary font-body antialiased`}
+        className={`${barlow.variable} ${outfit.variable} bg-bg-primary text-text-primary font-body antialiased`}
       >
         {children}
       </body>

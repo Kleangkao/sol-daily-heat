@@ -19,10 +19,11 @@ const config: Config = {
         border: "var(--border)",
         danger: "var(--danger)",
         heat: "var(--heat)",
+        "heat-hover": "var(--heat-hover)",
       },
       fontFamily: {
         heading: ["var(--font-barlow)", "sans-serif"],
-        body: ["var(--font-dm)", "sans-serif"],
+        body: ["var(--font-outfit)", "system-ui", "sans-serif"],
       },
     },
   },

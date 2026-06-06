@@ -226,7 +226,7 @@ export default function HeatDashboard() {
               <ExploreBar activeChip={activeExploreChip} onChipClick={onExploreChip} />
 
               <HeatSection
-                title="Top Heat"
+                title="| Top Heat"
                 sectionId="top-heat"
                 sectionLabel="Top Heat"
                 topicSections={topicSections}

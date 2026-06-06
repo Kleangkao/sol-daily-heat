@@ -24,8 +24,8 @@ export default function ExploreBar({ activeChip, onChipClick }: Props) {
             aria-pressed={active}
             className={`shrink-0 rounded-full border px-3 py-1.5 text-[12px] font-medium transition-colors ${
               active
-                ? "border-accent bg-accent/10 text-accent"
-                : "border-border bg-bg-secondary text-text-secondary hover:border-accent/50 hover:text-accent"
+                ? "border-heat/50 bg-heat/10 text-heat"
+                : "border-border bg-bg-secondary text-text-secondary hover:border-accent/40 hover:text-accent"
             }`}
           >
             {chip.label}

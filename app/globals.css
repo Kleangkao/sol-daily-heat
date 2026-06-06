@@ -3,17 +3,29 @@
 @tailwind utilities;
 
 :root {
-  --bg-primary: #0d0d0f;
-  --bg-secondary: #16161a;
-  --bg-card: #1c1c22;
-  --accent: #00e5ff;
-  --accent-hover: #00b8cc;
-  --heat: #ff9f43;
-  --text-primary: #f0f0f5;
-  --text-secondary: #8888a0;
-  --text-muted: rgba(136, 136, 160, 0.85);
-  --border: #2a2a35;
-  --danger: #ff4060;
+  --deep-900: #041616;
+  --deep-800: #061e1e;
+  --deep-700: #0a3131;
+  --deep-600: #104848;
+  --aegean-50: #eef4ec;
+  --aegean-100: #d4dfcc;
+  --crystal-teal: #90b8a3;
+  --crystal-cyan: #74a691;
+  --cta-gold: #fbbf24;
+  --cta-gold-hover: #f59e0b;
+
+  --bg-primary: var(--deep-900);
+  --bg-secondary: var(--deep-800);
+  --bg-card: var(--deep-700);
+  --accent: var(--crystal-teal);
+  --accent-hover: var(--crystal-cyan);
+  --heat: var(--cta-gold);
+  --heat-hover: var(--cta-gold-hover);
+  --text-primary: var(--aegean-50);
+  --text-secondary: var(--aegean-100);
+  --text-muted: rgba(212, 223, 204, 0.58);
+  --border: var(--deep-600);
+  --danger: #f87171;
 }
 
 html,
@@ -24,7 +36,7 @@ body {
 body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
-  font-family: "DM Sans", sans-serif;
+  font-family: "Outfit", system-ui, sans-serif;
 }
 
 a {
@@ -35,5 +47,11 @@ a {
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  .editorial-pipe::before {
+    content: "| ";
+    color: var(--crystal-teal);
+    font-weight: 600;
   }
 }

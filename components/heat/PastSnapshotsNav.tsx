@@ -21,7 +21,7 @@ export default function PastSnapshotsNav({ dates, activeDate }: Props) {
         href="/"
         className={
           !activeDate
-            ? "font-medium text-accent"
+            ? "font-medium text-heat"
             : "text-text-muted hover:text-accent"
         }
       >
@@ -34,7 +34,7 @@ export default function PastSnapshotsNav({ dates, activeDate }: Props) {
             href={`/?date=${iso}`}
             className={
               activeDate === iso
-                ? "font-medium text-accent"
+                ? "font-medium text-heat"
                 : "text-text-muted hover:text-accent"
             }
           >
