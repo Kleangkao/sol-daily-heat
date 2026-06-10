@@ -41,45 +41,29 @@ function FeaturedRow({
   );
 }
 
-type Props = {
-  /** Inline below explore chips (main column) vs full-width band under hero. */
-  variant?: "full" | "embedded";
-};
-
-export default function IslandDaoSponsorsRail({ variant = "full" }: Props) {
-  const embedded = variant === "embedded";
-
+export default function IslandDaoSponsorsRail() {
   return (
-    <section
-      aria-labelledby="islanddao-featured-heading"
-      className={
-        embedded
-          ? "mb-2 mt-5"
-          : "bg-bg-primary/55 px-4 pb-5 pt-1 backdrop-blur-[2px] sm:px-6 lg:px-8"
-      }
-    >
-      <div className={embedded ? undefined : "mx-auto max-w-6xl"}>
-        <p
-          id="islanddao-featured-heading"
-          className="editorial-pipe text-[11px] font-semibold uppercase tracking-[0.2em] text-accent"
-        >
-          IslandDAO Featured
-        </p>
+    <section aria-labelledby="whats-hot-heading" className="mt-3">
+      <p
+        id="whats-hot-heading"
+        className="editorial-pipe text-[11px] font-semibold tracking-[0.14em] text-accent sm:text-[12px]"
+      >
+        What&apos;s Hot on Solana
+      </p>
 
-        <div className="featured-marquee-clip relative mt-3 min-h-[76px] w-full max-w-full overflow-hidden py-1">
-          <div
-            className="featured-marquee-fade pointer-events-none absolute inset-y-0 left-0 z-10 w-8 sm:w-10"
-            aria-hidden
-          />
-          <div
-            className="featured-marquee-fade pointer-events-none absolute inset-y-0 right-0 z-10 w-8 rotate-180 sm:w-10"
-            aria-hidden
-          />
+      <div className="featured-marquee-clip relative mt-2.5 min-h-[76px] w-full max-w-full overflow-hidden py-1">
+        <div
+          className="featured-marquee-fade pointer-events-none absolute inset-y-0 left-0 z-10 w-8 sm:w-10"
+          aria-hidden
+        />
+        <div
+          className="featured-marquee-fade pointer-events-none absolute inset-y-0 right-0 z-10 w-8 rotate-180 sm:w-10"
+          aria-hidden
+        />
 
-          <div className="featured-marquee-track flex w-max flex-nowrap items-center gap-3">
-            <FeaturedRow partners={ISLANDDAO_FEATURED} />
-            <FeaturedRow partners={ISLANDDAO_FEATURED} ariaHidden />
-          </div>
+        <div className="featured-marquee-track flex w-max flex-nowrap items-center gap-3">
+          <FeaturedRow partners={ISLANDDAO_FEATURED} />
+          <FeaturedRow partners={ISLANDDAO_FEATURED} ariaHidden />
         </div>
       </div>
     </section>

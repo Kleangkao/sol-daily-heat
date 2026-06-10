@@ -27,7 +27,6 @@ import DashboardLoadingShell from "./DashboardLoadingShell";
 import DemoPreviewBanner from "./DemoPreviewBanner";
 import ExploreBar from "./ExploreBar";
 import HeatHero from "./HeatHero";
-import IslandDaoSponsorsRail from "./IslandDaoSponsorsRail";
 import HeatSection from "./HeatSection";
 import MarketPulse from "./MarketPulse";
 import PastSnapshotsNav from "./PastSnapshotsNav";
@@ -219,8 +218,6 @@ export default function HeatDashboard() {
           <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_252px] lg:items-start lg:gap-8">
             <div className="min-w-0">
               <ExploreBar activeChip={activeExploreChip} onChipClick={onExploreChip} />
-
-              <IslandDaoSponsorsRail variant="embedded" />
 
               <HeatSection
                 title="| Top Heat"
