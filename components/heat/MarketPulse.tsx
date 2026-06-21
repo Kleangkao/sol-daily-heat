@@ -289,7 +289,7 @@ export default function MarketPulse({
       {anchor ? (
         <div className="mt-3">
           <p className="text-[10px] font-semibold uppercase tracking-wide text-text-muted">
-            SOL anchor
+            Solana (SOL)
           </p>
           <div className="mt-1.5">
             <TokenChip

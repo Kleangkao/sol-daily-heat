@@ -27,10 +27,6 @@ type Props = {
   toolbar?: ReactNode;
 };
 
-function cardCountLabel(count: number): string {
-  return count === 1 ? "1 card" : `${count} cards`;
-}
-
 export default function HeatSection({
   title,
   subtitle,
@@ -50,11 +46,10 @@ export default function HeatSection({
 }: Props) {
   const panelId = `${sectionId}-panel`;
   const collapsible = Boolean(onToggle);
-  const count = items.length;
   const statusLabel =
-    sectionDataSource === "mock" ? "Demo" : sectionDataSource === "live" ? "Live" : null;
+    sectionDataSource === "mock" ? "demo" : sectionDataSource === "live" ? "live" : null;
 
-  const headerTitle = collapsible && !isOpen ? `${title} · ${count}` : title;
+  const headerTitle = title;
 
   const headerInner = (
     <>
@@ -68,10 +63,9 @@ export default function HeatSection({
               {subtitle}
             </p>
           ) : null}
-          <p className="mt-1 text-[12px] text-text-muted">
-            {cardCountLabel(count)}
-            {statusLabel ? ` · ${statusLabel}` : ""}
-          </p>
+          {statusLabel ? (
+            <p className="mt-1 text-[12px] lowercase text-text-muted">{statusLabel}</p>
+          ) : null}
         </div>
         {collapsible ? (
           <span

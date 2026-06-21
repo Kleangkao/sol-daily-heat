@@ -1,8 +1,10 @@
 export type IslandDaoFeatured = {
   id: string;
   name: string;
-  /** Path under /public (served as /sponsors/...) */
-  logoPath: string;
+  /** Path under /public (served as /sponsors/...). Omit when textLogo is true. */
+  logoPath?: string;
+  /** Temporary text-only logo when no asset is available yet. */
+  textLogo?: boolean;
   websiteUrl: string;
 };
 
@@ -60,10 +62,10 @@ export const ISLANDDAO_FEATURED: IslandDaoFeatured[] = [
     websiteUrl: "https://www.ionlyflyfirstclass.com/",
   },
   {
-    id: "little-unusual",
-    name: "Little Unusual",
-    logoPath: "/sponsors/little-unusual.png",
-    websiteUrl: "https://www.littleunusual.co/",
+    id: "solflare",
+    name: "Solflare",
+    textLogo: true,
+    websiteUrl: "https://solflare.com/",
   },
   {
     id: "surfcash",

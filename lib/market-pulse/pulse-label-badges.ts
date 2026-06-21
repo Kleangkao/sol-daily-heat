@@ -29,9 +29,9 @@ const PRIMARY_ORDER: PulseTokenLabel[] = [
 ];
 
 export function pulseLabelsToBadges(labels: PulseTokenLabel[]): SignalBadge[] {
-  const sorted = [...labels].sort(
-    (a, b) => PRIMARY_ORDER.indexOf(a) - PRIMARY_ORDER.indexOf(b)
-  );
+  const sorted = [...labels]
+    .filter((label) => label !== "Ecosystem anchor")
+    .sort((a, b) => PRIMARY_ORDER.indexOf(a) - PRIMARY_ORDER.indexOf(b));
   return sorted.slice(0, 2).map((label) => ({
     id: label.replace(/\s+/g, "-").toLowerCase(),
     label: displayPulseLabel(label),

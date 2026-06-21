@@ -1,4 +1,7 @@
+"use client";
+
 import Image from "next/image";
+import { useEffect } from "react";
 import { ISLANDDAO_FEATURED, type IslandDaoFeatured } from "@/lib/islanddao/sponsors";
 
 function FeaturedCard({ partner }: { partner: IslandDaoFeatured }) {
@@ -8,16 +11,25 @@ function FeaturedCard({ partner }: { partner: IslandDaoFeatured }) {
       target="_blank"
       rel="noopener noreferrer"
       aria-label={`${partner.name}, featured IslandDAO partner (opens in new tab)`}
+      onClick={(e) => {
+        e.currentTarget.blur();
+      }}
       className="group flex h-[72px] w-[148px] shrink-0 items-center justify-center rounded-[12px] border border-border bg-bg-card/50 px-4 py-3 transition-colors hover:border-accent/45 hover:bg-bg-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary"
     >
-      <Image
-        src={partner.logoPath}
-        alt=""
-        width={112}
-        height={40}
-        className="max-h-10 w-auto max-w-full object-contain opacity-90 transition-opacity group-hover:opacity-100"
-        aria-hidden
-      />
+      {partner.textLogo ? (
+        <span className="text-center text-[13px] font-bold uppercase tracking-wide text-text-primary opacity-90 transition-opacity group-hover:opacity-100">
+          {partner.name}
+        </span>
+      ) : (
+        <Image
+          src={partner.logoPath!}
+          alt=""
+          width={112}
+          height={40}
+          className="max-h-10 w-auto max-w-full object-contain opacity-90 transition-opacity group-hover:opacity-100"
+          aria-hidden
+        />
+      )}
     </a>
   );
 }
@@ -42,13 +54,25 @@ function FeaturedRow({
 }
 
 export default function IslandDaoSponsorsRail() {
+  useEffect(() => {
+    const resumeMarquee = () => {
+      if (document.visibilityState !== "visible") return;
+      const el = document.activeElement;
+      if (el instanceof HTMLElement && el.closest(".featured-marquee-clip")) {
+        el.blur();
+      }
+    };
+    document.addEventListener("visibilitychange", resumeMarquee);
+    return () => document.removeEventListener("visibilitychange", resumeMarquee);
+  }, []);
+
   return (
-    <section aria-labelledby="whats-hot-heading" className="mt-3">
+    <section aria-labelledby="islanddao-marquee-heading" className="mt-6 sm:mt-8">
       <p
-        id="whats-hot-heading"
-        className="editorial-pipe text-[11px] font-semibold tracking-[0.14em] text-accent sm:text-[12px]"
+        id="islanddao-marquee-heading"
+        className="editorial-pipe text-[11px] font-semibold tracking-[0.12em] text-accent sm:text-[12px]"
       >
-        What&apos;s Hot on Solana
+        Live from IslandDAO in Koh Samui
       </p>
 
       <div className="featured-marquee-clip relative mt-2.5 min-h-[76px] w-full max-w-full overflow-hidden py-1">
