@@ -158,7 +158,7 @@ export const NFT_DEMO_SECTION: DemoSpotlightSection = {
     },
     {
       id: "tensor",
-      name: "Tensor",
+      name: "Tensorians",
       categoryLabel: "NFT",
       imageSrc: "/nft/tensor.png",
       imageWidth: 1200,
@@ -205,7 +205,7 @@ export const AI_DEMO_SECTION: DemoSpotlightSection = {
   id: "ai-demo",
   title: "AI",
   description: "Solana AI projects — demo spotlight.",
-  cardLayout: "banner",
+  cardLayout: "square",
   modalVariant: "links-only",
   cards: [
     {

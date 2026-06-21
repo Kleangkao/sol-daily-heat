@@ -214,10 +214,12 @@ function SpotlightCard({
   card,
   layout,
   onOpen,
+  compact = false,
 }: {
   card: DemoCard;
   layout: DemoCardLayout;
   onOpen: () => void;
+  compact?: boolean;
 }) {
   return (
     <button
@@ -226,11 +228,19 @@ function SpotlightCard({
       className="w-full overflow-hidden rounded-[10px] border border-border bg-bg-card/60 text-left transition-colors hover:border-accent/40 hover:bg-bg-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary"
     >
       <SpotlightImage card={card} layout={layout} />
-      <div className="px-3 pb-3 pt-2">
-        <p className="text-[10px] font-semibold uppercase tracking-wide text-accent">
+      <div className={`px-3 pb-3 pt-2 ${compact ? "px-2.5 pb-2.5 pt-1.5" : ""}`}>
+        <p
+          className={`font-semibold uppercase tracking-wide text-accent ${
+            compact ? "text-[9px]" : "text-[10px]"
+          }`}
+        >
           {card.categoryLabel}
         </p>
-        <p className="mt-0.5 truncate text-[14px] font-bold text-text-primary sm:text-[15px]">
+        <p
+          className={`mt-0.5 truncate font-bold text-text-primary ${
+            compact ? "text-[13px] sm:text-[14px]" : "text-[14px] sm:text-[15px]"
+          }`}
+        >
           {card.name}
         </p>
       </div>
@@ -243,7 +253,7 @@ function gridClassForLayout(layout: DemoCardLayout) {
     case "gaming-row":
       return "flex flex-col gap-3";
     case "square":
-      return "grid grid-cols-1 gap-4 sm:grid-cols-2";
+      return "grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-3";
     case "banner":
       return "grid grid-cols-1 gap-4 md:grid-cols-2";
   }
@@ -277,6 +287,7 @@ export default function DemoSpotlightSection({ section }: { section: DemoSpotlig
               key={card.id}
               card={card}
               layout={section.cardLayout}
+              compact={section.cardLayout === "square"}
               onOpen={() => setActiveId(card.id)}
             />
           ))}
