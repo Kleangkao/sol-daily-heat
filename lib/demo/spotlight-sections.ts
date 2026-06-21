@@ -12,7 +12,7 @@ export type DemoCard = {
   imageHeight: number;
   /** Banner thumb crop — default centers; top keeps header art visible. */
   thumbObjectPosition?: "top" | "center";
-  /** Gaming popups only */
+  /** Popup About body copy */
   about?: string;
   links: DemoLink[];
 };
@@ -123,6 +123,7 @@ export const NFT_DEMO_SECTION: DemoSpotlightSection = {
       imageSrc: "/nft/monkedao.png",
       imageWidth: 512,
       imageHeight: 512,
+      about: "A leading Solana NFT community and ecosystem brand.",
       links: [
         { label: "X", href: "https://x.com/MonkeDAO" },
         { label: "Website", href: "https://monkedao.io/" },
@@ -135,6 +136,7 @@ export const NFT_DEMO_SECTION: DemoSpotlightSection = {
       imageSrc: "/nft/islanddao.png",
       imageWidth: 1200,
       imageHeight: 1200,
+      about: "A Solana-native community and collaboration hub.",
       links: [
         { label: "X", href: "https://x.com/islanddao" },
         { label: "Website", href: "https://islanddao.org/" },
@@ -147,6 +149,8 @@ export const NFT_DEMO_SECTION: DemoSpotlightSection = {
       imageSrc: "/nft/mad-lads.jpg",
       imageWidth: 1200,
       imageHeight: 1200,
+      about:
+        "Backpack-native xNFT culture and one of Solana's modern blue-chip NFT names.",
       links: [
         { label: "Website", href: "https://www.madlads.com/" },
         { label: "X", href: "https://x.com/MadLads" },
@@ -159,6 +163,8 @@ export const NFT_DEMO_SECTION: DemoSpotlightSection = {
       imageSrc: "/nft/tensor.png",
       imageWidth: 1200,
       imageHeight: 1200,
+      about:
+        "Solana's leading NFT marketplace for collectors, pro traders, and NFT discovery.",
       links: [
         { label: "Website", href: "https://www.tensor.trade" },
         { label: "X", href: "https://x.com/tensor_hq" },
@@ -171,6 +177,8 @@ export const NFT_DEMO_SECTION: DemoSpotlightSection = {
       imageSrc: "/nft/famous-fox-federation.png",
       imageWidth: 1200,
       imageHeight: 1200,
+      about:
+        "A long-running Solana NFT community known for Foxes, tools, and utility.",
       links: [
         { label: "Website", href: "https://famousfoxes.com/" },
         { label: "X", href: "https://x.com/FamousFoxFed" },
@@ -183,6 +191,8 @@ export const NFT_DEMO_SECTION: DemoSpotlightSection = {
       imageSrc: "/nft/okay-bears.jpg",
       imageWidth: 1200,
       imageHeight: 1200,
+      about:
+        "A Solana-born culture brand known for community, art, and mainstream-friendly identity.",
       links: [
         { label: "Website", href: "https://okaybears.com/" },
         { label: "X", href: "https://x.com/okaybears" },
@@ -205,6 +215,8 @@ export const AI_DEMO_SECTION: DemoSpotlightSection = {
       imageSrc: "/ai/bido.jpg",
       imageWidth: 800,
       imageHeight: 450,
+      about:
+        "A Solana-focused AI product experience designed to help users interact with tools and workflows in a simple, accessible way.",
       links: [
         { label: "X", href: "https://x.com/usebido" },
         { label: "Website", href: "https://www.usebido.com/" },
@@ -217,6 +229,7 @@ export const AI_DEMO_SECTION: DemoSpotlightSection = {
       imageSrc: "/ai/nosana.jpg",
       imageWidth: 800,
       imageHeight: 450,
+      about: "A Solana-based GPU marketplace for AI and high-performance workloads.",
       links: [
         { label: "Website", href: "https://nosana.com/" },
         { label: "X", href: "https://x.com/nosana_ai" },
@@ -229,6 +242,8 @@ export const AI_DEMO_SECTION: DemoSpotlightSection = {
       imageSrc: "/ai/sendai.jpg",
       imageWidth: 800,
       imageHeight: 450,
+      about:
+        "A Solana-native toolkit for connecting AI agents to on-chain actions and workflows.",
       links: [
         { label: "Website", href: "https://www.sendai.fun/" },
         { label: "Agent Kit", href: "https://kit.sendai.fun/" },
@@ -242,6 +257,8 @@ export const AI_DEMO_SECTION: DemoSpotlightSection = {
       imageSrc: "/ai/griffain.png",
       imageWidth: 800,
       imageHeight: 450,
+      about:
+        "A consumer-facing Solana AI agent app for natural-language on-chain actions.",
       links: [
         { label: "Website", href: "https://griffain.com/" },
         { label: "X", href: "https://x.com/griffaindotcom" },
@@ -254,6 +271,8 @@ export const AI_DEMO_SECTION: DemoSpotlightSection = {
       imageSrc: "/ai/grass.jpg",
       imageWidth: 800,
       imageHeight: 450,
+      about:
+        "A decentralized data network that turns unused internet bandwidth into AI-era infrastructure.",
       links: [
         { label: "Website", href: "https://www.grass.io/" },
         { label: "X", href: "https://x.com/grass" },
@@ -266,6 +285,7 @@ export const AI_DEMO_SECTION: DemoSpotlightSection = {
       imageSrc: "/ai/ionet.jpg",
       imageWidth: 800,
       imageHeight: 450,
+      about: "A decentralized GPU cloud for AI teams that need scalable compute.",
       links: [
         { label: "Website", href: "https://io.net/" },
         { label: "X", href: "https://x.com/ionet" },

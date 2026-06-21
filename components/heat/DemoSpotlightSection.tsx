@@ -188,7 +188,7 @@ function SpotlightModal({
         </div>
 
         <div className="scrollbar-hidden min-h-0 flex-1 overflow-y-auto overscroll-y-contain px-4 py-3 sm:px-5">
-          {section.modalVariant === "gaming-about" && card.about ? (
+          {card.about ? (
             <div className="mb-4">
               <p className="text-[10px] font-semibold uppercase tracking-wide text-text-muted">
                 About
