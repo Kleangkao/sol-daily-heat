@@ -70,8 +70,8 @@ export const EXPLORE_CHIPS: { id: ExploreChipId; label: string }[] = [
   { id: "investor", label: "Investor" },
 ];
 
-/** Hidden from the Explore bar row for now; sections remain reachable via scroll/hash. */
-const HIDDEN_EXPLORE_BAR_CHIPS = new Set<ExploreChipId>(["builder", "creator"]);
+/** Hidden from the Explore bar row for now; homepage sections not rendered. */
+const HIDDEN_EXPLORE_BAR_CHIPS = new Set<ExploreChipId>(["builder", "creator", "investor"]);
 
 export const EXPLORE_BAR_CHIPS = EXPLORE_CHIPS.filter(
   (chip) => !HIDDEN_EXPLORE_BAR_CHIPS.has(chip.id),

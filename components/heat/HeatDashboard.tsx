@@ -25,7 +25,6 @@ import {
   HOT_ON_SOLANA,
   NEW_AND_TRENDING,
 } from "@/lib/product/copy";
-import { sectionItemsMetricHeavy } from "@/lib/heat/card-display";
 import DashboardLoadingShell from "./DashboardLoadingShell";
 import DemoPreviewBanner from "./DemoPreviewBanner";
 import ExploreBar from "./ExploreBar";
@@ -180,9 +179,6 @@ export default function HeatDashboard() {
 
   const sectionSource = (key: DashboardSectionKey) => dashboard?.sectionSources?.[key];
 
-  const investorMetricHeavy =
-    dashboard != null && sectionItemsMetricHeavy(dashboard.investorWatchlist);
-
   const footerLabel =
     dashboard?.dataSource === "live"
       ? "Live rankings from Supabase"
@@ -267,24 +263,6 @@ export default function HeatDashboard() {
               {HOMEPAGE_DEMO_SECTIONS.map((section) => (
                 <DemoSpotlightSection key={section.id} section={section} />
               ))}
-
-              <HeatSection
-                title="Investor Watchlist"
-                sectionId="investor"
-                sectionLabel="Investor"
-                topicSections={topicSections}
-                description="Neutral watch context for builders and investors."
-                items={dashboard.investorWatchlist}
-                sectionDataSource={sectionSource("investorWatchlist")}
-                personaHighlight="investor"
-                sectionDisclaimer={
-                  investorMetricHeavy
-                    ? "Watchlist items are signals, not recommendations."
-                    : undefined
-                }
-                isOpen={sectionOpen.investor}
-                onToggle={() => toggleSection("investor")}
-              />
 
               <footer className="mt-16 border-t border-border py-8 text-center text-[12px] text-text-muted">
                 <p>
