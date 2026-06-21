@@ -10,12 +10,14 @@ export type DemoCard = {
   imageSrc: string;
   imageWidth: number;
   imageHeight: number;
+  /** Banner thumb crop — default centers; top keeps header art visible. */
+  thumbObjectPosition?: "top" | "center";
   /** Gaming popups only */
   about?: string;
   links: DemoLink[];
 };
 
-export type DemoCardLayout = "banner" | "square";
+export type DemoCardLayout = "gaming-row" | "square" | "banner";
 
 export type DemoSpotlightSection = {
   id: string;
@@ -30,7 +32,7 @@ export const GAMING_DEMO_SECTION: DemoSpotlightSection = {
   id: "gaming-demo",
   title: "Gaming",
   description: "Solana games and playable worlds — demo spotlight, not a live feed.",
-  cardLayout: "banner",
+  cardLayout: "gaming-row",
   modalVariant: "gaming-about",
   cards: [
     {
@@ -60,6 +62,7 @@ export const GAMING_DEMO_SECTION: DemoSpotlightSection = {
       imageSrc: "/gaming/wilder-world.jpg",
       imageWidth: 1920,
       imageHeight: 1080,
+      thumbObjectPosition: "top",
       about:
         "A futuristic open-world metaverse set in Wiami, mixing racing, FPS combat, exploration, missions, and player-owned assets.",
       links: [
@@ -137,6 +140,54 @@ export const NFT_DEMO_SECTION: DemoSpotlightSection = {
         { label: "Website", href: "https://islanddao.org/" },
       ],
     },
+    {
+      id: "mad-lads",
+      name: "Mad Lads",
+      categoryLabel: "NFT",
+      imageSrc: "/nft/mad-lads.jpg",
+      imageWidth: 1200,
+      imageHeight: 1200,
+      links: [
+        { label: "Website", href: "https://www.madlads.com/" },
+        { label: "X", href: "https://x.com/MadLads" },
+      ],
+    },
+    {
+      id: "tensor",
+      name: "Tensor",
+      categoryLabel: "NFT",
+      imageSrc: "/nft/tensor.png",
+      imageWidth: 1200,
+      imageHeight: 1200,
+      links: [
+        { label: "Website", href: "https://www.tensor.trade" },
+        { label: "X", href: "https://x.com/tensor_hq" },
+      ],
+    },
+    {
+      id: "famous-fox-federation",
+      name: "Famous Fox Federation",
+      categoryLabel: "NFT",
+      imageSrc: "/nft/famous-fox-federation.png",
+      imageWidth: 1200,
+      imageHeight: 1200,
+      links: [
+        { label: "Website", href: "https://famousfoxes.com/" },
+        { label: "X", href: "https://x.com/FamousFoxFed" },
+      ],
+    },
+    {
+      id: "okay-bears",
+      name: "Okay Bears",
+      categoryLabel: "NFT",
+      imageSrc: "/nft/okay-bears.jpg",
+      imageWidth: 1200,
+      imageHeight: 1200,
+      links: [
+        { label: "Website", href: "https://okaybears.com/" },
+        { label: "X", href: "https://x.com/okaybears" },
+      ],
+    },
   ],
 };
 
@@ -157,6 +208,67 @@ export const AI_DEMO_SECTION: DemoSpotlightSection = {
       links: [
         { label: "X", href: "https://x.com/usebido" },
         { label: "Website", href: "https://www.usebido.com/" },
+      ],
+    },
+    {
+      id: "nosana",
+      name: "Nosana",
+      categoryLabel: "AI",
+      imageSrc: "/ai/nosana.jpg",
+      imageWidth: 800,
+      imageHeight: 450,
+      links: [
+        { label: "Website", href: "https://nosana.com/" },
+        { label: "X", href: "https://x.com/nosana_ai" },
+      ],
+    },
+    {
+      id: "sendai",
+      name: "SendAI / Solana Agent Kit",
+      categoryLabel: "AI",
+      imageSrc: "/ai/sendai.jpg",
+      imageWidth: 800,
+      imageHeight: 450,
+      links: [
+        { label: "Website", href: "https://www.sendai.fun/" },
+        { label: "Agent Kit", href: "https://kit.sendai.fun/" },
+        { label: "X", href: "https://x.com/sendaifun" },
+      ],
+    },
+    {
+      id: "griffain",
+      name: "Griffain",
+      categoryLabel: "AI",
+      imageSrc: "/ai/griffain.png",
+      imageWidth: 800,
+      imageHeight: 450,
+      links: [
+        { label: "Website", href: "https://griffain.com/" },
+        { label: "X", href: "https://x.com/griffaindotcom" },
+      ],
+    },
+    {
+      id: "grass",
+      name: "Grass",
+      categoryLabel: "AI",
+      imageSrc: "/ai/grass.jpg",
+      imageWidth: 800,
+      imageHeight: 450,
+      links: [
+        { label: "Website", href: "https://www.grass.io/" },
+        { label: "X", href: "https://x.com/grass" },
+      ],
+    },
+    {
+      id: "ionet",
+      name: "io.net",
+      categoryLabel: "AI",
+      imageSrc: "/ai/ionet.jpg",
+      imageWidth: 800,
+      imageHeight: 450,
+      links: [
+        { label: "Website", href: "https://io.net/" },
+        { label: "X", href: "https://x.com/ionet" },
       ],
     },
   ],
