@@ -168,3 +168,34 @@ export function deriveActiveExploreChip(
   if (sectionHash === "defi") return "defi";
   return "top-heat";
 }
+
+/** Homepage section ids observed for ExploreBar scroll highlighting. */
+export const EXPLORE_SCROLL_SECTION_IDS = [
+  "top-heat",
+  "new-tokens",
+  "defi",
+  DEMO_TOPIC_SECTION_IDS.gaming,
+  DEMO_TOPIC_SECTION_IDS.nft,
+  DEMO_TOPIC_SECTION_IDS.ai,
+  "investor",
+] as const;
+
+/** Map a visible section element id to the ExploreBar chip that should highlight. */
+export function exploreChipForSectionElementId(
+  sectionId: string,
+  categoryFilter: TopicCategory | null
+): ExploreChipId | null {
+  if (sectionId === "top-heat") {
+    if (categoryFilter && TOP_HEAT_CATEGORY_LENSES.includes(categoryFilter)) {
+      return categoryFilter as ExploreChipId;
+    }
+    return "top-heat";
+  }
+  if (sectionId === "new-tokens") return "new-tokens";
+  if (sectionId === "defi") return "defi";
+  if (sectionId === "investor") return "investor";
+  for (const [chip, demoId] of Object.entries(DEMO_TOPIC_SECTION_IDS)) {
+    if (sectionId === demoId) return chip as ExploreChipId;
+  }
+  return null;
+}

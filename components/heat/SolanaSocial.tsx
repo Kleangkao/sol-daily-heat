@@ -26,17 +26,19 @@ function SocialImage({
 }) {
   if (variant === "modal") {
     return (
-      <Image
-        src={card.imageSrc}
-        alt=""
-        width={card.imageWidth}
-        height={card.imageHeight}
-        unoptimized
-        loading="eager"
-        className="mx-auto block max-h-[min(60vh,480px)] w-auto max-w-full object-contain"
-        sizes="(max-width: 640px) calc(100vw - 48px), 480px"
-        aria-hidden
-      />
+      <div className="overflow-hidden rounded-[6px] bg-bg-secondary/30">
+        <Image
+          src={card.imageSrc}
+          alt=""
+          width={card.imageWidth}
+          height={card.imageHeight}
+          unoptimized
+          loading="eager"
+          className="mx-auto block max-h-[min(60vh,480px)] w-auto max-w-full object-contain rounded-[6px]"
+          sizes="(max-width: 640px) calc(100vw - 48px), 480px"
+          aria-hidden
+        />
+      </div>
     );
   }
 

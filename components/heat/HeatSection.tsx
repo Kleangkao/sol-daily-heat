@@ -100,9 +100,6 @@ export default function HeatSection({
       {isOpen ? (
         <div id={panelId}>
           {toolbar ? <div className="mb-4">{toolbar}</div> : null}
-          {description ? (
-            <p className="mb-3 max-w-2xl text-[13px] text-text-secondary">{description}</p>
-          ) : null}
           {sectionDisclaimer ? (
             <p className="mb-3 max-w-2xl text-[12px] italic text-text-muted">
               {sectionDisclaimer}

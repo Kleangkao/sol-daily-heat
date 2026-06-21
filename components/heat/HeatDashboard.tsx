@@ -13,6 +13,8 @@ import {
 import {
   deriveActiveExploreChip,
   DEMO_TOPIC_SECTION_IDS,
+  EXPLORE_SCROLL_SECTION_IDS,
+  exploreChipForSectionElementId,
   resolveExploreChipAction,
   type ExploreChipId,
 } from "@/lib/heat/explore-navigation";
@@ -90,6 +92,44 @@ export default function HeatDashboard() {
 
   const awaitingData = data == null && (isLoading || isValidating);
   const dashboard = data ?? null;
+
+  useEffect(() => {
+    if (!dashboard) return;
+
+    const visible = new Map<string, number>();
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            visible.set(entry.target.id, entry.intersectionRatio);
+          } else {
+            visible.delete(entry.target.id);
+          }
+        }
+
+        if (visible.size === 0) return;
+
+        const bestId = Array.from(visible.entries()).sort((a, b) => b[1] - a[1])[0]?.[0];
+        if (!bestId) return;
+
+        const chip = exploreChipForSectionElementId(bestId, categoryFilter);
+        if (chip) setActiveExploreChip(chip);
+      },
+      {
+        root: null,
+        rootMargin: "-30% 0px -45% 0px",
+        threshold: [0, 0.15, 0.35, 0.55],
+      }
+    );
+
+    for (const id of EXPLORE_SCROLL_SECTION_IDS) {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    }
+
+    return () => observer.disconnect();
+  }, [dashboard, categoryFilter]);
 
   const syncUrl = useCallback(
     (nextDate: string | undefined, nextCategory: TopicCategory | null) => {

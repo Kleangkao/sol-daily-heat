@@ -1,12 +1,28 @@
 "use client";
 
 import Image from "next/image";
+import type { ReactNode } from "react";
 import { useCallback, useEffect, useId, useState } from "react";
 import { createPortal } from "react-dom";
-import type { DemoCard, DemoSpotlightSection } from "@/lib/demo/spotlight-sections";
+import type { DemoCard, DemoCardLayout, DemoSpotlightSection } from "@/lib/demo/spotlight-sections";
 
-function cardAspectClass(layout: DemoSpotlightSection["cardLayout"]) {
-  return layout === "square" ? "aspect-square" : "aspect-[16/9]";
+function bannerThumbFrameClass(layout: DemoCardLayout) {
+  if (layout === "gaming-row") {
+    return "aspect-[2.35/1] max-h-[11rem] sm:max-h-[12.5rem]";
+  }
+  return "aspect-[16/9]";
+}
+
+const MODAL_IMAGE_ROUND = "rounded-[6px]";
+
+function bannerObjectClass(card: DemoCard) {
+  return card.thumbObjectPosition === "top" ? "object-cover object-top" : "object-cover object-center";
+}
+
+function ModalImageFrame({ children }: { children: React.ReactNode }) {
+  return (
+    <div className={`overflow-hidden ${MODAL_IMAGE_ROUND} bg-bg-secondary/30`}>{children}</div>
+  );
 }
 
 function SpotlightImage({
@@ -15,28 +31,48 @@ function SpotlightImage({
   variant = "thumb",
 }: {
   card: DemoCard;
-  layout: DemoSpotlightSection["cardLayout"];
+  layout: DemoCardLayout;
   variant?: "thumb" | "modal";
 }) {
   if (variant === "modal") {
     return (
-      <Image
-        src={card.imageSrc}
-        alt=""
-        width={card.imageWidth}
-        height={card.imageHeight}
-        unoptimized
-        loading="eager"
-        className="mx-auto block max-h-[min(60vh,480px)] w-auto max-w-full object-contain"
-        sizes="(max-width: 640px) calc(100vw - 48px), 480px"
-        aria-hidden
-      />
+      <ModalImageFrame>
+        <Image
+          src={card.imageSrc}
+          alt=""
+          width={card.imageWidth}
+          height={card.imageHeight}
+          unoptimized
+          loading="eager"
+          className={`mx-auto block max-h-[min(60vh,480px)] w-auto max-w-full object-contain ${MODAL_IMAGE_ROUND}`}
+          sizes="(max-width: 640px) calc(100vw - 48px), 480px"
+          aria-hidden
+        />
+      </ModalImageFrame>
+    );
+  }
+
+  if (layout === "square") {
+    return (
+      <div className="relative aspect-square w-full overflow-hidden rounded-[8px] border border-border/80 bg-bg-secondary">
+        <Image
+          src={card.imageSrc}
+          alt=""
+          width={card.imageWidth}
+          height={card.imageHeight}
+          unoptimized
+          loading="lazy"
+          className="h-full w-full object-cover object-center"
+          sizes="(max-width: 768px) 100vw, 50vw"
+          aria-hidden
+        />
+      </div>
     );
   }
 
   return (
     <div
-      className={`relative w-full overflow-hidden rounded-[8px] border border-border/80 bg-bg-secondary ${cardAspectClass(layout)}`}
+      className={`relative w-full overflow-hidden rounded-[8px] border border-border/80 bg-bg-secondary ${bannerThumbFrameClass(layout)}`}
     >
       <Image
         src={card.imageSrc}
@@ -45,8 +81,8 @@ function SpotlightImage({
         height={card.imageHeight}
         unoptimized
         loading="lazy"
-        className="h-full w-full object-cover object-center"
-        sizes="(max-width: 768px) 100vw, 50vw"
+        className={`h-full w-full ${bannerObjectClass(card)}`}
+        sizes={layout === "gaming-row" ? "(max-width: 768px) 100vw, 640px" : "(max-width: 768px) 100vw, 50vw"}
         aria-hidden
       />
     </div>
@@ -180,7 +216,7 @@ function SpotlightCard({
   onOpen,
 }: {
   card: DemoCard;
-  layout: DemoSpotlightSection["cardLayout"];
+  layout: DemoCardLayout;
   onOpen: () => void;
 }) {
   return (
@@ -202,16 +238,22 @@ function SpotlightCard({
   );
 }
 
+function gridClassForLayout(layout: DemoCardLayout) {
+  switch (layout) {
+    case "gaming-row":
+      return "flex flex-col gap-3";
+    case "square":
+      return "grid grid-cols-1 gap-4 sm:grid-cols-2";
+    case "banner":
+      return "grid grid-cols-1 gap-4 md:grid-cols-2";
+  }
+}
+
 export default function DemoSpotlightSection({ section }: { section: DemoSpotlightSection }) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const active = section.cards.find((c) => c.id === activeId) ?? null;
   const close = useCallback(() => setActiveId(null), []);
   const headingId = `${section.id}-heading`;
-
-  const gridClass =
-    section.cardLayout === "square"
-      ? "grid grid-cols-1 gap-4 sm:grid-cols-2"
-      : "grid grid-cols-1 gap-4 md:grid-cols-2";
 
   return (
     <>
@@ -227,11 +269,9 @@ export default function DemoSpotlightSection({ section }: { section: DemoSpotlig
           >
             {section.title}
           </h2>
-          <p className="mt-1 text-[12px] text-text-muted sm:text-[13px]">{section.description}</p>
-          <p className="mt-1 text-[12px] lowercase text-text-muted">demo</p>
         </div>
 
-        <div className={gridClass}>
+        <div className={gridClassForLayout(section.cardLayout)}>
           {section.cards.map((card) => (
             <SpotlightCard
               key={card.id}
