@@ -39,15 +39,17 @@ export const CREATOR_SPACE = {
 
 /** Map legacy pulse labels from stored snapshots to public copy. */
 const PULSE_LABEL_DISPLAY: Record<string, string> = {
-  [HOT_ON_SOLANA.legacyPulseBadge]: HOT_ON_SOLANA.pulseBadge,
-  [NEW_AND_TRENDING.legacyPulseBadge]: NEW_AND_TRENDING.pulseBadge,
+  [HOT_ON_SOLANA.legacyPulseBadge]: "Hot Mention",
+  [HOT_ON_SOLANA.pulseBadge]: "Hot Mention",
+  [NEW_AND_TRENDING.legacyPulseBadge]: "New & Trending",
+  [NEW_AND_TRENDING.pulseBadge]: "New & Trending",
   "Promoted boost": "Boosted",
-  "New pair": "New pair",
-  "Low liquidity": "Low liquidity",
-  "Known token": "Tracked Token",
-  "Pump.fun style": "Launchpad token",
+  "New pair": "New Pair",
+  "Low liquidity": "Low Liquidity",
+  "Known token": "Tracked",
+  "Pump.fun style": "Launchpad",
   "High risk": "Volatile",
-  "Market signal only": "Board only",
+  "Market signal only": "Board Only",
 };
 
 export function displayPulseLabel(label: string): string {

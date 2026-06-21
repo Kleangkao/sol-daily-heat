@@ -222,10 +222,16 @@ export default function HeatDashboard() {
           </div>
 
           <div className="mb-5 lg:hidden">
-            <SolanaSocial />
+            <SolanaSocial headingId="solana-social-mobile-heading" />
           </div>
 
-          <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_252px] lg:items-start lg:gap-8">
+          <div className="lg:grid lg:grid-cols-[252px_minmax(0,1fr)_252px] lg:items-start lg:gap-5">
+            <aside className="hidden lg:block">
+              <div className="sticky top-4">
+                <SolanaSocial headingId="solana-social-desktop-heading" />
+              </div>
+            </aside>
+
             <div className="min-w-0">
               <ExploreBar activeChip={activeExploreChip} onChipClick={onExploreChip} />
 
@@ -330,8 +336,7 @@ export default function HeatDashboard() {
             </div>
 
             <aside className="hidden lg:block">
-              <div className="sticky top-4 space-y-4">
-                <SolanaSocial />
+              <div className="sticky top-4">
                 <MarketPulse
                   layout="rail"
                   heatDataSource={dashboard.dataSource}

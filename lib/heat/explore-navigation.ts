@@ -70,6 +70,13 @@ export const EXPLORE_CHIPS: { id: ExploreChipId; label: string }[] = [
   { id: "investor", label: "Investor" },
 ];
 
+/** Hidden from the Explore bar row for now; sections remain reachable via scroll/hash. */
+const HIDDEN_EXPLORE_BAR_CHIPS = new Set<ExploreChipId>(["builder", "creator"]);
+
+export const EXPLORE_BAR_CHIPS = EXPLORE_CHIPS.filter(
+  (chip) => !HIDDEN_EXPLORE_BAR_CHIPS.has(chip.id),
+);
+
 export function resolveExploreChipAction(id: ExploreChipId): ExploreChipAction {
   switch (id) {
     case "top-heat":

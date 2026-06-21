@@ -53,6 +53,43 @@ a {
     text-wrap: balance;
   }
 
+  .scrollbar-hidden {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .scrollbar-hidden::-webkit-scrollbar {
+    display: none;
+  }
+
+  @media (min-width: 1024px) {
+    .rail-shell {
+      --rail-body-max: calc(3 * ((14.25rem * 3 / 4) + 2.375rem) + 1rem);
+    }
+
+    .rail-shell-desktop {
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      align-self: flex-start;
+      gap: 0.625rem;
+      overflow: hidden;
+      height: calc(2.75rem + 0.625rem + var(--rail-body-max) + 1.5rem);
+      max-height: calc(100vh - 2rem);
+    }
+
+    .rail-shell-header {
+      flex-shrink: 0;
+      min-height: 2.75rem;
+    }
+
+    .rail-body-scroll {
+      min-height: 0;
+      flex: 1 1 0;
+      overflow-y: auto;
+    }
+  }
+
   .editorial-pipe::before {
     content: "| ";
     color: var(--crystal-teal);

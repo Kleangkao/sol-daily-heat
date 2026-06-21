@@ -1,6 +1,6 @@
 "use client";
 
-import { EXPLORE_CHIPS, type ExploreChipId } from "@/lib/heat/explore-navigation";
+import { EXPLORE_BAR_CHIPS, type ExploreChipId } from "@/lib/heat/explore-navigation";
 
 type Props = {
   activeChip: ExploreChipId;
@@ -11,10 +11,10 @@ export default function ExploreBar({ activeChip, onChipClick }: Props) {
   return (
     <div className="sticky top-0 z-30 -mx-1 border-b border-border/70 bg-bg-primary/95 pt-[max(0.25rem,env(safe-area-inset-top,0px))] pb-2 backdrop-blur-md">
       <nav
-        className="flex gap-2 overflow-x-auto overscroll-x-contain px-1 pb-0.5 snap-x snap-mandatory [-webkit-overflow-scrolling:touch] [scrollbar-width:thin]"
+        className="flex gap-2 overflow-x-auto overscroll-x-contain px-1 pb-0.5 snap-x snap-mandatory [-webkit-overflow-scrolling:touch] scrollbar-hidden"
         aria-label="Explore dashboard"
       >
-        {EXPLORE_CHIPS.map((chip) => {
+        {EXPLORE_BAR_CHIPS.map((chip) => {
           const active = activeChip === chip.id;
           return (
             <button

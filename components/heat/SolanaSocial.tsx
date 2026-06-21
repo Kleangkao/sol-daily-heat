@@ -1,195 +1,237 @@
 "use client";
 
+import Image from "next/image";
 import { useCallback, useEffect, useId, useState } from "react";
+import { createPortal } from "react-dom";
 import {
-  SOLANA_SOCIAL_EVENTS,
+  SOLANA_SOCIAL_CARDS,
   SOLANA_SOCIAL_SUBTITLE,
   SOLANA_SOCIAL_TITLE,
-  type SolanaSocialEvent,
+  type SolanaSocialCard,
 } from "@/lib/social/solana-social";
 
-function SocialVisual({ large = false }: { large?: boolean }) {
-  return (
-    <div
-      className={`relative overflow-hidden rounded-[10px] border border-border/80 bg-bg-secondary ${
-        large ? "aspect-[16/10] w-full" : "aspect-[4/3] w-full"
-      }`}
-      aria-hidden
-    >
-      <div
-        className="absolute inset-0 opacity-90"
-        style={{
-          background:
-            "linear-gradient(145deg, rgba(153,69,255,0.25) 0%, rgba(20,241,149,0.18) 45%, rgba(4,22,22,0.95) 100%)",
-        }}
+function thumbObjectClass(card: SolanaSocialCard) {
+  if (card.thumbObjectPosition === "top") {
+    return "object-cover object-center lg:object-top";
+  }
+  return "object-cover object-center";
+}
+
+function SocialImage({
+  card,
+  variant = "thumb",
+}: {
+  card: SolanaSocialCard;
+  variant?: "thumb" | "modal";
+}) {
+  if (variant === "modal") {
+    return (
+      <Image
+        src={card.imageSrc}
+        alt=""
+        width={card.imageWidth}
+        height={card.imageHeight}
+        unoptimized
+        loading="eager"
+        className="mx-auto block max-h-[min(60vh,480px)] w-auto max-w-full object-contain"
+        sizes="(max-width: 640px) calc(100vw - 48px), 480px"
+        aria-hidden
       />
-      <div className="absolute inset-0 flex items-end p-3">
-        <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-text-muted">
-          Community preview
-        </span>
-      </div>
+    );
+  }
+
+  return (
+    <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[8px] border border-border/80 bg-bg-secondary">
+      <Image
+        src={card.imageSrc}
+        alt=""
+        width={card.imageWidth}
+        height={card.imageHeight}
+        unoptimized
+        loading="eager"
+        className={`h-full w-full ${thumbObjectClass(card)}`}
+        sizes="(max-width: 1024px) 45vw, 240px"
+        aria-hidden
+      />
     </div>
   );
 }
 
 function SocialModal({
-  event,
+  card,
   onClose,
 }: {
-  event: SolanaSocialEvent;
+  card: SolanaSocialCard;
   onClose: () => void;
 }) {
   const titleId = useId();
   const descId = useId();
+  const [mounted, setMounted] = useState(false);
+  const isPortrait = card.imageHeight > card.imageWidth;
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
     document.addEventListener("keydown", onKey);
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+
+    const html = document.documentElement;
+    const body = document.body;
+    const prevHtmlOverflow = html.style.overflow;
+    const prevBodyOverflow = body.style.overflow;
+
+    html.style.overflow = "hidden";
+    body.style.overflow = "hidden";
+
     return () => {
       document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = prev;
+      html.style.overflow = prevHtmlOverflow;
+      body.style.overflow = prevBodyOverflow;
     };
   }, [onClose]);
 
-  return (
+  if (!mounted) return null;
+
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center p-4 sm:items-center"
+      className="fixed inset-0 z-[200] flex items-center justify-center p-3 sm:p-4"
       role="presentation"
       onClick={onClose}
     >
-      <div className="absolute inset-0 bg-black/65 backdrop-blur-[2px]" aria-hidden />
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-[2px]" aria-hidden />
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={descId}
-        className="relative z-10 max-h-[min(90vh,640px)] w-full max-w-md overflow-y-auto rounded-[14px] border border-border bg-bg-card shadow-xl"
+        className={`relative z-10 flex max-h-[calc(100vh-48px)] w-full flex-col overflow-hidden rounded-[14px] border border-border bg-bg-card shadow-2xl ${
+          isPortrait
+            ? "max-w-[min(400px,calc(100vw-24px))]"
+            : "max-w-[min(560px,calc(100vw-24px))]"
+        }`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="p-4 sm:p-5">
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <p className="text-[10px] font-semibold uppercase tracking-wide text-accent">
-                {event.location}
-              </p>
-              <h3 id={titleId} className="mt-1 font-heading text-[22px] font-bold uppercase text-text-primary">
-                {event.name}
-              </h3>
-            </div>
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border text-[18px] leading-none text-text-muted transition-colors hover:border-accent/50 hover:text-text-primary"
-              aria-label="Close"
+        <div className="flex shrink-0 items-start justify-between gap-3 border-b border-border px-4 py-3 sm:px-5">
+          <div className="min-w-0">
+            <h3
+              id={titleId}
+              className="font-heading text-[17px] font-bold uppercase text-text-primary sm:text-[18px]"
             >
-              ×
-            </button>
-          </div>
-
-          <div className="mt-4">
-            <SocialVisual large />
-          </div>
-
-          <p id={descId} className="mt-4 text-[14px] leading-relaxed text-text-secondary">
-            {event.modalDescription}
-          </p>
-
-          <div className="mt-5 border-t border-border pt-4">
-            <p className="text-[10px] font-semibold uppercase tracking-wide text-text-muted">
-              Follow / contact
+              {SOLANA_SOCIAL_TITLE}
+            </h3>
+            <p id={descId} className="mt-0.5 text-[11px] text-text-muted sm:text-[12px]">
+              Community photo
             </p>
-            <ul className="mt-2 space-y-2">
-              {event.links.map((link) => (
-                <li key={link.label}>
-                  {link.href ? (
-                    <a
-                      href={link.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[13px] font-medium text-accent hover:text-accent-hover"
-                    >
-                      {link.label}
-                    </a>
-                  ) : (
-                    <span className="text-[13px] text-text-muted">
-                      {link.label}
-                      {link.status === "coming_soon" ? " · coming soon" : ""}
-                    </span>
-                  )}
-                </li>
-              ))}
-            </ul>
           </div>
-
-          <p className="mt-4 text-[11px] text-text-muted">
-            Static v0 preview · not investment advice · not an endorsement
-          </p>
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border text-[18px] leading-none text-text-muted transition-colors hover:border-accent/50 hover:text-text-primary"
+            aria-label="Close"
+          >
+            ×
+          </button>
         </div>
+
+        <div className="shrink-0 px-4 py-3 sm:px-5">
+          <SocialImage card={card} variant="modal" />
+        </div>
+
+        <div className="scrollbar-hidden min-h-0 flex-1 overflow-y-auto overscroll-y-contain px-4 py-3 sm:px-5">
+          <p className="text-[10px] font-semibold uppercase tracking-wide text-text-muted">
+            People in this image
+          </p>
+          <ul className="mt-2.5 space-y-2">
+            {card.people.map((name) => (
+              <li
+                key={name}
+                className="rounded-[8px] border border-border/80 bg-bg-secondary/40 px-3 py-2"
+              >
+                <p className="text-[13px] font-semibold text-text-primary">{name}</p>
+                <p className="mt-0.5 text-[11px] text-text-muted">Social links coming soon</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <p className="shrink-0 border-t border-border px-4 py-2.5 text-[10px] text-text-muted sm:px-5 sm:text-[11px]">
+          Static preview · not investment advice · not an endorsement
+        </p>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 
 function SocialCard({
-  event,
+  card,
   onOpen,
 }: {
-  event: SolanaSocialEvent;
+  card: SolanaSocialCard;
   onOpen: () => void;
 }) {
+  const peopleLabel =
+    card.people.length === 1 ? card.people[0] : `${card.people.length} people`;
+
   return (
     <button
       type="button"
       onClick={onOpen}
-      className="w-full rounded-[12px] border border-border bg-bg-card/60 text-left transition-colors hover:border-accent/40 hover:bg-bg-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary"
+      className="w-full overflow-hidden rounded-[10px] border border-border bg-bg-card/60 text-left transition-colors hover:border-accent/40 hover:bg-bg-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary"
     >
-      <SocialVisual />
-      <div className="px-3 pb-3 pt-2.5">
-        <p className="text-[10px] font-semibold uppercase tracking-wide text-accent">
-          {event.location}
+      <SocialImage card={card} />
+      <div className="px-2 pb-2 pt-1.5">
+        <p className="truncate text-[11px] font-semibold text-text-primary lg:text-[12px]">
+          {peopleLabel}
         </p>
-        <p className="mt-0.5 font-heading text-[15px] font-bold uppercase text-text-primary">
-          {event.name}
-        </p>
-        <p className="mt-1 line-clamp-2 text-[12px] leading-snug text-text-secondary">
-          {event.tagline}
-        </p>
-        <p className="mt-2 text-[11px] font-medium text-text-muted">Tap for details</p>
+        <p className="mt-0.5 hidden text-[10px] text-text-muted lg:block">Tap to view</p>
       </div>
     </button>
   );
 }
 
-export default function SolanaSocial() {
+export default function SolanaSocial({
+  headingId = "solana-social-heading",
+}: {
+  headingId?: string;
+}) {
   const [activeId, setActiveId] = useState<string | null>(null);
-  const active = SOLANA_SOCIAL_EVENTS.find((e) => e.id === activeId) ?? null;
+  const active = SOLANA_SOCIAL_CARDS.find((c) => c.id === activeId) ?? null;
 
   const close = useCallback(() => setActiveId(null), []);
 
   return (
-    <section aria-labelledby="solana-social-heading" className="rounded-[12px] border border-border bg-bg-secondary/30 p-3">
-      <div>
-        <h2
-          id="solana-social-heading"
-          className="editorial-pipe font-heading text-[14px] font-bold uppercase tracking-tight text-text-primary lg:text-[15px]"
-        >
-          {SOLANA_SOCIAL_TITLE}
-        </h2>
-        <p className="mt-1 text-[11px] text-text-muted">{SOLANA_SOCIAL_SUBTITLE}</p>
-        <p className="mt-0.5 text-[10px] lowercase text-text-muted">v0 preview</p>
-      </div>
+    <>
+      <section
+        aria-labelledby={headingId}
+        className="rail-shell rail-shell-desktop rounded-[12px] border border-border bg-bg-secondary/30 p-2.5 sm:p-3"
+      >
+        <div className="rail-shell-header shrink-0">
+          <h2
+            id={headingId}
+            className="editorial-pipe font-heading text-[13px] font-bold uppercase tracking-tight text-text-primary lg:text-[14px]"
+          >
+            {SOLANA_SOCIAL_TITLE}
+          </h2>
+          <p className="mt-0.5 text-[10px] text-text-muted lg:mt-1 lg:text-[11px]">
+            {SOLANA_SOCIAL_SUBTITLE}
+          </p>
+        </div>
 
-      <div className="mt-3 space-y-3">
-        {SOLANA_SOCIAL_EVENTS.map((event) => (
-          <SocialCard key={event.id} event={event} onOpen={() => setActiveId(event.id)} />
-        ))}
-      </div>
+        <div className="scrollbar-hidden rail-body-scroll">
+          <div className="grid grid-cols-2 gap-2 lg:grid-cols-1 lg:gap-2">
+            {SOLANA_SOCIAL_CARDS.map((card) => (
+              <SocialCard key={card.id} card={card} onOpen={() => setActiveId(card.id)} />
+            ))}
+          </div>
+        </div>
+      </section>
 
-      {active ? <SocialModal event={active} onClose={close} /> : null}
-    </section>
+      {active ? <SocialModal card={active} onClose={close} /> : null}
+    </>
   );
 }

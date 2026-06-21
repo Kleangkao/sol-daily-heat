@@ -425,10 +425,10 @@ export default function MarketPulse({
 
   return (
     <section
-      className="rounded-[12px] border border-border bg-bg-secondary/30 p-3"
+      className="rail-shell rail-shell-desktop rounded-[12px] border border-border bg-bg-secondary/30 p-3"
       aria-labelledby="market-pulse-rail-heading"
     >
-      <div className="flex items-baseline justify-between gap-2">
+      <div className="rail-shell-header flex shrink-0 items-baseline justify-between gap-2">
         <div>
           <h2 id="market-pulse-rail-heading" className={headingClass}>
             Daily heat board
@@ -443,7 +443,9 @@ export default function MarketPulse({
           </span>
         ) : null}
       </div>
-      {body}
+      <div className="scrollbar-hidden rail-body-scroll">
+        {body}
+      </div>
     </section>
   );
 }
