@@ -26,7 +26,9 @@ function FeaturedCard({ partner }: { partner: IslandDaoFeatured }) {
           alt=""
           width={112}
           height={40}
-          className="max-h-10 w-auto max-w-full object-contain opacity-90 transition-opacity group-hover:opacity-100"
+          className={`max-h-10 w-auto max-w-full object-contain opacity-90 transition-opacity group-hover:opacity-100 ${
+            partner.id === "solflare" ? "brightness-0 invert" : ""
+          }`}
           aria-hidden
         />
       )}

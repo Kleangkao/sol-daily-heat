@@ -64,7 +64,7 @@ export const ISLANDDAO_FEATURED: IslandDaoFeatured[] = [
   {
     id: "solflare",
     name: "Solflare",
-    textLogo: true,
+    logoPath: "/sponsors/solflare-logo.webp",
     websiteUrl: "https://solflare.com/",
   },
   {
