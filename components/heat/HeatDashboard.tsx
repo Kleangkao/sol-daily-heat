@@ -34,6 +34,8 @@ import HeatSection from "./HeatSection";
 import MarketPulse from "./MarketPulse";
 import PastSnapshotsNav from "./PastSnapshotsNav";
 import SolanaSocial from "./SolanaSocial";
+import DemoSpotlightSection from "./DemoSpotlightSection";
+import { HOMEPAGE_DEMO_SECTIONS } from "@/lib/demo/spotlight-sections";
 import { useSectionOpenState } from "./useSectionOpenState";
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
@@ -261,6 +263,10 @@ export default function HeatDashboard() {
                 isOpen={sectionOpen.defi}
                 onToggle={() => toggleSection("defi")}
               />
+
+              {HOMEPAGE_DEMO_SECTIONS.map((section) => (
+                <DemoSpotlightSection key={section.id} section={section} />
+              ))}
 
               <HeatSection
                 title="Investor Watchlist"
