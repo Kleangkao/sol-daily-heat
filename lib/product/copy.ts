@@ -46,8 +46,8 @@ const PULSE_LABEL_DISPLAY: Record<string, string> = {
   "Low liquidity": "Low liquidity",
   "Known token": "Tracked Token",
   "Pump.fun style": "Launchpad token",
-  "High risk": "High risk",
-  "Market signal only": "Tape only",
+  "High risk": "Volatile",
+  "Market signal only": "Board only",
 };
 
 export function displayPulseLabel(label: string): string {

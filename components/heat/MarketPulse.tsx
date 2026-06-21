@@ -361,7 +361,7 @@ export default function MarketPulse({
       {filteredTape.length > 0 ? (
         <details className="mt-3 group">
           <summary className="cursor-pointer list-none text-[10px] font-semibold uppercase tracking-wide text-text-secondary hover:text-accent">
-            More on tape ({filteredTape.length})
+            More on the board ({filteredTape.length})
           </summary>
           <div className="mt-1.5 space-y-1">
             {filteredTape.slice(0, layout === "rail" ? 4 : 6).map((item) => (
@@ -373,12 +373,12 @@ export default function MarketPulse({
 
       {hiddenTapeCount > 0 ? (
         <p className="mt-2 text-[10px] text-text-muted">
-          {hiddenTapeCount} also listed in New &amp; Trending below.
+          {hiddenTapeCount} also appear in New &amp; Trending below.
         </p>
       ) : null}
 
       <p className="mt-3 text-[10px] leading-relaxed text-text-muted">
-        Not investment advice. Paid promotions are visibility only, not recommendations.
+        Paid boosts are visibility only, not recommendations.
       </p>
     </>
   );
