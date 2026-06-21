@@ -11,6 +11,7 @@ import { alsoInSections } from "@/lib/heat/topic-section-appearances";
 
 type Props = {
   title: string;
+  subtitle?: string;
   sectionId: string;
   description?: string;
   items: HeatCardView[];
@@ -32,6 +33,7 @@ function cardCountLabel(count: number): string {
 
 export default function HeatSection({
   title,
+  subtitle,
   sectionId,
   description,
   items,
@@ -61,6 +63,11 @@ export default function HeatSection({
           <h2 className="font-heading text-[18px] font-bold uppercase tracking-wide text-text-primary sm:text-[22px]">
             {headerTitle}
           </h2>
+          {subtitle && isOpen ? (
+            <p className="mt-0.5 text-[12px] font-medium tracking-wide text-accent sm:text-[13px]">
+              {subtitle}
+            </p>
+          ) : null}
           <p className="mt-1 text-[12px] text-text-muted">
             {cardCountLabel(count)}
             {statusLabel ? ` · ${statusLabel}` : ""}

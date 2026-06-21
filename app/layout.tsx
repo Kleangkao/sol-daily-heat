@@ -15,6 +15,7 @@ const outfit = Outfit({
 });
 
 import BeachAtmosphere from "@/components/heat/BeachAtmosphere";
+import { PRODUCT_NAME, PRODUCT_TAGLINE } from "@/lib/product/copy";
 import { SITE_URL } from "@/lib/site";
 
 export const viewport: Viewport = {
@@ -25,9 +26,8 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: "Solana Daily Heat",
-  description:
-    "Daily intelligence dashboard for the Solana ecosystem. What is hot, why, and what to watch.",
+  title: PRODUCT_NAME,
+  description: PRODUCT_TAGLINE,
   alternates: {
     canonical: "/",
   },

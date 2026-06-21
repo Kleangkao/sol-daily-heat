@@ -1,11 +1,16 @@
 import type { HeatCardView, HeatDashboardData } from "@/lib/types/heat";
+import {
+  CREATOR_SPACE,
+  HOT_ON_SOLANA,
+  NEW_AND_TRENDING,
+} from "@/lib/product/copy";
 
 const SECTIONS: { label: string; items: (d: HeatDashboardData) => HeatCardView[] }[] = [
-  { label: "Top Heat", items: (d) => d.topHeat },
-  { label: "New Tokens", items: (d) => d.newTokens },
+  { label: HOT_ON_SOLANA.shortLabel, items: (d) => d.topHeat },
+  { label: NEW_AND_TRENDING.shortLabel, items: (d) => d.newTokens },
   { label: "DeFi", items: (d) => d.defiSignals },
   { label: "Builder", items: (d) => d.builderWatch },
-  { label: "Creator", items: (d) => d.creatorAngles },
+  { label: CREATOR_SPACE.shortLabel, items: (d) => d.creatorAngles },
   { label: "Investor", items: (d) => d.investorWatchlist },
 ];
 

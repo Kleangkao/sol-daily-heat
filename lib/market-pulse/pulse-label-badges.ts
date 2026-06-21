@@ -1,4 +1,5 @@
 import type { SignalBadge, SignalBadgeTone } from "@/lib/heat/card-display";
+import { displayPulseLabel } from "@/lib/product/copy";
 import type { PulseTokenLabel } from "@/lib/market-pulse/types";
 
 const LABEL_TONE: Record<PulseTokenLabel, SignalBadgeTone> = {
@@ -33,7 +34,7 @@ export function pulseLabelsToBadges(labels: PulseTokenLabel[]): SignalBadge[] {
   );
   return sorted.slice(0, 2).map((label) => ({
     id: label.replace(/\s+/g, "-").toLowerCase(),
-    label,
+    label: displayPulseLabel(label),
     tone: LABEL_TONE[label],
   }));
 }

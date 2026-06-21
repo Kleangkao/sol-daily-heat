@@ -5,6 +5,11 @@ import { DEXSCREENER_SOURCE_SLUG } from "@/lib/market-pulse/constants";
 import { readHotTapeSnapshot, readWatchlistSnapshot } from "@/lib/market-pulse/snapshots";
 import type { HotTapeItem, PulseTokenLabel, PulseTokenRow } from "@/lib/market-pulse/types";
 import { SECTION_LABELS } from "@/lib/types/heat";
+import {
+  HOT_ON_SOLANA,
+  NEW_AND_TRENDING,
+  PRODUCT_NAME,
+} from "@/lib/product/copy";
 import type {
   Protocol,
   RankingSection,
@@ -320,13 +325,13 @@ function buildScannerContext(input: {
     lines.push("Listed on today's Market Pulse scanner signals tape.");
   }
   if (input.inNewTokens) {
-    lines.push("Linked to a topic ranked in New Tokens Today.");
+    lines.push(`Linked to a topic ranked in ${NEW_AND_TRENDING.rankingSectionLabel}.`);
   }
   if (input.inTopHeat) {
-    lines.push("Linked to a topic ranked in Top Heat Today.");
+    lines.push(`Linked to a topic ranked in ${HOT_ON_SOLANA.rankingSectionLabel}.`);
   }
   if (input.relatedTopicCount > 0 && !input.inNewTokens && !input.inTopHeat) {
-    lines.push(`Mentioned in ${input.relatedTopicCount} ranked topic(s) in Solana Daily Heat.`);
+    lines.push(`Mentioned in ${input.relatedTopicCount} ranked topic(s) in ${PRODUCT_NAME}.`);
   }
   if (lines.length === 0) {
     lines.push("No stored scanner placement for this mint yet. Verify on external explorers.");

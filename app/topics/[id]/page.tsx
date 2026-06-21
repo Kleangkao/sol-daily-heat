@@ -5,6 +5,7 @@ import { getTopicDetail } from "@/lib/db/queries/topic-detail";
 import { getSupabaseBrowser } from "@/lib/db/supabase-browser";
 import { isLiveTopicId } from "@/lib/heat/topic-link";
 import { SITE_URL } from "@/lib/site";
+import { PRODUCT_NAME } from "@/lib/product/copy";
 
 type Props = {
   params: { id: string };
@@ -16,24 +17,24 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
   if (!isLiveTopicId(params.id)) {
     return {
-      title: "Topic · Solana Daily Heat",
-      description: "Topic intelligence detail from Solana Daily Heat.",
+      title: `Topic · ${PRODUCT_NAME}`,
+      description: `Topic intelligence detail from ${PRODUCT_NAME}.`,
     };
   }
 
   const db = getSupabaseBrowser();
   if (!db) {
     return {
-      title: "Topic · Solana Daily Heat",
-      description: "Topic intelligence detail from Solana Daily Heat.",
+      title: `Topic · ${PRODUCT_NAME}`,
+      description: `Topic intelligence detail from ${PRODUCT_NAME}.`,
     };
   }
 
   const topic = await getTopicDetail(db, params.id, searchParams.date);
   if (!topic) {
     return {
-      title: "Topic · Solana Daily Heat",
-      description: "Topic intelligence detail from Solana Daily Heat.",
+      title: `Topic · ${PRODUCT_NAME}`,
+      description: `Topic intelligence detail from ${PRODUCT_NAME}.`,
     };
   }
 
@@ -44,10 +45,10 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
 
   const description =
     topic.summary?.trim().slice(0, 160) ||
-    "Rule-based topic intelligence from Solana Daily Heat. Not investment advice.";
+    `Rule-based topic intelligence from ${PRODUCT_NAME}. Not investment advice.`;
 
   return {
-    title: `${topic.title} · Solana Daily Heat`,
+    title: `${topic.title} · ${PRODUCT_NAME}`,
     description,
     alternates: {
       canonical: `${canonical.pathname}${canonical.search}`,

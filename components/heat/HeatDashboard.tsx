@@ -22,6 +22,11 @@ import type { HeatDashboardData, DashboardSectionKey } from "@/lib/types/heat";
 import type { TopicCategory } from "@/lib/types/db";
 import { CATEGORY_LABELS } from "@/lib/types/heat";
 import { SECTION_LIMITS } from "@/lib/process/section-limits";
+import {
+  CREATOR_SPACE,
+  HOT_ON_SOLANA,
+  NEW_AND_TRENDING,
+} from "@/lib/product/copy";
 import { sectionItemsMetricHeavy } from "@/lib/heat/card-display";
 import DashboardLoadingShell from "./DashboardLoadingShell";
 import DemoPreviewBanner from "./DemoPreviewBanner";
@@ -155,11 +160,11 @@ export default function HeatDashboard() {
 
   const topHeatEmptyMessage = useMemo(() => {
     if (!dashboard) return "No topics match this category filter.";
-    if (categoryFilter === null) return "No Top Heat topics for this snapshot.";
+    if (categoryFilter === null) return `No ${HOT_ON_SOLANA.title} topics for this snapshot.`;
     const snapshot = dashboard.date;
     const curatedNote = " Other sections below are curated separately.";
     const label = CATEGORY_LABELS[categoryFilter];
-    return `No Top Heat topics matched ${label} for snapshot ${snapshot} UTC.${curatedNote}`;
+    return `No ${HOT_ON_SOLANA.title} topics matched ${label} for snapshot ${snapshot} UTC.${curatedNote}`;
   }, [dashboard, categoryFilter]);
 
   const newTokenMints = useMemo(() => {
@@ -220,11 +225,11 @@ export default function HeatDashboard() {
               <ExploreBar activeChip={activeExploreChip} onChipClick={onExploreChip} />
 
               <HeatSection
-                title="| Top Heat"
+                title={HOT_ON_SOLANA.title}
                 sectionId="top-heat"
-                sectionLabel="Top Heat"
+                sectionLabel={HOT_ON_SOLANA.shortLabel}
                 topicSections={topicSections}
-                description="Highest rule-based heat scores for the selected UTC snapshot, deduplicated for that day."
+                description={HOT_ON_SOLANA.description}
                 items={topFiltered}
                 emptyMessage={topHeatEmptyMessage}
                 sectionDataSource={sectionSource("topHeat")}
@@ -233,11 +238,11 @@ export default function HeatDashboard() {
               />
 
               <HeatSection
-                title="New Solana Tokens"
+                title={NEW_AND_TRENDING.title}
                 sectionId="new-tokens"
-                sectionLabel="New Tokens"
+                sectionLabel={NEW_AND_TRENDING.shortLabel}
                 topicSections={topicSections}
-                description="New pair and mint signals from DexScreener-style adapters (24h window, UTC snapshot day)."
+                description={NEW_AND_TRENDING.description}
                 items={dashboard.newTokens}
                 sectionDataSource={sectionSource("newTokens")}
                 isOpen={sectionOpen["new-tokens"]}
@@ -275,11 +280,12 @@ export default function HeatDashboard() {
               />
 
               <HeatSection
-                title="Creator Angles"
+                title={CREATOR_SPACE.title}
+                subtitle={CREATOR_SPACE.subtitle}
                 sectionId="creator"
-                sectionLabel="Creator"
+                sectionLabel={CREATOR_SPACE.shortLabel}
                 topicSections={topicSections}
-                description="Thread and clip starting points derived from the UTC snapshot. Add your own verification."
+                description={CREATOR_SPACE.description}
                 items={dashboard.creatorAngles}
                 sectionDataSource={sectionSource("creatorAngles")}
                 personaHighlight="creator"

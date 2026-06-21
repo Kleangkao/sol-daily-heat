@@ -3,6 +3,11 @@
 import type { InterpretationType, RankingSection, TopicCategory } from "./db";
 import type { TopicEvidence } from "./evidence";
 import type { StoryTimeKind } from "@/lib/heat/story-timestamp";
+import {
+  CREATOR_SPACE,
+  HOT_ON_SOLANA,
+  NEW_AND_TRENDING,
+} from "@/lib/product/copy";
 
 export type HeatCategoryFilter = TopicCategory | "all";
 
@@ -92,10 +97,10 @@ export interface HeatDashboardData {
 }
 
 export const SECTION_LABELS: Record<RankingSection, string> = {
-  top_heat: "Top Heat Today",
-  new_tokens: "New Solana Tokens",
+  top_heat: HOT_ON_SOLANA.rankingSectionLabel,
+  new_tokens: NEW_AND_TRENDING.rankingSectionLabel,
   defi_signals: "DeFi Signals",
-  creator_angles: "Creator Angles",
+  creator_angles: CREATOR_SPACE.rankingSectionLabel,
   investor_watchlist: "Investor Watchlist",
   builder_watch: "Builder / Infra Watch",
 };

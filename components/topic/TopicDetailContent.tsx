@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { TopicDetailView } from "@/lib/types/topic-detail";
+import { PRODUCT_NAME } from "@/lib/product/copy";
 import type { EvidenceItem, EvidenceKind } from "@/lib/types/evidence";
 import { CATEGORY_LABELS } from "@/lib/types/heat";
 import { canLinkTokenDetail, tokenDetailPath } from "@/lib/heat/token-link";
@@ -265,7 +266,7 @@ export default function TopicDetailContent({ topic }: Props) {
             href="/"
             className="inline-flex min-h-[44px] items-center text-[13px] font-semibold text-heat hover:text-heat-hover"
           >
-            ← Back to Daily Heat
+            ← Back to {PRODUCT_NAME}
           </Link>
           <div className="mt-2 flex flex-col gap-4 sm:mt-4 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
             <div className="min-w-0 flex-1">
@@ -811,7 +812,7 @@ export default function TopicDetailContent({ topic }: Props) {
 
         <footer className="mt-10 border-t border-border py-6 text-center text-[12px] text-text-muted">
           <Link href="/" className="text-accent hover:underline">
-            Back to Daily Heat
+            Back to {PRODUCT_NAME}
           </Link>
           {" · "}
           <code className="text-accent">not investment advice</code>

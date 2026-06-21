@@ -1,6 +1,11 @@
 import type { DashboardSectionDomId } from "@/lib/heat/section-collapse";
 import { CATEGORY_LABELS } from "@/lib/types/heat";
 import type { TopicCategory } from "@/lib/types/db";
+import {
+  CREATOR_SPACE,
+  HOT_ON_SOLANA,
+  NEW_AND_TRENDING,
+} from "@/lib/product/copy";
 
 /** Category lenses in the unified Explore bar (no Ecosystem — Top Heat shows all). */
 export const TOP_HEAT_CATEGORY_LENSES: TopicCategory[] = [
@@ -51,8 +56,8 @@ export type ExploreChipAction =
     };
 
 export const EXPLORE_CHIPS: { id: ExploreChipId; label: string }[] = [
-  { id: "top-heat", label: "Top Heat" },
-  { id: "new-tokens", label: "New Tokens" },
+  { id: "top-heat", label: HOT_ON_SOLANA.exploreLabel },
+  { id: "new-tokens", label: NEW_AND_TRENDING.exploreLabel },
   { id: "defi", label: CATEGORY_LABELS.defi },
   { id: "meme", label: CATEGORY_LABELS.meme },
   { id: "infra", label: CATEGORY_LABELS.infra },
@@ -61,7 +66,7 @@ export const EXPLORE_CHIPS: { id: ExploreChipId; label: string }[] = [
   { id: "ai", label: CATEGORY_LABELS.ai },
   { id: "regulatory", label: CATEGORY_LABELS.regulatory },
   { id: "builder", label: "Builder" },
-  { id: "creator", label: "Creator" },
+  { id: "creator", label: CREATOR_SPACE.exploreLabel },
   { id: "investor", label: "Investor" },
 ];
 

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import CopyMintButton from "@/components/token/CopyMintButton";
+import { PRODUCT_NAME } from "@/lib/product/copy";
 import SignalQualityBadges from "@/components/heat/SignalQualityBadges";
 import { pulseLabelsToBadges } from "@/lib/market-pulse/pulse-label-badges";
 import {
@@ -63,7 +64,7 @@ export default function TokenDetailContent({ token }: Props) {
             href="/"
             className="inline-flex min-h-[44px] items-center text-[13px] font-semibold text-heat hover:text-heat-hover"
           >
-            ← Back to Daily Heat
+            ← Back to {PRODUCT_NAME}
           </Link>
           <div className="mt-2 flex flex-wrap items-start justify-between gap-4 sm:mt-4">
             <div className="min-w-0 flex-1">
