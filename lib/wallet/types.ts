@@ -7,5 +7,5 @@ export type BrowserWalletOption = {
   installed: boolean;
 };
 
-/** Public product scope — connect on Solana mainnet only; no signing or transactions. */
+/** Public product scope — connect and memo-only actions on Solana mainnet. */
 export const WALLET_NETWORK_LABEL = "Solana mainnet";

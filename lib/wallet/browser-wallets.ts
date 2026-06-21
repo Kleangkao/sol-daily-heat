@@ -1,5 +1,7 @@
+import type { Transaction } from "@solana/web3.js";
 import type { BrowserWalletId, BrowserWalletOption } from "@/lib/wallet/types";
 import { getWalletAddressString } from "@/lib/wallet/address";
+import { normalizeSignature } from "@/lib/wallet/encoding";
 
 interface InjectedSolanaWallet {
   isPhantom?: boolean;
@@ -8,6 +10,15 @@ interface InjectedSolanaWallet {
   publicKey?: unknown;
   connect(options?: { onlyIfTrusted?: boolean }): Promise<{ publicKey?: unknown }>;
   disconnect(): Promise<void>;
+  signMessage?(
+    message: Uint8Array,
+    display?: string
+  ): Promise<{ signature: Uint8Array }>;
+  signTransaction?(transaction: Transaction): Promise<Transaction>;
+  signAndSendTransaction?(
+    transaction: Transaction,
+    options?: { skipPreflight?: boolean; preflightCommitment?: string }
+  ): Promise<{ signature: string | Uint8Array }>;
 }
 
 type WindowWithWallets = Window & {
@@ -105,4 +116,63 @@ export async function connectBrowserWallet(id: BrowserWalletId): Promise<string>
 export async function disconnectBrowserWallet(id: BrowserWalletId): Promise<void> {
   const provider = getBrowserWalletProvider(id);
   if (provider) await provider.disconnect();
+}
+
+export async function signMessageWithBrowserWallet(
+  id: BrowserWalletId,
+  message: Uint8Array
+): Promise<Uint8Array> {
+  const provider = getBrowserWalletProvider(id);
+  if (!provider?.signMessage) {
+    throw new Error("This wallet does not support message signing.");
+  }
+  const { signature } = await provider.signMessage(message, "utf8");
+  return signature;
+}
+
+export function browserWalletSupportsSignTransaction(id: BrowserWalletId): boolean {
+  const provider = getBrowserWalletProvider(id);
+  return typeof provider?.signTransaction === "function";
+}
+
+export function browserWalletSupportsTransactions(id: BrowserWalletId): boolean {
+  const provider = getBrowserWalletProvider(id);
+  if (!provider) return false;
+  return (
+    typeof provider.signAndSendTransaction === "function" ||
+    typeof provider.signTransaction === "function"
+  );
+}
+
+export async function signTransactionWithBrowserWallet(
+  id: BrowserWalletId,
+  transaction: Transaction
+): Promise<Transaction> {
+  const provider = getBrowserWalletProvider(id);
+  if (!provider?.signTransaction) {
+    throw new Error("This wallet cannot sign a transaction without sending.");
+  }
+  return provider.signTransaction(transaction);
+}
+
+export async function signAndSendTransactionWithBrowserWallet(
+  id: BrowserWalletId,
+  transaction: Transaction
+): Promise<string> {
+  const provider = getBrowserWalletProvider(id);
+  if (!provider) throw new Error("Wallet disconnected");
+
+  if (typeof provider.signAndSendTransaction === "function") {
+    const result = await provider.signAndSendTransaction(transaction, {
+      skipPreflight: false,
+      preflightCommitment: "confirmed",
+    });
+    return normalizeSignature(result.signature);
+  }
+
+  if (typeof provider.signTransaction === "function") {
+    throw new Error("This wallet must support signAndSendTransaction to send on mainnet.");
+  }
+
+  throw new Error("This wallet cannot send transactions.");
 }

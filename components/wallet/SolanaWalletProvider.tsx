@@ -60,7 +60,6 @@ export function SolanaWalletProvider({ children }: { children: ReactNode }) {
       const pubkey = await connectBrowserWallet(id);
       setWalletId(id);
       setAddress(pubkey);
-      setModalOpen(false);
     } catch (e) {
       setError(friendlyWalletError(e));
       throw e;
