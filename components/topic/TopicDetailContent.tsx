@@ -9,7 +9,6 @@ import ScoreBreakdown from "@/components/heat/ScoreBreakdown";
 import { explainScoreBreakdown } from "@/lib/heat/score-breakdown-explainer";
 import { buildTopicNarrativeBrief } from "@/lib/heat/topic-narrative-brief";
 import {
-  relevantPersonaRoles,
   resolveTopicTimelineEntries,
 } from "@/lib/heat/topic-evidence-depth";
 import { resolveTopicDisplayCategory } from "@/lib/heat/topic-display-category";
@@ -27,10 +26,7 @@ import {
   type TopicMetricEvidence,
 } from "@/lib/heat/topic-metric-evidence";
 import { buildTopicMixedMetrics } from "@/lib/heat/topic-mixed-metrics";
-import {
-  buildPersonaDisplayNote,
-  personaInputFromTopic,
-} from "@/lib/heat/persona-display-copy";
+import { personaInputFromTopic } from "@/lib/heat/persona-display-copy";
 import { formatDetailDate, formatDetailDateTime } from "@/lib/heat/story-timestamp";
 type DisplayEvidenceKind = EvidenceKind | "status_incident";
 
@@ -146,21 +142,6 @@ export default function TopicDetailContent({ topic }: Props) {
   const mixedMetrics = buildTopicMixedMetrics(topic);
   const sectionCount = topic.sectionAppearancesToday.length;
   const personaInput = personaInputFromTopic(topic);
-  const creatorPersona = buildPersonaDisplayNote(
-    "creator",
-    personaInput,
-    topic.creatorAngle
-  );
-  const investorPersona = buildPersonaDisplayNote(
-    "investor",
-    personaInput,
-    topic.investorWatchline
-  );
-  const builderPersona = buildPersonaDisplayNote(
-    "builder",
-    personaInput,
-    topic.builderNote
-  );
   const scoreRows = explainScoreBreakdown(topic.scoreBreakdown, {
     uniqueSourceCount: topic.uniqueSourceCount,
   });
@@ -216,18 +197,6 @@ export default function TopicDetailContent({ topic }: Props) {
     : dedupedEvidenceItems;
   const displayEvidenceItems = mapEvidenceForDisplay(evidenceItemsForDisplay);
   const signalKind = classifyReaderSignal(personaInput);
-  const personaRoles = relevantPersonaRoles(signalKind);
-  const angleNotes = [
-    personaRoles.includes("creator") && creatorPersona
-      ? { role: "Creator", text: creatorPersona }
-      : null,
-    personaRoles.includes("investor") && investorPersona
-      ? { role: "Investor", text: investorPersona }
-      : null,
-    personaRoles.includes("builder") && builderPersona
-      ? { role: "Builder", text: builderPersona }
-      : null,
-  ].filter((n): n is { role: string; text: string } => Boolean(n));
   const hasRelated = topic.tokens.length > 0 || topic.protocols.length > 0;
   const sourceSlugs = Array.from(new Set(topic.timeline.map((t) => t.sourceSlug)));
   const protocolRoles = resolveProtocolDisplayRoles(
@@ -656,37 +625,6 @@ export default function TopicDetailContent({ topic }: Props) {
               ) : null}
             </div>
         </section>
-        ) : null}
-
-        {angleNotes.length > 0 ? (
-          <details className="group mt-6 rounded-[10px] border border-border bg-bg-card">
-            <summary className="cursor-pointer list-none p-5 font-heading text-[16px] font-bold uppercase tracking-wide text-text-primary marker:content-none [&::-webkit-details-marker]:hidden">
-              <span className="flex items-center justify-between gap-3">
-                Context
-                <span className="text-[11px] font-semibold normal-case tracking-normal text-text-muted group-open:hidden">
-                  Show
-                </span>
-                <span className="hidden text-[11px] font-semibold normal-case tracking-normal text-text-muted group-open:inline">
-                  Hide
-                </span>
-              </span>
-            </summary>
-            <div className="border-t border-border px-5 pb-5 pt-4">
-              <div className="space-y-3">
-                {angleNotes.map((note) => (
-                  <div
-                    key={note.role}
-                    className="rounded-[8px] bg-bg-secondary/50 px-3 py-2.5"
-                  >
-                    <p className="text-[11px] font-semibold uppercase text-text-muted">
-                      {note.role}
-                    </p>
-                    <p className="mt-1 text-[13px] text-text-primary">{note.text}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </details>
         ) : null}
 
         {showTimeline ? (
