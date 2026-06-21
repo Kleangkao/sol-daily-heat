@@ -41,10 +41,10 @@ export const CREATOR_SPACE = {
 const PULSE_LABEL_DISPLAY: Record<string, string> = {
   [HOT_ON_SOLANA.legacyPulseBadge]: HOT_ON_SOLANA.pulseBadge,
   [NEW_AND_TRENDING.legacyPulseBadge]: NEW_AND_TRENDING.pulseBadge,
-  "Promoted boost": "Paid promotion",
+  "Promoted boost": "Boosted",
   "New pair": "New pair",
   "Low liquidity": "Low liquidity",
-  "Known token": "Established token",
+  "Known token": "Tracked Token",
   "Pump.fun style": "Launchpad token",
   "High risk": "High risk",
   "Market signal only": "Tape only",

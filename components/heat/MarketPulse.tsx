@@ -209,15 +209,6 @@ function TapeRow({
   return <div className={shell}>{inner}</div>;
 }
 
-function formatPulseAge(fetchedAt: string | null | undefined): string | null {
-  if (!fetchedAt) return null;
-  const min = Math.round((Date.now() - new Date(fetchedAt).getTime()) / 60_000);
-  if (min < 1) return "just now";
-  if (min < 60) return `${min}m ago`;
-  const h = Math.round(min / 60);
-  return `${h}h ago`;
-}
-
 export default function MarketPulse({
   heatDataSource,
   layout = "rail",
@@ -238,8 +229,6 @@ export default function MarketPulse({
     () => splitHotTokens(hotTokens),
     [hotTokens]
   );
-
-  const pulseAge = formatPulseAge(pulse?.fetchedAt);
 
   const displayedMints = useMemo(() => {
     const mints = new Set(usedMints);
@@ -298,7 +287,7 @@ export default function MarketPulse({
       {anchor ? (
         <div className="mt-3">
           <p className="text-[10px] font-semibold uppercase tracking-wide text-text-muted">
-            Solana (SOL)
+            SOL PRICE CHECK
           </p>
           <div className="mt-1.5">
             <TokenChip
@@ -315,7 +304,7 @@ export default function MarketPulse({
       {gainers.length > 0 ? (
         <div className="mt-3">
           <p className="text-[10px] font-semibold uppercase tracking-wide text-text-muted">
-            Top movers
+            TOP MOVERS
           </p>
           <div className={`mt-1.5 ${tokenGroupClass}`}>
             {gainers.map((row) => (
@@ -334,7 +323,7 @@ export default function MarketPulse({
       {droppers.length > 0 ? (
         <div className="mt-3">
           <p className="text-[10px] font-semibold uppercase tracking-wide text-text-muted">
-            Biggest drops
+            BIGGEST DROPS
           </p>
           <div className={`mt-1.5 ${tokenGroupClass}`}>
             {droppers.map((row) => (
@@ -353,7 +342,7 @@ export default function MarketPulse({
       {highRisk.length > 0 ? (
         <div className="mt-3">
           <p className="text-[10px] font-semibold uppercase tracking-wide text-text-muted">
-            High-risk / boosted
+            BOOSTED &amp; VOLATILE
           </p>
           <div className={`mt-1.5 ${tokenGroupClass}`}>
             {highRisk.map((row) => (
@@ -389,8 +378,7 @@ export default function MarketPulse({
       ) : null}
 
       <p className="mt-3 text-[10px] leading-relaxed text-text-muted">
-        Market tape · not investment advice. Paid promotions are visibility only, not
-        recommendations.
+        Not investment advice. Paid promotions are visibility only, not recommendations.
       </p>
     </>
   );
@@ -412,10 +400,10 @@ export default function MarketPulse({
               id="market-pulse-mobile-heading"
               className={headingClass}
             >
-              Market tape
+              Daily heat board
             </h2>
             <p className="text-[11px] text-text-muted">
-              SOL · movers · risk context{pulseAge ? ` · ${pulseAge}` : ""}
+              Prices, 24h moves, and token highlights
             </p>
           </div>
           <span className="text-[11px] text-text-muted">{mobileOpen ? "−" : "+"}</span>
@@ -438,11 +426,10 @@ export default function MarketPulse({
       <div className="flex items-baseline justify-between gap-2">
         <div>
           <h2 id="market-pulse-rail-heading" className={headingClass}>
-            Market tape
+            Daily heat board
           </h2>
           <p className="mt-0.5 text-[10px] text-text-muted">
-            Context · not trading advice
-            {pulseAge ? ` · snapshot ${pulseAge}` : ""}
+            Prices, 24h moves, and token highlights
           </p>
         </div>
         {showStale ? (
