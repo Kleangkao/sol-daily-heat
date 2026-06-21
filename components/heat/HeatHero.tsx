@@ -20,20 +20,20 @@ export default function HeatHero({ archiveDate }: Props) {
         <SolanaSpaceBrand />
 
         <h1 className="mt-6 max-w-3xl sm:mt-8">
-          <span className="sr-only">What&apos;s hot on Solana</span>
+          <span className="sr-only">What&apos;s Hot on Solana</span>
           <span
-            className="inline-flex flex-wrap items-center gap-x-1.5 sm:gap-x-2"
+            className="inline-flex flex-wrap items-end gap-x-2"
             aria-hidden
           >
-            <span className="text-[11px] font-semibold uppercase leading-none tracking-[0.12em] text-text-primary sm:text-[12px]">
-              What&apos;s hot on
+            <span className="translate-y-[2px] text-[16px] font-semibold uppercase leading-none tracking-[0.12em] text-text-primary sm:translate-y-[2px] sm:text-[17px]">
+              What&apos;s Hot on
             </span>
             <Image
               src="/brand/solana-wordmark.svg"
               alt=""
               width={WORDMARK_WIDTH}
               height={WORDMARK_HEIGHT}
-              className="h-[11px] w-auto shrink-0 translate-y-[1.5px] sm:h-[12px] sm:translate-y-[2px]"
+              className="h-[13px] w-auto shrink-0 sm:h-[14px]"
               priority
             />
           </span>

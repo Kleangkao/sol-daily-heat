@@ -69,7 +69,7 @@ export default function IslandDaoSponsorsRail() {
   }, []);
 
   return (
-    <section aria-labelledby="islanddao-marquee-heading" className="mt-6 sm:mt-8">
+    <section aria-labelledby="islanddao-marquee-heading" className="mt-3 sm:mt-4">
       <p
         id="islanddao-marquee-heading"
         className="editorial-pipe text-[11px] font-semibold tracking-[0.12em] text-accent sm:text-[12px]"
