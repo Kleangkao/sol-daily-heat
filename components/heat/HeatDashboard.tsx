@@ -255,7 +255,7 @@ export default function HeatDashboard() {
               />
 
               <HeatSection
-                title="DeFi / Protocol Signals"
+                title="DeFi & Protocols"
                 sectionId="defi"
                 sectionLabel="DeFi"
                 topicSections={topicSections}

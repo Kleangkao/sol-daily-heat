@@ -662,7 +662,7 @@ export default function TopicDetailContent({ topic }: Props) {
           <details className="group mt-6 rounded-[10px] border border-border bg-bg-card">
             <summary className="cursor-pointer list-none p-5 font-heading text-[16px] font-bold uppercase tracking-wide text-text-primary marker:content-none [&::-webkit-details-marker]:hidden">
               <span className="flex items-center justify-between gap-3">
-                Angles
+                Context
                 <span className="text-[11px] font-semibold normal-case tracking-normal text-text-muted group-open:hidden">
                   Show
                 </span>

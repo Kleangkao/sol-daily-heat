@@ -99,7 +99,7 @@ export interface HeatDashboardData {
 export const SECTION_LABELS: Record<RankingSection, string> = {
   top_heat: HOT_ON_SOLANA.rankingSectionLabel,
   new_tokens: NEW_AND_TRENDING.rankingSectionLabel,
-  defi_signals: "DeFi Signals",
+  defi_signals: "DeFi & Protocols",
   creator_angles: CREATOR_SPACE.rankingSectionLabel,
   investor_watchlist: "Investor Watchlist",
   builder_watch: "Builder / Infra Watch",

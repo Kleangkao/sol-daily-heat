@@ -2,8 +2,6 @@
 
 export const PRODUCT_NAME = "Solana Space";
 
-export const PRODUCT_EYEBROW = "Tracked Solana coverage";
-
 export const PRODUCT_TAGLINE =
   "Daily heat, standout signals, and curated ecosystem activity — not every headline, not every launch.";
 
