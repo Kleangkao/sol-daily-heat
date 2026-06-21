@@ -23,6 +23,7 @@ const greatVibes = localFont({
 });
 
 import BeachAtmosphere from "@/components/heat/BeachAtmosphere";
+import WalletProviders from "@/components/wallet/WalletProviders";
 import { PRODUCT_NAME, PRODUCT_TAGLINE } from "@/lib/product/copy";
 import { SITE_URL } from "@/lib/site";
 
@@ -52,7 +53,9 @@ export default function RootLayout({
         className={`${barlow.variable} ${outfit.variable} ${greatVibes.variable} bg-bg-primary text-text-primary font-body antialiased`}
       >
         <BeachAtmosphere />
-        <div className="relative z-10 min-w-0 overflow-x-clip">{children}</div>
+        <div className="relative z-10 min-w-0 overflow-x-clip">
+          <WalletProviders>{children}</WalletProviders>
+        </div>
       </body>
     </html>
   );

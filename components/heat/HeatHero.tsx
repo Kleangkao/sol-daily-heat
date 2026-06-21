@@ -3,6 +3,7 @@ import Link from "next/link";
 import { formatSnapshotArchiveHeading } from "@/lib/heat/snapshot-date";
 import IslandDaoSponsorsRail from "./IslandDaoSponsorsRail";
 import SolanaSpaceBrand from "./SolanaSpaceBrand";
+import WalletConnectButton from "@/components/wallet/WalletConnectButton";
 
 const WORDMARK_WIDTH = 262;
 const WORDMARK_HEIGHT = 40;
@@ -17,7 +18,10 @@ export default function HeatHero({ archiveDate }: Props) {
     <header className="hero-stage relative px-4 pt-8 pb-4 sm:px-6 sm:pt-10 sm:pb-5 lg:px-8">
       <div className="hero-stage__overlay pointer-events-none absolute inset-0" aria-hidden />
       <div className="relative mx-auto max-w-6xl">
-        <SolanaSpaceBrand />
+        <div className="flex flex-wrap items-start justify-between gap-3 sm:gap-4">
+          <SolanaSpaceBrand />
+          <WalletConnectButton />
+        </div>
 
         <h1 className="mt-6 max-w-3xl sm:mt-8">
           <span className="sr-only">What&apos;s Hot on Solana</span>
