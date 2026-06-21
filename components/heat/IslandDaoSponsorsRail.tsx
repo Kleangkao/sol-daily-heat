@@ -74,7 +74,7 @@ export default function IslandDaoSponsorsRail() {
         id="islanddao-marquee-heading"
         className="editorial-pipe text-[11px] font-semibold tracking-[0.12em] text-accent sm:text-[12px]"
       >
-        Live from IslandDAO in Koh Samui
+        Happening at IslandDAO, Koh Samui
       </p>
 
       <div className="featured-marquee-clip relative mt-2.5 min-h-[76px] w-full max-w-full overflow-hidden py-1">

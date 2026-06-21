@@ -68,12 +68,6 @@ export const ISLANDDAO_FEATURED: IslandDaoFeatured[] = [
     websiteUrl: "https://solflare.com/",
   },
   {
-    id: "surfcash",
-    name: "SurfCash",
-    logoPath: "/sponsors/surfcash.png",
-    websiteUrl: "https://www.getsurf.cash/",
-  },
-  {
     id: "ride",
     name: "Ride",
     logoPath: "/sponsors/ride.png",

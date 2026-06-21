@@ -29,7 +29,7 @@ export default function SolanaSpaceBrand() {
               className="h-[14px] w-auto sm:h-4"
               priority
             />
-            <span className="font-space mt-1.5 block text-[26px] leading-none text-solana-mint sm:mt-2 sm:text-[30px]">
+            <span className="font-space mt-3.5 block text-[26px] leading-none text-solana-mint sm:mt-4 sm:text-[30px]">
               Space
             </span>
           </div>
