@@ -2,21 +2,32 @@ import type { DashboardSectionDomId } from "@/lib/heat/section-collapse";
 import { CATEGORY_LABELS } from "@/lib/types/heat";
 import type { TopicCategory } from "@/lib/types/db";
 import {
+  AI_DEMO_SECTION,
+  GAMING_DEMO_SECTION,
+  NFT_DEMO_SECTION,
+} from "@/lib/demo/spotlight-sections";
+import {
   CREATOR_SPACE,
   HOT_ON_SOLANA,
   NEW_AND_TRENDING,
 } from "@/lib/product/copy";
 
-/** Category lenses in the unified Explore bar (no Ecosystem — Top Heat shows all). */
+/** Category lenses for Top Heat — mock/demo topics use static sections instead. */
 export const TOP_HEAT_CATEGORY_LENSES: TopicCategory[] = [
   "defi",
   "meme",
   "infra",
-  "gaming",
-  "nft",
-  "ai",
   "regulatory",
 ];
+
+/** Explore chips that scroll to static demo sections (not Top Heat filters). */
+export const DEMO_TOPIC_SECTION_IDS = {
+  gaming: GAMING_DEMO_SECTION.id,
+  nft: NFT_DEMO_SECTION.id,
+  ai: AI_DEMO_SECTION.id,
+} as const;
+
+export type DemoTopicExploreChipId = keyof typeof DEMO_TOPIC_SECTION_IDS;
 
 export type ExploreChipId =
   | "top-heat"
@@ -53,6 +64,10 @@ export type ExploreChipAction =
       category: "defi";
       openSections: ["top-heat", "defi"];
       scrollTo: "top-heat";
+    }
+  | {
+      type: "demo-section";
+      sectionId: string;
     };
 
 export const EXPLORE_CHIPS: { id: ExploreChipId; label: string }[] = [
@@ -96,9 +111,6 @@ export function resolveExploreChipAction(id: ExploreChipId): ExploreChipAction {
       };
     case "meme":
     case "infra":
-    case "gaming":
-    case "nft":
-    case "ai":
     case "regulatory":
       return {
         type: "category-lens",
@@ -106,6 +118,12 @@ export function resolveExploreChipAction(id: ExploreChipId): ExploreChipAction {
         openSections: ["top-heat"],
         scrollTo: "top-heat",
       };
+    case "gaming":
+      return { type: "demo-section", sectionId: DEMO_TOPIC_SECTION_IDS.gaming };
+    case "nft":
+      return { type: "demo-section", sectionId: DEMO_TOPIC_SECTION_IDS.nft };
+    case "ai":
+      return { type: "demo-section", sectionId: DEMO_TOPIC_SECTION_IDS.ai };
     case "builder":
       return { type: "section-only", section: "builder" };
     case "creator":
@@ -122,11 +140,22 @@ const SECTION_ONLY_EXPLORE_CHIPS: ExploreChipId[] = [
   "investor",
 ];
 
-/** Derive highlighted chip from URL category + section hash. */
+function demoChipFromHash(hash: string): DemoTopicExploreChipId | null {
+  const id = hash.replace(/^#/, "");
+  for (const [chip, sectionId] of Object.entries(DEMO_TOPIC_SECTION_IDS)) {
+    if (id === sectionId) return chip as DemoTopicExploreChipId;
+  }
+  return null;
+}
+
+/** Derive highlighted chip from URL category + location hash. */
 export function deriveActiveExploreChip(
   categoryFilter: TopicCategory | null,
-  sectionHash: DashboardSectionDomId | null
+  sectionHash: DashboardSectionDomId | null,
+  locationHash = ""
 ): ExploreChipId {
+  const demoChip = demoChipFromHash(locationHash);
+  if (demoChip) return demoChip;
   if (
     sectionHash &&
     (SECTION_ONLY_EXPLORE_CHIPS as readonly string[]).includes(sectionHash)

@@ -12,6 +12,7 @@ import {
 } from "@/lib/heat/dashboard-url-state";
 import {
   deriveActiveExploreChip,
+  DEMO_TOPIC_SECTION_IDS,
   resolveExploreChipAction,
   type ExploreChipId,
 } from "@/lib/heat/explore-navigation";
@@ -54,20 +55,28 @@ export default function HeatDashboard() {
     initialCategoryFilter
   );
   const [activeExploreChip, setActiveExploreChip] = useState<ExploreChipId>(() =>
-    deriveActiveExploreChip(initialCategoryFilter, null)
+    deriveActiveExploreChip(initialCategoryFilter, null, typeof window !== "undefined" ? window.location.hash : "")
   );
   const { open: sectionOpen, toggleSection, navigateToSection, navigateToSections } =
     useSectionOpenState();
 
   useEffect(() => {
-    const hash = parseSectionHash(window.location.hash);
-    setActiveExploreChip(deriveActiveExploreChip(categoryFilter, hash));
+    const locationHash = window.location.hash;
+    const hash = parseSectionHash(locationHash);
+    setActiveExploreChip(deriveActiveExploreChip(categoryFilter, hash, locationHash));
   }, [categoryFilter]);
 
   useEffect(() => {
     const onHashChange = () => {
-      const hash = parseSectionHash(window.location.hash);
-      setActiveExploreChip(deriveActiveExploreChip(categoryFilter, hash));
+      const locationHash = window.location.hash;
+      const hash = parseSectionHash(locationHash);
+      setActiveExploreChip(deriveActiveExploreChip(categoryFilter, hash, locationHash));
+      const demoId = locationHash.replace(/^#/, "");
+      if ((Object.values(DEMO_TOPIC_SECTION_IDS) as string[]).includes(demoId)) {
+        requestAnimationFrame(() => {
+          document.getElementById(demoId)?.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
     };
     window.addEventListener("hashchange", onHashChange);
     return () => window.removeEventListener("hashchange", onHashChange);
@@ -133,6 +142,17 @@ export default function HeatDashboard() {
           setCategoryFilter(action.category);
           syncUrl(date, action.category);
           navigateToSections(action.openSections, action.scrollTo);
+          break;
+        case "demo-section":
+          setCategoryFilter(null);
+          syncUrl(date, null);
+          window.history.replaceState(null, "", `#${action.sectionId}`);
+          requestAnimationFrame(() => {
+            document.getElementById(action.sectionId)?.scrollIntoView({
+              behavior: "smooth",
+              block: "start",
+            });
+          });
           break;
       }
     },
