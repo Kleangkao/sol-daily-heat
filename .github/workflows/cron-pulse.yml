@@ -1,0 +1,17 @@
+name: Production cron — pulse
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+jobs:
+  pulse:
+    name: Market Pulse
+    runs-on: ubuntu-latest
+    steps:
+      - name: POST /api/cron/pulse
+        run: |
+          curl -fsS -X POST "https://sol-daily-heat.vercel.app/api/cron/pulse" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json"

@@ -155,17 +155,17 @@ curl -sS -X POST "https://YOUR_DOMAIN/api/cron/cleanup?dry_run=1" \
 
 ### GitHub Actions (production)
 
-This repo includes [`.github/workflows/cron.yml`](../.github/workflows/cron.yml) to call production cron routes on schedule (UTC):
+This repo includes separate GitHub Actions workflows on schedule (UTC): [`cron-pulse.yml`](../.github/workflows/cron-pulse.yml), [`cron-pipeline.yml`](../.github/workflows/cron-pipeline.yml), [`cron-cleanup.yml`](../.github/workflows/cron-cleanup.yml).
 
-| Job | Schedule (UTC) | Endpoint |
-|-----|----------------|----------|
+| Job | Schedule (UTC) | Endpoint / runner |
+|-----|----------------|-------------------|
 | Market Pulse | `*/30 * * * *` (every 30 min) | `POST https://sol-daily-heat.vercel.app/api/cron/pulse` |
-| Pipeline | `0 */3 * * *` (every 3 hours) | `POST https://sol-daily-heat.vercel.app/api/cron/pipeline` |
-| Cleanup (dry-run) | `0 3 * * *` (daily 03:00) | `POST https://sol-daily-heat.vercel.app/api/cron/cleanup?dry_run=1` |
+| Pipeline | `7 */3 * * *` (every 3 hours, :07) | Ingest + pipeline on GitHub runner |
+| Cleanup (dry-run) | `7 3 * * *` (daily 03:07) | `POST https://sol-daily-heat.vercel.app/api/cron/cleanup?dry_run=1` |
 
-**Repository secret (required):** In GitHub → **Settings** → **Secrets and variables** → **Actions** → **New repository secret**, add `CRON_SECRET` with the **same value** as Vercel Production `CRON_SECRET`. The workflow uses `Authorization: Bearer` via `${{ secrets.CRON_SECRET }}` — never commit the secret.
+**Repository secrets (required):** `CRON_SECRET` (pulse + cleanup), `NEXT_PUBLIC_SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` (pipeline runner). Pulse/cleanup use `Authorization: Bearer` via `${{ secrets.CRON_SECRET }}` — never commit secrets.
 
-**Manual run:** **Actions** → **Production cron** → **Run workflow** (`workflow_dispatch`) runs all three jobs once (useful after deploy or secret rotation).
+**Manual run:** **Actions** → **Production cron — pulse / pipeline / cleanup** → **Run workflow** (`workflow_dispatch` on each workflow).
 
 Cleanup is **dry-run only** in this workflow until you change the workflow URL (remove `?dry_run=1`) after reviewing `wouldDelete` from dry-run responses.
 
@@ -173,9 +173,9 @@ Cleanup is **dry-run only** in this workflow until you change the workflow URL (
 
 | Job | Cadence | Cron expression | Route |
 |-----|---------|-----------------|-------|
-| Pipeline | Every **3 hours** | `0 */3 * * *` | `POST /api/cron/pipeline` |
+| Pipeline | Every **3 hours** (:07 UTC) | `7 */3 * * *` | Ingest + pipeline on GitHub runner |
 | Pulse | Every **30 minutes** | `*/30 * * * *` | `POST /api/cron/pulse` |
-| Cleanup | **Daily** 03:00 UTC (after dry-run) | `0 3 * * *` | `POST /api/cron/cleanup` |
+| Cleanup | **Daily** 03:07 UTC (after dry-run) | `7 3 * * *` | `POST /api/cron/cleanup` |
 
 **First day order:** pipeline → pulse → smoke tests → then enable schedulers.
 

@@ -22,16 +22,16 @@ Vercel production tracks `main`; deployment reported **ready** with live dashboa
 
 ## Cron scheduler
 
-**Provider:** GitHub Actions ([`.github/workflows/cron.yml`](../.github/workflows/cron.yml))
+**Provider:** GitHub Actions — separate workflows: [`cron-pulse.yml`](../.github/workflows/cron-pulse.yml), [`cron-pipeline.yml`](../.github/workflows/cron-pipeline.yml), [`cron-cleanup.yml`](../.github/workflows/cron-cleanup.yml)
 
-| Job | UTC schedule | Endpoint |
-|-----|--------------|----------|
+| Job | UTC schedule | Endpoint / runner |
+|-----|--------------|-------------------|
 | Market Pulse | `*/30 * * * *` | `POST /api/cron/pulse` |
-| Pipeline | `0 */3 * * *` | `POST /api/cron/pipeline` |
-| Cleanup (dry-run) | `0 3 * * *` | `POST /api/cron/cleanup?dry_run=1` |
+| Pipeline | `7 */3 * * *` | Ingest + pipeline on GitHub runner (`run-ingest.ts`, `run-pipeline.ts`) |
+| Cleanup (dry-run) | `7 3 * * *` | `POST /api/cron/cleanup?dry_run=1` |
 
 - Auth: `Authorization: Bearer` via repository secret `CRON_SECRET` (matches Vercel Production).
-- **Manual run:** Actions → **Production cron** → **Run workflow** — succeeded post-push.
+- **Manual run:** Actions → **Production cron — pulse / pipeline / cleanup** → **Run workflow** (`workflow_dispatch` on each).
 - **Cleanup:** still **dry-run only** in workflow; no destructive deletes scheduled yet.
 
 ---
