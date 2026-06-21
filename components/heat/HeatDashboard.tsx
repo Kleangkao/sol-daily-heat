@@ -29,7 +29,7 @@ import {
   NEW_AND_TRENDING,
 } from "@/lib/product/copy";
 import { sectionItemsMetricHeavy } from "@/lib/heat/card-display";
-import DashboardLoadingShell from "./DashboardLoadingShell";
+import DashboardMainSkeleton from "./DashboardMainSkeleton";
 import DemoPreviewBanner from "./DemoPreviewBanner";
 import ExploreBar from "./ExploreBar";
 import HeatHero from "./HeatHero";
@@ -262,22 +262,13 @@ export default function HeatDashboard() {
         />
       ) : null}
       {awaitingData ? (
-        <DashboardLoadingShell />
+        <main className="mx-auto max-w-7xl px-4 py-5 sm:px-6 sm:py-8 lg:px-8">
+          <ExploreBar activeChip={activeExploreChip} onChipClick={onExploreChip} />
+          <DashboardMainSkeleton />
+        </main>
       ) : dashboard ? (
         <main className="mx-auto max-w-7xl px-4 py-5 sm:px-6 sm:py-8 lg:px-8">
-          <div className="lg:hidden">
-            <MarketPulse
-              layout="mobile"
-              heatDataSource={dashboard.dataSource}
-              newTokenMints={newTokenMints}
-            />
-          </div>
-
-          <div className="mb-5 lg:hidden">
-            <SolanaSocial headingId="solana-social-mobile-heading" />
-          </div>
-
-          <div className="lg:grid lg:grid-cols-[252px_minmax(0,1fr)_252px] lg:items-start lg:gap-5">
+          <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-[252px_minmax(0,1fr)_252px]">
             <aside className="hidden lg:block">
               <div className="sticky top-4">
                 <SolanaSocial headingId="solana-social-desktop-heading" />
@@ -299,6 +290,16 @@ export default function HeatDashboard() {
                 isOpen={sectionOpen["top-heat"]}
                 onToggle={() => toggleSection("top-heat")}
               />
+
+              <div className="mb-5 flex flex-col gap-5 lg:hidden">
+                <SolanaSocial headingId="solana-social-mobile-heading" feed />
+                <MarketPulse
+                  feed
+                  headingId="market-pulse-mobile-heading"
+                  heatDataSource={dashboard.dataSource}
+                  newTokenMints={newTokenMints}
+                />
+              </div>
 
               <HeatSection
                 title={NEW_AND_TRENDING.title}
@@ -357,7 +358,6 @@ export default function HeatDashboard() {
             <aside className="hidden lg:block">
               <div className="sticky top-4">
                 <MarketPulse
-                  layout="rail"
                   heatDataSource={dashboard.dataSource}
                   newTokenMints={newTokenMints}
                 />

@@ -20,9 +20,11 @@ function thumbObjectClass(card: SolanaSocialCard) {
 function SocialImage({
   card,
   variant = "thumb",
+  uncropped = false,
 }: {
   card: SolanaSocialCard;
   variant?: "thumb" | "modal";
+  uncropped?: boolean;
 }) {
   if (variant === "modal") {
     return (
@@ -43,7 +45,13 @@ function SocialImage({
   }
 
   return (
-    <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[8px] border border-border/80 bg-bg-secondary">
+    <div
+      className={
+        uncropped
+          ? "relative w-full overflow-hidden rounded-[8px] border border-border/80 bg-bg-secondary/50"
+          : "relative aspect-[4/3] w-full overflow-hidden rounded-[8px] border border-border/80 bg-bg-secondary"
+      }
+    >
       <Image
         src={card.imageSrc}
         alt=""
@@ -51,8 +59,12 @@ function SocialImage({
         height={card.imageHeight}
         unoptimized
         loading="eager"
-        className={`h-full w-full ${thumbObjectClass(card)}`}
-        sizes="(max-width: 1024px) 45vw, 240px"
+        className={
+          uncropped
+            ? "h-auto w-full object-contain"
+            : `h-full w-full ${thumbObjectClass(card)}`
+        }
+        sizes={uncropped ? "100vw" : "(max-width: 1024px) 45vw, 240px"}
         aria-hidden
       />
     </div>
@@ -172,9 +184,13 @@ function SocialModal({
 function SocialCard({
   card,
   onOpen,
+  showTapHint = false,
+  uncropped = false,
 }: {
   card: SolanaSocialCard;
   onOpen: () => void;
+  showTapHint?: boolean;
+  uncropped?: boolean;
 }) {
   const peopleLabel =
     card.people.length === 1 ? card.people[0] : `${card.people.length} people`;
@@ -185,12 +201,14 @@ function SocialCard({
       onClick={onOpen}
       className="w-full overflow-hidden rounded-[10px] border border-border bg-bg-card/60 text-left transition-colors hover:border-accent/40 hover:bg-bg-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary"
     >
-      <SocialImage card={card} />
+      <SocialImage card={card} uncropped={uncropped} />
       <div className="px-2 pb-2 pt-1.5">
         <p className="truncate text-[11px] font-semibold text-text-primary lg:text-[12px]">
           {peopleLabel}
         </p>
-        <p className="mt-0.5 hidden text-[10px] text-text-muted lg:block">Tap to view</p>
+        <p className={`mt-0.5 text-[10px] text-text-muted ${showTapHint ? "block" : "hidden lg:block"}`}>
+          Tap to view
+        </p>
       </div>
     </button>
   );
@@ -198,19 +216,30 @@ function SocialCard({
 
 export default function SolanaSocial({
   headingId = "solana-social-heading",
+  compact = false,
+  feed = false,
 }: {
   headingId?: string;
+  compact?: boolean;
+  /** Mobile feed: full section, uncropped photos, no height cap. */
+  feed?: boolean;
 }) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const active = SOLANA_SOCIAL_CARDS.find((c) => c.id === activeId) ?? null;
 
   const close = useCallback(() => setActiveId(null), []);
 
+  const shellClass = feed
+    ? "rail-shell rail-shell-feed"
+    : compact
+      ? "rail-shell rail-shell-compact"
+      : "rail-shell rail-shell-desktop";
+
   return (
     <>
       <section
         aria-labelledby={headingId}
-        className="rail-shell rail-shell-desktop rounded-[12px] border border-border bg-bg-secondary/30 p-2.5 sm:p-3"
+        className={`${shellClass} rounded-[12px] border border-border bg-bg-secondary/30 p-2.5 sm:p-3`}
       >
         <div className="rail-shell-header shrink-0">
           <h2
@@ -224,10 +253,18 @@ export default function SolanaSocial({
           </p>
         </div>
 
-        <div className="scrollbar-hidden rail-body-scroll">
-          <div className="grid grid-cols-2 gap-2 lg:grid-cols-1 lg:gap-2">
+        <div className={feed ? "rail-body-open" : "scrollbar-hidden rail-body-scroll"}>
+          <div
+            className={`grid gap-3 ${feed ? "grid-cols-1" : compact ? "grid-cols-1" : "grid-cols-2 lg:grid-cols-1"}`}
+          >
             {SOLANA_SOCIAL_CARDS.map((card) => (
-              <SocialCard key={card.id} card={card} onOpen={() => setActiveId(card.id)} />
+              <SocialCard
+                key={card.id}
+                card={card}
+                onOpen={() => setActiveId(card.id)}
+                showTapHint={feed || compact}
+                uncropped={feed}
+              />
             ))}
           </div>
         </div>

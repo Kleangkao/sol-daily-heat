@@ -114,7 +114,7 @@ export default function HeatSection({
               {emptyMessage}
             </p>
           ) : (
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               {items.map((item) => (
                 <HeatCard
                   key={item.id}

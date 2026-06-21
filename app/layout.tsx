@@ -23,7 +23,9 @@ const greatVibes = localFont({
 });
 
 import BeachAtmosphere from "@/components/heat/BeachAtmosphere";
+import SolanaGradientAtmosphere from "@/components/heat/SolanaGradientAtmosphere";
 import WalletProviders from "@/components/wallet/WalletProviders";
+import { USE_SOLANA_GRADIENT_THEME } from "@/lib/theme/background-theme";
 import { PRODUCT_NAME, PRODUCT_TAGLINE } from "@/lib/product/copy";
 import { SITE_URL } from "@/lib/site";
 
@@ -50,9 +52,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${barlow.variable} ${outfit.variable} ${greatVibes.variable} bg-bg-primary text-text-primary font-body antialiased`}
+        className={`${barlow.variable} ${outfit.variable} ${greatVibes.variable} bg-bg-primary text-text-primary font-body antialiased${USE_SOLANA_GRADIENT_THEME ? " theme-solana-gradient" : ""}`}
       >
         <BeachAtmosphere />
+        {USE_SOLANA_GRADIENT_THEME ? <SolanaGradientAtmosphere /> : null}
         <div className="relative z-10 min-w-0 overflow-x-clip">
           <WalletProviders>{children}</WalletProviders>
         </div>

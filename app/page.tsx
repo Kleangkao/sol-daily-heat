@@ -1,10 +1,10 @@
 import { Suspense } from "react";
 import HeatDashboard from "@/components/heat/HeatDashboard";
-import DashboardLoadingShell from "@/components/heat/DashboardLoadingShell";
+import HomePageLoadingFallback from "@/components/heat/HomePageLoadingFallback";
 
 export default function HomePage() {
   return (
-    <Suspense fallback={<DashboardLoadingShell />}>
+    <Suspense fallback={<HomePageLoadingFallback />}>
       <HeatDashboard />
     </Suspense>
   );

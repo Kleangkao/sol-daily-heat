@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import useSWR from "swr";
 import SignalQualityBadges from "./SignalQualityBadges";
 import { isValidMintParam, tokenDetailPath } from "@/lib/heat/token-link";
@@ -32,11 +32,12 @@ const CHANGE_CLASS = {
   flat: "text-text-muted",
 } as const;
 
-type Layout = "rail" | "mobile";
-
 type Props = {
   heatDataSource?: string;
-  layout?: Layout;
+  compact?: boolean;
+  /** Mobile feed: full section, no height cap or scroll clip. */
+  feed?: boolean;
+  headingId?: string;
   /** Mints featured in New Tokens. De-emphasize duplicate scanner rows. */
   newTokenMints?: Set<string>;
 };
@@ -211,10 +212,11 @@ function TapeRow({
 
 export default function MarketPulse({
   heatDataSource,
-  layout = "rail",
+  compact = false,
+  feed = false,
+  headingId = "market-pulse-rail-heading",
   newTokenMints,
 }: Props) {
-  const [mobileOpen, setMobileOpen] = useState(false);
   const { data, isLoading } = useSWR<MarketPulseResponse>("/api/market/pulse", fetcher, {
     revalidateOnFocus: true,
     refreshInterval: PULSE_CLIENT_REFRESH_MS,
@@ -267,12 +269,9 @@ export default function MarketPulse({
   }
 
   const headingClass =
-    layout === "rail"
-      ? "editorial-pipe font-heading text-[14px] font-bold uppercase tracking-tight text-text-primary"
-      : "editorial-pipe font-heading text-[16px] font-bold uppercase tracking-tight text-text-primary";
+    "editorial-pipe font-heading text-[13px] font-bold uppercase tracking-tight text-text-primary lg:text-[14px]";
 
-  const tokenGroupClass =
-    layout === "rail" ? "space-y-1.5" : "grid grid-cols-2 gap-2";
+  const tokenGroupClass = "space-y-1.5";
 
   const body = (
     <>
@@ -297,8 +296,8 @@ export default function MarketPulse({
             <TokenChip
               row={anchor}
               prominent
-              compact={layout === "rail"}
-              fullWidth={layout === "mobile"}
+              compact
+              fullWidth={compact || feed}
               linkEnabled={linkEnabled}
             />
           </div>
@@ -316,7 +315,7 @@ export default function MarketPulse({
                 key={row.mint}
                 row={row}
                 compact
-                fullWidth={layout === "mobile"}
+                fullWidth={compact || feed}
                 linkEnabled={linkEnabled}
               />
             ))}
@@ -335,7 +334,7 @@ export default function MarketPulse({
                 key={`drop-${row.mint}`}
                 row={row}
                 compact
-                fullWidth={layout === "mobile"}
+                fullWidth={compact || feed}
                 linkEnabled={linkEnabled}
               />
             ))}
@@ -354,7 +353,7 @@ export default function MarketPulse({
                 key={`risk-${row.mint}`}
                 row={row}
                 compact
-                fullWidth={layout === "mobile"}
+                fullWidth={compact || feed}
                 linkEnabled={linkEnabled}
               />
             ))}
@@ -368,7 +367,7 @@ export default function MarketPulse({
             More on the board ({filteredTape.length})
           </summary>
           <div className="mt-1.5 space-y-1">
-            {filteredTape.slice(0, layout === "rail" ? 4 : 6).map((item) => (
+            {filteredTape.slice(0, 4).map((item) => (
               <TapeRow key={item.mint ?? item.title} item={item} linkEnabled={linkEnabled} />
             ))}
           </div>
@@ -388,49 +387,20 @@ export default function MarketPulse({
     </>
   );
 
-  if (layout === "mobile") {
-    return (
-      <section
-        className="mb-5 rounded-[12px] border border-border bg-bg-secondary/40"
-        aria-labelledby="market-pulse-mobile-heading"
-      >
-        <button
-          type="button"
-          className="flex min-h-[48px] w-full items-center justify-between gap-2 px-3 py-3 text-left"
-          onClick={() => setMobileOpen((o) => !o)}
-          aria-expanded={mobileOpen}
-        >
-          <div>
-            <h2
-              id="market-pulse-mobile-heading"
-              className={headingClass}
-            >
-              Daily heat board
-            </h2>
-            <p className="text-[11px] text-text-muted">
-              Prices, 24h moves, and token highlights
-            </p>
-          </div>
-          <span className="text-[11px] text-text-muted">{mobileOpen ? "−" : "+"}</span>
-        </button>
-        {mobileOpen ? <div className="border-t border-border px-3 pb-3">{body}</div> : null}
-        {showStale ? (
-          <p className="border-t border-border px-3 py-1.5 text-[10px] text-heat/90">
-            Prices delayed
-          </p>
-        ) : null}
-      </section>
-    );
-  }
+  const shellClass = feed
+    ? "rail-shell rail-shell-feed"
+    : compact
+      ? "rail-shell rail-shell-compact"
+      : "rail-shell rail-shell-desktop";
 
   return (
     <section
-      className="rail-shell rail-shell-desktop rounded-[12px] border border-border bg-bg-secondary/30 p-3"
-      aria-labelledby="market-pulse-rail-heading"
+      className={`${shellClass} rounded-[12px] border border-border bg-bg-secondary/30 p-2.5 sm:p-3`}
+      aria-labelledby={headingId}
     >
       <div className="rail-shell-header flex shrink-0 items-baseline justify-between gap-2">
         <div>
-          <h2 id="market-pulse-rail-heading" className={headingClass}>
+          <h2 id={headingId} className={headingClass}>
             Daily heat board
           </h2>
           <p className="mt-0.5 text-[10px] text-text-muted">
@@ -443,7 +413,7 @@ export default function MarketPulse({
           </span>
         ) : null}
       </div>
-      <div className="scrollbar-hidden rail-body-scroll">
+      <div className={feed ? "rail-body-open" : "scrollbar-hidden rail-body-scroll"}>
         {body}
       </div>
     </section>

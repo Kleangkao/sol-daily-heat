@@ -9,9 +9,9 @@ type Props = {
 
 export default function ExploreBar({ activeChip, onChipClick }: Props) {
   return (
-    <div className="sticky top-0 z-30 -mx-1 border-b border-border/70 bg-bg-primary/95 pt-[max(0.25rem,env(safe-area-inset-top,0px))] pb-2 backdrop-blur-md">
+    <div className="explore-bar-shell sticky -mx-4 border-b border-border/70 bg-bg-primary/95 px-4 backdrop-blur-md sm:-mx-6 sm:px-6 lg:top-0 lg:z-30 lg:mx-0 lg:px-0 lg:pb-2 lg:pt-[max(0.25rem,env(safe-area-inset-top,0px))]">
       <nav
-        className="flex gap-2 overflow-x-auto overscroll-x-contain px-1 pb-0.5 snap-x snap-mandatory [-webkit-overflow-scrolling:touch] scrollbar-hidden"
+        className="flex gap-2 overflow-x-auto overscroll-x-contain pb-0.5 snap-x snap-mandatory [-webkit-overflow-scrolling:touch] scrollbar-hidden"
         aria-label="Explore dashboard"
       >
         {EXPLORE_BAR_CHIPS.map((chip) => {

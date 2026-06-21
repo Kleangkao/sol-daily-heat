@@ -90,6 +90,58 @@ a {
     }
   }
 
+  .rail-shell {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+  }
+
+  .rail-shell-compact {
+    max-height: min(28rem, 58vh);
+    overflow: hidden;
+  }
+
+  .rail-shell-feed {
+    max-height: none;
+    overflow: visible;
+  }
+
+  .rail-body-open {
+    overflow: visible;
+  }
+
+  @media (max-width: 1023px) {
+    :root {
+      --mobile-head-block: 5.875rem;
+    }
+
+    @media (min-width: 640px) {
+      :root {
+        --mobile-head-block: 6.25rem;
+      }
+    }
+
+    .explore-bar-shell {
+      position: sticky;
+      top: calc(var(--mobile-head-block) + env(safe-area-inset-top, 0px));
+      z-index: 40;
+      padding-top: 0.75rem;
+      padding-bottom: 0.625rem;
+    }
+  }
+
+  .rail-shell-header {
+    flex-shrink: 0;
+  }
+
+  .rail-body-scroll {
+    min-height: 0;
+    flex: 1 1 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
   .editorial-pipe::before {
     content: "| ";
     color: var(--crystal-teal);
@@ -392,6 +444,94 @@ a {
       rgba(0, 0, 0, 0.35) 45%,
       transparent 100%
     );
+  }
+
+  /* ── Solana gradient theme (desktop experiment) ── */
+  .theme-solana-gradient {
+    --solana-gradient-split: min(44vh, 440px);
+  }
+
+  .solana-gradient-atmosphere {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .solana-gradient-atmosphere__base {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: calc(var(--solana-gradient-split) - 3rem);
+    background: linear-gradient(
+      to top,
+      #9945ff 0%,
+      #8a4ae8 12%,
+      #6b52d4 24%,
+      #4a7fc8 38%,
+      #2da8b0 52%,
+      #1ec99a 68%,
+      #14f195 100%
+    );
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 3.5rem, #000 100%);
+    mask-image: linear-gradient(to bottom, transparent 0%, #000 3.5rem, #000 100%);
+  }
+
+  .solana-space-head-gradient {
+    height: 3.5rem;
+    width: auto;
+    max-width: min(62vw, 320px);
+    background: linear-gradient(to top right, #9945ff 0%, #14f195 100%);
+    -webkit-mask: url("/brand/solana-space-head-white.png") left center / contain no-repeat;
+    mask: url("/brand/solana-space-head-white.png") left center / contain no-repeat;
+  }
+
+  @media (min-width: 640px) {
+    .solana-space-head-gradient {
+      height: 4rem;
+      max-width: min(48vw, 360px);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    /* Header zone: keep legacy beach atmosphere */
+    .theme-solana-gradient .beach-atmosphere {
+      clip-path: inset(0 0 calc(100% - var(--solana-gradient-split)) 0);
+    }
+
+    .theme-solana-gradient .solana-gradient-atmosphere {
+      display: block;
+    }
+
+    /* Hero keeps original dark styling — no gradient bleed-through */
+    .theme-solana-gradient .hero-stage {
+      background:
+        radial-gradient(ellipse 85% 70% at 12% -8%, rgba(153, 69, 255, 0.22) 0%, transparent 55%),
+        radial-gradient(ellipse 70% 55% at 88% 0%, rgba(20, 241, 149, 0.14) 0%, transparent 50%),
+        linear-gradient(180deg, rgba(4, 22, 22, 0.72) 0%, rgba(4, 22, 22, 0.45) 55%, transparent 100%);
+    }
+
+    .theme-solana-gradient .hero-stage__overlay {
+      background: linear-gradient(
+        180deg,
+        rgba(0, 0, 0, 0.55) 0%,
+        rgba(0, 0, 0, 0.35) 45%,
+        transparent 100%
+      );
+    }
+
+    .theme-solana-gradient .rail-shell {
+      background: rgba(20, 241, 149, 0.09);
+      border-color: rgba(20, 241, 149, 0.28);
+    }
+
+    .theme-solana-gradient .explore-bar-shell {
+      background: rgba(4, 22, 22, 0.82);
+      border-bottom-color: rgba(20, 241, 149, 0.18);
+    }
   }
 
   .featured-marquee-fade {
