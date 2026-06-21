@@ -38,8 +38,18 @@ export const CREATOR_SPACE = {
 } as const;
 
 /** Map legacy pulse labels from stored snapshots to public copy. */
+const PULSE_LABEL_DISPLAY: Record<string, string> = {
+  [HOT_ON_SOLANA.legacyPulseBadge]: HOT_ON_SOLANA.pulseBadge,
+  [NEW_AND_TRENDING.legacyPulseBadge]: NEW_AND_TRENDING.pulseBadge,
+  "Promoted boost": "Paid promotion",
+  "New pair": "New pair",
+  "Low liquidity": "Low liquidity",
+  "Known token": "Established token",
+  "Pump.fun style": "Launchpad token",
+  "High risk": "High risk",
+  "Market signal only": "Tape only",
+};
+
 export function displayPulseLabel(label: string): string {
-  if (label === HOT_ON_SOLANA.legacyPulseBadge) return HOT_ON_SOLANA.pulseBadge;
-  if (label === NEW_AND_TRENDING.legacyPulseBadge) return NEW_AND_TRENDING.pulseBadge;
-  return label;
+  return PULSE_LABEL_DISPLAY[label] ?? label;
 }

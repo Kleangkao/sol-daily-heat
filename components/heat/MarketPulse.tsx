@@ -145,6 +145,12 @@ function TokenChip({
   return <div className={className}>{inner}</div>;
 }
 
+function formatTapeCaption(item: HotTapeItem): string | null {
+  if (/^DexScreener boost:/i.test(item.title)) return null;
+  if (/^New pair:/i.test(item.title)) return "New trading pair";
+  return item.title;
+}
+
 function TapeRow({
   item,
   linkEnabled,
@@ -153,6 +159,7 @@ function TapeRow({
   linkEnabled: boolean;
 }) {
   const display = resolveHotTapeDisplay(item);
+  const caption = formatTapeCaption(item);
   const tokenHref =
     linkEnabled && item.mint && isValidMintParam(item.mint)
       ? tokenDetailPath(item.mint)
@@ -171,7 +178,9 @@ function TapeRow({
           <span className="font-mono text-[9px] text-text-muted">{display.secondaryLabel}</span>
         ) : null}
       </div>
-      <span className="truncate text-[10px] text-text-muted">{item.title}</span>
+      {caption ? (
+        <span className="truncate text-[10px] text-text-muted">{caption}</span>
+      ) : null}
       <SignalQualityBadges badges={hotTapeBadges(item)} />
     </div>
   );
@@ -363,7 +372,7 @@ export default function MarketPulse({
       {filteredTape.length > 0 ? (
         <details className="mt-3 group">
           <summary className="cursor-pointer list-none text-[10px] font-semibold uppercase tracking-wide text-text-secondary hover:text-accent">
-            More scanner signals ({filteredTape.length})
+            More on tape ({filteredTape.length})
           </summary>
           <div className="mt-1.5 space-y-1">
             {filteredTape.slice(0, layout === "rail" ? 4 : 6).map((item) => (
@@ -375,13 +384,12 @@ export default function MarketPulse({
 
       {hiddenTapeCount > 0 ? (
         <p className="mt-2 text-[10px] text-text-muted">
-          {hiddenTapeCount} scanner signal{hiddenTapeCount !== 1 ? "s" : ""} also appear in New
-          Tokens below.
+          {hiddenTapeCount} also listed in New &amp; Trending below.
         </p>
       ) : null}
 
       <p className="mt-3 text-[10px] leading-relaxed text-text-muted">
-        Market tape · not investment advice. Promoted boosts are paid visibility, not
+        Market tape · not investment advice. Paid promotions are visibility only, not
         recommendations.
       </p>
     </>
