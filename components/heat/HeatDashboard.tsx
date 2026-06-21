@@ -35,6 +35,7 @@ import HeatHero from "./HeatHero";
 import HeatSection from "./HeatSection";
 import MarketPulse from "./MarketPulse";
 import PastSnapshotsNav from "./PastSnapshotsNav";
+import SolanaSocial from "./SolanaSocial";
 import { useSectionOpenState } from "./useSectionOpenState";
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
@@ -220,6 +221,10 @@ export default function HeatDashboard() {
             />
           </div>
 
+          <div className="mb-5 lg:hidden">
+            <SolanaSocial />
+          </div>
+
           <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_252px] lg:items-start lg:gap-8">
             <div className="min-w-0">
               <ExploreBar activeChip={activeExploreChip} onChipClick={onExploreChip} />
@@ -325,7 +330,8 @@ export default function HeatDashboard() {
             </div>
 
             <aside className="hidden lg:block">
-              <div className="sticky top-4">
+              <div className="sticky top-4 space-y-4">
+                <SolanaSocial />
                 <MarketPulse
                   layout="rail"
                   heatDataSource={dashboard.dataSource}
