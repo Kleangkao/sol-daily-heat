@@ -21,9 +21,7 @@ import { utcAvailableDates, utcTodayIso } from "@/lib/heat/snapshot-date";
 import type { HeatDashboardData, DashboardSectionKey } from "@/lib/types/heat";
 import type { TopicCategory } from "@/lib/types/db";
 import { CATEGORY_LABELS } from "@/lib/types/heat";
-import { SECTION_LIMITS } from "@/lib/process/section-limits";
 import {
-  CREATOR_SPACE,
   HOT_ON_SOLANA,
   NEW_AND_TRENDING,
 } from "@/lib/product/copy";
@@ -180,16 +178,8 @@ export default function HeatDashboard() {
 
   const sectionSource = (key: DashboardSectionKey) => dashboard?.sectionSources?.[key];
 
-  const creatorSparse =
-    dashboard != null &&
-    dashboard.creatorAngles.length > 0 &&
-    dashboard.creatorAngles.length < SECTION_LIMITS.creator_angles;
   const investorMetricHeavy =
     dashboard != null && sectionItemsMetricHeavy(dashboard.investorWatchlist);
-  const builderSparse =
-    dashboard != null &&
-    dashboard.builderWatch.length > 0 &&
-    dashboard.builderWatch.length < SECTION_LIMITS.builder_watch;
 
   const footerLabel =
     dashboard?.dataSource === "live"
@@ -270,43 +260,6 @@ export default function HeatDashboard() {
                 sectionDataSource={sectionSource("defiSignals")}
                 isOpen={sectionOpen.defi}
                 onToggle={() => toggleSection("defi")}
-              />
-
-              <HeatSection
-                title="Builder / Infra Watch"
-                sectionId="builder"
-                sectionLabel="Builder"
-                topicSections={topicSections}
-                description="Infrastructure, developer tooling, protocol plumbing, and status signals for Solana builders."
-                items={dashboard.builderWatch}
-                sectionDataSource={sectionSource("builderWatch")}
-                sparseNote={
-                  builderSparse
-                    ? "Only builder-relevant infra, tooling, and status signals are shown."
-                    : undefined
-                }
-                sectionDisclaimer="Operational and ecosystem context. Not investment advice."
-                isOpen={sectionOpen.builder}
-                onToggle={() => toggleSection("builder")}
-              />
-
-              <HeatSection
-                title={CREATOR_SPACE.title}
-                subtitle={CREATOR_SPACE.subtitle}
-                sectionId="creator"
-                sectionLabel={CREATOR_SPACE.shortLabel}
-                topicSections={topicSections}
-                description={CREATOR_SPACE.description}
-                items={dashboard.creatorAngles}
-                sectionDataSource={sectionSource("creatorAngles")}
-                personaHighlight="creator"
-                sparseNote={
-                  creatorSparse
-                    ? "Only high-confidence narrative angles are shown."
-                    : undefined
-                }
-                isOpen={sectionOpen.creator}
-                onToggle={() => toggleSection("creator")}
               />
 
               <HeatSection
