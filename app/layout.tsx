@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Barlow_Condensed, Outfit } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
 const barlow = Barlow_Condensed({
@@ -12,6 +13,13 @@ const outfit = Outfit({
   subsets: ["latin"],
   weight: ["400", "500", "600"],
   variable: "--font-outfit",
+});
+
+const greatVibes = localFont({
+  src: "./fonts/GreatVibes-Regular.ttf",
+  variable: "--font-great-vibes",
+  weight: "400",
+  display: "swap",
 });
 
 import BeachAtmosphere from "@/components/heat/BeachAtmosphere";
@@ -41,7 +49,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${barlow.variable} ${outfit.variable} bg-bg-primary text-text-primary font-body antialiased`}
+        className={`${barlow.variable} ${outfit.variable} ${greatVibes.variable} bg-bg-primary text-text-primary font-body antialiased`}
       >
         <BeachAtmosphere />
         <div className="relative z-10 min-w-0 overflow-x-clip">{children}</div>

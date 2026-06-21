@@ -20,10 +20,12 @@ const config: Config = {
         danger: "var(--danger)",
         heat: "var(--heat)",
         "heat-hover": "var(--heat-hover)",
+        "solana-mint": "var(--solana-mint)",
       },
       fontFamily: {
         heading: ["var(--font-barlow)", "sans-serif"],
         body: ["var(--font-outfit)", "system-ui", "sans-serif"],
+        space: ["var(--font-great-vibes)", "cursive"],
       },
     },
   },
