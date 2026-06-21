@@ -245,7 +245,11 @@ export default function MarketPulse({
     });
   }, [pulse?.hotTape, newTokenMints, displayedMints]);
 
-  const hiddenTapeCount = (pulse?.hotTape.length ?? 0) - filteredTape.length;
+  const newTrendingOverlapCount = useMemo(
+    () =>
+      (pulse?.hotTape ?? []).filter((item) => item.mint && newTokenMints?.has(item.mint)).length,
+    [pulse?.hotTape, newTokenMints]
+  );
 
   const showStale =
     pulse?.stale &&
@@ -371,9 +375,10 @@ export default function MarketPulse({
         </details>
       ) : null}
 
-      {hiddenTapeCount > 0 ? (
+      {newTrendingOverlapCount > 0 ? (
         <p className="mt-2 text-[10px] text-text-muted">
-          {hiddenTapeCount} also appear in New &amp; Trending below.
+          {newTrendingOverlapCount} also{" "}
+          {newTrendingOverlapCount === 1 ? "appears" : "appear"} in New &amp; Trending below.
         </p>
       ) : null}
 
