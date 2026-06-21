@@ -4,6 +4,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
@@ -12,9 +13,15 @@ import {
   browserWalletLabel,
   connectBrowserWallet,
   disconnectBrowserWallet,
+  tryAutoConnectBrowserWallet,
 } from "@/lib/wallet/browser-wallets";
 import { friendlyWalletError } from "@/lib/wallet/errors";
 import type { BrowserWalletId } from "@/lib/wallet/types";
+import {
+  clearSavedBrowserWalletId,
+  getSavedBrowserWalletId,
+  saveBrowserWalletId,
+} from "@/lib/wallet/wallet-persistence";
 import WalletConnectModal from "./WalletConnectModal";
 
 type WalletContextValue = {
@@ -22,6 +29,7 @@ type WalletContextValue = {
   walletId: BrowserWalletId | null;
   walletLabel: string | null;
   connecting: boolean;
+  reconnecting: boolean;
   error: string | null;
   modalOpen: boolean;
   openModal: () => void;
@@ -37,8 +45,39 @@ export function SolanaWalletProvider({ children }: { children: ReactNode }) {
   const [address, setAddress] = useState<string | null>(null);
   const [walletId, setWalletId] = useState<BrowserWalletId | null>(null);
   const [connecting, setConnecting] = useState(false);
+  const [reconnecting, setReconnecting] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function restoreWallet() {
+      setReconnecting(true);
+      try {
+        const savedId = getSavedBrowserWalletId();
+        if (!savedId) return;
+
+        const restored = await tryAutoConnectBrowserWallet(savedId);
+        if (cancelled) return;
+
+        if (!restored) {
+          clearSavedBrowserWalletId();
+          return;
+        }
+
+        setWalletId(savedId);
+        setAddress(restored);
+      } finally {
+        if (!cancelled) setReconnecting(false);
+      }
+    }
+
+    void restoreWallet();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const openModal = useCallback(() => {
     setError(null);
@@ -60,6 +99,8 @@ export function SolanaWalletProvider({ children }: { children: ReactNode }) {
       const pubkey = await connectBrowserWallet(id);
       setWalletId(id);
       setAddress(pubkey);
+      saveBrowserWalletId(id);
+      setModalOpen(false);
     } catch (e) {
       setError(friendlyWalletError(e));
       throw e;
@@ -75,6 +116,7 @@ export function SolanaWalletProvider({ children }: { children: ReactNode }) {
         await disconnectBrowserWallet(walletId);
       }
     } finally {
+      clearSavedBrowserWalletId();
       setWalletId(null);
       setAddress(null);
       setModalOpen(false);
@@ -89,6 +131,7 @@ export function SolanaWalletProvider({ children }: { children: ReactNode }) {
       walletId,
       walletLabel,
       connecting,
+      reconnecting,
       error,
       modalOpen,
       openModal,
@@ -102,6 +145,7 @@ export function SolanaWalletProvider({ children }: { children: ReactNode }) {
       walletId,
       walletLabel,
       connecting,
+      reconnecting,
       error,
       modalOpen,
       openModal,

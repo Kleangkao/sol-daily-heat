@@ -6,7 +6,7 @@ import { createPortal } from "react-dom";
 import { shortenWalletAddress } from "@/lib/wallet/address";
 import { listBrowserWalletOptions } from "@/lib/wallet/browser-wallets";
 import type { BrowserWalletId } from "@/lib/wallet/types";
-import { WALLET_NETWORK_LABEL } from "@/lib/wallet/types";
+import { WALLET_NETWORK_LABEL, WALLET_ADVANCED_UI_ENABLED } from "@/lib/wallet/types";
 import { WALLET_ICON_SRC } from "@/lib/wallet/wallet-icons";
 import { useSolanaWallet } from "./SolanaWalletProvider";
 import WalletActionsPanel from "./WalletActionsPanel";
@@ -157,7 +157,7 @@ export default function WalletConnectModal() {
             </h2>
             <p className="mt-0.5 text-[11px] text-text-muted">
               {WALLET_NETWORK_LABEL}
-              {connected ? " · sign & memo actions" : " · connect to continue"}
+              {connected ? " · connected" : " · connect to continue"}
             </p>
           </div>
           <button
@@ -189,7 +189,9 @@ export default function WalletConnectModal() {
                 </div>
               </div>
 
-              <WalletActionsPanel walletId={walletId} address={address} />
+              {WALLET_ADVANCED_UI_ENABLED ? (
+                <WalletActionsPanel walletId={walletId} address={address} />
+              ) : null}
 
               <button
                 type="button"
@@ -222,7 +224,9 @@ export default function WalletConnectModal() {
         </div>
 
         <p className="shrink-0 border-t border-border px-4 py-2.5 text-[10px] text-text-muted sm:px-5 sm:text-[11px]">
-          Memo-only actions on mainnet · no SOL or token movement · not investment advice
+          {WALLET_ADVANCED_UI_ENABLED
+            ? "Memo-only actions on mainnet · no SOL or token movement · not investment advice"
+            : "Connect only · not investment advice"}
         </p>
       </div>
     </div>,

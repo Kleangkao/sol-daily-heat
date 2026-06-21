@@ -3,10 +3,24 @@
 import Image from "next/image";
 import { shortenWalletAddress } from "@/lib/wallet/address";
 import { WALLET_ICON_SRC } from "@/lib/wallet/wallet-icons";
+import { WALLET_ADVANCED_UI_ENABLED } from "@/lib/wallet/types";
 import { useSolanaWallet } from "./SolanaWalletProvider";
 
 export default function WalletConnectButton() {
-  const { address, walletId, walletLabel, openModal, disconnect, connecting } = useSolanaWallet();
+  const { address, walletId, walletLabel, openModal, disconnect, connecting, reconnecting } =
+    useSolanaWallet();
+
+  if (reconnecting) {
+    return (
+      <button
+        type="button"
+        disabled
+        className="min-h-[44px] shrink-0 rounded-[8px] border border-border bg-bg-card/70 px-4 py-2 text-[12px] font-semibold uppercase tracking-wide text-text-muted opacity-70 sm:text-[13px]"
+      >
+        Connecting…
+      </button>
+    );
+  }
 
   if (address) {
     const iconSrc = walletId ? WALLET_ICON_SRC[walletId] : null;
@@ -36,14 +50,16 @@ export default function WalletConnectButton() {
             </p>
           </div>
         </button>
-        <button
-          type="button"
-          onClick={() => void disconnect()}
-          disabled={connecting}
-          className="min-h-[44px] rounded-[8px] border border-border bg-bg-secondary/50 px-3 py-2 text-[12px] font-semibold text-text-primary transition-colors hover:border-accent/50 hover:text-accent disabled:opacity-60"
-        >
-          Disconnect
-        </button>
+        {WALLET_ADVANCED_UI_ENABLED ? (
+          <button
+            type="button"
+            onClick={() => void disconnect()}
+            disabled={connecting}
+            className="min-h-[44px] rounded-[8px] border border-border bg-bg-secondary/50 px-3 py-2 text-[12px] font-semibold text-text-primary transition-colors hover:border-accent/50 hover:text-accent disabled:opacity-60"
+          >
+            Disconnect
+          </button>
+        ) : null}
       </div>
     );
   }

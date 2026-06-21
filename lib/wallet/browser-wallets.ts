@@ -113,6 +113,35 @@ export async function connectBrowserWallet(id: BrowserWalletId): Promise<string>
   return address;
 }
 
+/** Read address when the extension still trusts this site (no connect prompt). */
+export function getConnectedBrowserWalletAddress(id: BrowserWalletId): string | null {
+  const provider = getBrowserWalletProvider(id);
+  if (!provider) return null;
+  return getWalletAddressString(provider.publicKey);
+}
+
+/** Restore session after refresh — never prompts unless onlyIfTrusted is accepted. */
+export async function tryAutoConnectBrowserWallet(id: BrowserWalletId): Promise<string | null> {
+  const provider = getBrowserWalletProvider(id);
+  if (!provider) return null;
+
+  const existing = getConnectedBrowserWalletAddress(id);
+  if (existing) return existing;
+
+  try {
+    const connect = provider.connect as (
+      options?: { onlyIfTrusted?: boolean }
+    ) => Promise<{ publicKey?: unknown }>;
+    const result = await connect({ onlyIfTrusted: true });
+    return (
+      getWalletAddressString(result?.publicKey) ??
+      getWalletAddressString(provider.publicKey)
+    );
+  } catch {
+    return null;
+  }
+}
+
 export async function disconnectBrowserWallet(id: BrowserWalletId): Promise<void> {
   const provider = getBrowserWalletProvider(id);
   if (provider) await provider.disconnect();
