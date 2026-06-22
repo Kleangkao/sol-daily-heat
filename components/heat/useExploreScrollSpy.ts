@@ -108,6 +108,8 @@ export function useExploreScrollSpy({
   const setActiveRef = useRef(setActiveExploreChip);
   setActiveRef.current = setActiveExploreChip;
 
+  const lastChipRef = useRef<ExploreChipId | null>(null);
+
   useEffect(() => {
     if (!enabled) return;
 
@@ -131,7 +133,9 @@ export function useExploreScrollSpy({
       const chip = exploreChipForSectionElementId(bestId, categoryRef.current);
       if (!chip) return;
 
-      setActiveRef.current((prev) => (prev === chip ? prev : chip));
+      if (lastChipRef.current === chip) return;
+      lastChipRef.current = chip;
+      setActiveRef.current(chip);
     };
 
     const connectObserver = () => {
