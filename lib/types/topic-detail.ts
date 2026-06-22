@@ -86,4 +86,6 @@ export type TopicDetailView = {
   rankingDate: string;
   /** Distinct linked sources (topic_sources), used for score explanation copy */
   uniqueSourceCount: number;
+  /** Article/feed image from primary or first timeline source when metadata provides one. */
+  sourceImageUrl: string | null;
 };

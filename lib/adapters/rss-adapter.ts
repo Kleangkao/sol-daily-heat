@@ -14,6 +14,7 @@ import {
 
 import { isWithinHours } from "@/lib/scoring/freshness";
 
+import { extractRssImageUrl } from "@/lib/adapters/extract-rss-image-url";
 import { isPricePredictionItem } from "@/lib/sources/cointelegraph-shadow-patterns";
 import {
 
@@ -35,7 +36,17 @@ import {
 
 
 
-const parser = new Parser({ timeout: 15000 });
+const parser = new Parser({
+  timeout: 15000,
+  customFields: {
+    item: [
+      ["media:content", "mediaContent", { keepArray: true }],
+      ["media:thumbnail", "mediaThumbnail", { keepArray: true }],
+      ["media:group", "mediaGroup"],
+      ["itunes:image", "itunesImage"],
+    ],
+  },
+});
 
 
 
@@ -117,7 +128,7 @@ export class RssAdapter implements SourceAdapter {
 
     const feed = await parser.parseString(xml);
 
-    const items = (feed.items ?? []) as Array<Record<string, unknown>>;
+    const items = (feed.items ?? []) as unknown as Array<Record<string, unknown>>;
 
     const meta = (ctx.source.metadata_json ?? {}) as Record<string, unknown>;
 
@@ -222,7 +233,7 @@ export class RssAdapter implements SourceAdapter {
 
       if (needsFilter) blockPassed += 1;
 
-
+      const imageUrl = extractRssImageUrl(item);
 
       drafts.push({
 
@@ -245,6 +256,8 @@ export class RssAdapter implements SourceAdapter {
           item_type: "news",
 
           ...(topicCategory ? { topic_category: topicCategory } : {}),
+
+          ...(imageUrl ? { image_url: imageUrl } : {}),
 
           ...(isStatus
             ? { source_kind: "status" }

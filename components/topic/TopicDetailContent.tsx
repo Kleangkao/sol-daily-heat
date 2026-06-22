@@ -389,8 +389,28 @@ export default function TopicDetailContent({ topic }: Props) {
           </section>
         ) : null}
 
+        {topic.sourceImageUrl ? (
+          <figure
+            className={`overflow-hidden rounded-[10px] border border-border bg-bg-card${metricEvidence || mixedMetrics ? " mt-6" : ""}`}
+          >
+            <div className="aspect-video w-full bg-bg-secondary">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={topic.sourceImageUrl}
+                alt={topic.title}
+                loading="lazy"
+                decoding="async"
+                referrerPolicy="no-referrer"
+                className="h-full w-full object-cover"
+              />
+            </div>
+          </figure>
+        ) : null}
+
         <section
-          className={`rounded-[10px] border border-border bg-bg-card p-5${metricEvidence ? " mt-6" : ""}`}
+          className={`rounded-[10px] border border-border bg-bg-card p-5${
+            metricEvidence || mixedMetrics || topic.sourceImageUrl ? " mt-6" : ""
+          }`}
         >
           <h2 className="font-heading text-[18px] font-bold uppercase tracking-wide text-text-primary">
             {brief.heading}

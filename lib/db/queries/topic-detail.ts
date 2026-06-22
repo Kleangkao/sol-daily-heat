@@ -22,6 +22,8 @@ import type {
   TopicTimelineEntry,
 } from "@/lib/types/topic-detail";
 
+import { resolveTopicSourceImageUrl } from "@/lib/heat/source-image-url";
+
 function todayDate(): string {
   return new Date().toISOString().slice(0, 10);
 }
@@ -207,6 +209,20 @@ export async function getTopicDetail(
 
   const headlineOnlySources = timeline.some((t) => t.headlineOnly);
 
+  const sourceImageUrl = resolveTopicSourceImageUrl(
+    (topic.topic_sources ?? []).map((ts) => ({
+      id: ts.id,
+      is_primary: ts.is_primary,
+      raw_items: ts.raw_items
+        ? {
+            id: ts.raw_items.id,
+            metadata_json: (ts.raw_items.metadata_json ?? {}) as Record<string, unknown>,
+          }
+        : null,
+    })),
+    timeline
+  );
+
   const tokens =
     topic.topic_tokens?.map((tt) => {
       const t = tt.tokens;
@@ -290,5 +306,6 @@ export async function getTopicDetail(
     headlineOnlySources,
     rankingDate: date,
     uniqueSourceCount: sourceSlugs.length,
+    sourceImageUrl,
   };
 }
