@@ -155,13 +155,24 @@ function SocialModal({
             People in this image
           </p>
           <ul className="mt-2.5 space-y-2">
-            {card.people.map((name) => (
+            {card.people.map((person) => (
               <li
-                key={name}
+                key={person.name}
                 className="rounded-[8px] border border-border/80 bg-bg-secondary/40 px-3 py-2"
               >
-                <p className="text-[13px] font-semibold text-text-primary">{name}</p>
-                <p className="mt-0.5 text-[11px] text-text-muted">Social links coming soon</p>
+                <p className="text-[13px] font-semibold text-text-primary">{person.name}</p>
+                {person.xUrl ? (
+                  <a
+                    href={person.xUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-0.5 inline-block text-[11px] font-medium text-accent hover:text-accent-hover"
+                  >
+                    X profile
+                  </a>
+                ) : (
+                  <p className="mt-0.5 text-[11px] text-text-muted">X coming soon</p>
+                )}
               </li>
             ))}
           </ul>
