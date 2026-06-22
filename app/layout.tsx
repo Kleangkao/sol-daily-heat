@@ -63,7 +63,7 @@ export default function RootLayout({
         <DevChunkRecovery />
         <BeachAtmosphere />
         {USE_SOLANA_GRADIENT_THEME ? <SolanaGradientAtmosphere /> : null}
-        <div className="relative z-10 min-w-0 overflow-x-clip">
+        <div className="relative z-10 min-w-0 overflow-x-clip max-lg:overflow-x-visible">
           <WalletProviders>{children}</WalletProviders>
         </div>
       </body>

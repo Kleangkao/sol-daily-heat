@@ -32,10 +32,11 @@ import { sectionItemsMetricHeavy } from "@/lib/heat/card-display";
 import DashboardMainSkeleton from "./DashboardMainSkeleton";
 import DemoPreviewBanner from "./DemoPreviewBanner";
 import ExploreBar from "./ExploreBar";
-import HeatHero from "./HeatHero";
+import HeatHero, { HeroHeadRow } from "./HeatHero";
 import HeatSection from "./HeatSection";
 import { DailyHeatTitle } from "./EmojiAccents";
 import MarketPulse from "./MarketPulse";
+import MobileHeatStickyShell from "./MobileHeatStickyShell";
 import PastSnapshotsNav from "./PastSnapshotsNav";
 import SolanaSocial from "./SolanaSocial";
 import DemoSpotlightSection from "./DemoSpotlightSection";
@@ -253,15 +254,18 @@ export default function HeatDashboard() {
           ? "Demo mock data"
           : "";
 
-  const exploreBar = (
-    <ExploreBar activeChip={activeExploreChip} onChipClick={onExploreChip} />
-  );
-
-  const mobileExploreBar = <div className="lg:hidden">{exploreBar}</div>;
+  const exploreChipProps = {
+    activeChip: activeExploreChip,
+    onChipClick: onExploreChip,
+  };
 
   return (
     <div className="min-h-screen">
-      <HeatHero archiveDate={archiveDate} mobileStickySlot={mobileExploreBar} />
+      <MobileHeatStickyShell>
+        <HeroHeadRow />
+        <ExploreBar key="mobile-explore" {...exploreChipProps} />
+      </MobileHeatStickyShell>
+      <HeatHero archiveDate={archiveDate} />
       {dashboard && dashboard.dataSource && dashboard.dataSource !== "live" ? (
         <DemoPreviewBanner
           dataSource={dashboard.dataSource}
@@ -270,7 +274,9 @@ export default function HeatDashboard() {
       ) : null}
       {awaitingData ? (
         <main className="mx-auto max-w-7xl px-4 py-5 sm:px-6 sm:py-8 lg:px-8">
-          <div className="hidden lg:block">{exploreBar}</div>
+          <div className="hidden lg:block">
+            <ExploreBar key="desktop-explore" {...exploreChipProps} />
+          </div>
           <DashboardMainSkeleton />
         </main>
       ) : dashboard ? (
@@ -283,7 +289,9 @@ export default function HeatDashboard() {
             </aside>
 
             <div className="min-w-0">
-              <div className="hidden lg:block">{exploreBar}</div>
+              <div className="hidden lg:block">
+            <ExploreBar key="desktop-explore" {...exploreChipProps} />
+          </div>
 
               <HeatSection
                 title={<DailyHeatTitle />}
