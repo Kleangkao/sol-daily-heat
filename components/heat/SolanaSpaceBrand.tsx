@@ -17,9 +17,6 @@ export default function SolanaSpaceBrand() {
         priority
         aria-hidden
       />
-      <p className="mt-2 text-[11px] font-medium tracking-wide text-text-muted sm:mt-2.5 sm:text-[12px]">
-        Solana daily heat
-      </p>
     </div>
   );
 }

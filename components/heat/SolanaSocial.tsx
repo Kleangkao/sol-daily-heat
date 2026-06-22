@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useId, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useId, useState } from "react";
 import { createPortal } from "react-dom";
 import { solanaGramFont } from "@/lib/fonts/solana-gram-font";
 import {
@@ -12,6 +12,9 @@ import {
 
 const GRAM_LOGO_WIDTH = 320;
 const GRAM_LOGO_HEIGHT = 96;
+
+/** Temporarily hidden while evaluating film-strip visuals. */
+const SHOW_FRAME_LABELS = false;
 
 function thumbObjectClass(card: SolanaSocialCard) {
   if (card.thumbObjectPosition === "top") {
@@ -66,20 +69,6 @@ function SocialImage({
         sizes={uncropped ? "100vw" : "(max-width: 1024px) 45vw, 240px"}
         aria-hidden
       />
-    </div>
-  );
-}
-
-function FilmStripFrame({
-  children,
-}: {
-  children: ReactNode;
-}) {
-  return (
-    <div className="film-strip-frame">
-      <div className="film-strip-sprockets" aria-hidden />
-      <div className="film-strip-window">{children}</div>
-      <div className="film-strip-sprockets" aria-hidden />
     </div>
   );
 }
@@ -194,58 +183,23 @@ function SocialModal({
   );
 }
 
-function SocialCard({
-  card,
-  onOpen,
-  showTapHint = false,
-  uncropped = false,
-}: {
-  card: SolanaSocialCard;
-  onOpen: () => void;
-  showTapHint?: boolean;
-  uncropped?: boolean;
-}) {
-  const peopleLabel =
-    card.people.length === 1 ? card.people[0] : `${card.people.length} people`;
-
-  return (
-    <button
-      type="button"
-      onClick={onOpen}
-      className="film-strip-card text-left transition-transform duration-200 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary"
-    >
-      <FilmStripFrame>
-        <SocialImage card={card} uncropped={uncropped} />
-      </FilmStripFrame>
-      <div className="film-strip-caption">
-        <p className="truncate text-[11px] font-semibold text-text-primary lg:text-[12px]">
-          {peopleLabel}
-        </p>
-        <p
-          className={`mt-0.5 text-[10px] text-text-muted ${showTapHint ? "block" : "hidden lg:block"}`}
-        >
-          Tap to view
-        </p>
-      </div>
-    </button>
-  );
-}
-
 function SolanaGramBrand() {
   return (
-    <div className="flex min-w-0 items-center gap-2">
+    <div className="flex w-full flex-col items-center justify-center gap-1.5 py-0.5 text-center">
       {/* TODO: Replace/verify brand font asset before any commercial/public release. */}
-      <Image
-        src="/brand/solana-gram-logo.png"
-        alt=""
-        width={GRAM_LOGO_WIDTH}
-        height={GRAM_LOGO_HEIGHT}
-        className="h-7 w-auto max-w-[42%] shrink-0 object-contain object-left sm:h-8"
-        priority
-        aria-hidden
-      />
+      <div className="solana-gram-logo-shell overflow-hidden rounded-[16px] shadow-sm ring-1 ring-white/10">
+        <Image
+          src="/brand/solana-gram-logo.png"
+          alt=""
+          width={GRAM_LOGO_WIDTH}
+          height={GRAM_LOGO_HEIGHT}
+          className="h-8 w-auto max-w-[min(140px,72%)] object-contain rounded-[14px] sm:h-9"
+          priority
+          aria-hidden
+        />
+      </div>
       <span
-        className={`${solanaGramFont.className} truncate text-[15px] leading-none tracking-tight text-text-primary sm:text-[16px]`}
+        className={`${solanaGramFont.className} text-[15px] leading-none tracking-tight text-text-primary sm:text-[16px]`}
       >
         {SOLANA_GRAM_TITLE}
       </span>
@@ -274,31 +228,45 @@ export default function SolanaSocial({
       ? "rail-shell rail-shell-compact"
       : "rail-shell rail-shell-desktop";
 
+  const uncropped = feed;
+
   return (
     <>
       <section
         aria-labelledby={headingId}
         className={`${shellClass} rounded-[12px] border border-border bg-bg-secondary/30 p-2.5 sm:p-3`}
       >
-        <div className="rail-shell-header shrink-0">
-          <h2 id={headingId} className="min-w-0">
+        <div className="rail-shell-header flex shrink-0 justify-center">
+          <h2 id={headingId} className="w-full min-w-0">
             <SolanaGramBrand />
           </h2>
         </div>
 
         <div className={feed ? "rail-body-open" : "scrollbar-hidden rail-body-scroll"}>
-          <div
-            className={`grid gap-3 ${feed ? "grid-cols-1" : compact ? "grid-cols-1" : "grid-cols-2 lg:grid-cols-1"}`}
-          >
-            {SOLANA_GRAM_CARDS.map((card) => (
-              <SocialCard
-                key={card.id}
-                card={card}
-                onOpen={() => setActiveId(card.id)}
-                showTapHint={feed || compact}
-                uncropped={feed}
-              />
-            ))}
+          <div className="film-strip-panel">
+            <div className="film-strip-sprockets" aria-hidden />
+            <div className="film-strip-reel">
+              {SOLANA_GRAM_CARDS.map((card) => (
+                <button
+                  key={card.id}
+                  type="button"
+                  onClick={() => setActiveId(card.id)}
+                  className="film-strip-cell focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary"
+                  aria-label={`View Solana Gram photo ${card.id.replace("social-", "")}`}
+                >
+                  <SocialImage card={card} uncropped={uncropped} />
+                  {SHOW_FRAME_LABELS ? (
+                    <span className="sr-only">
+                      {card.people.length === 1
+                        ? card.people[0]
+                        : `${card.people.length} people`}
+                      {" · Tap to view"}
+                    </span>
+                  ) : null}
+                </button>
+              ))}
+            </div>
+            <div className="film-strip-sprockets" aria-hidden />
           </div>
         </div>
       </section>

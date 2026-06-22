@@ -10,7 +10,7 @@ import type {
 import { alsoInSections } from "@/lib/heat/topic-section-appearances";
 
 type Props = {
-  title: string;
+  title: ReactNode;
   subtitle?: string;
   sectionId: string;
   description?: string;

@@ -5,7 +5,7 @@ import { useMemo } from "react";
 import type { HeatCardPersonaHighlight, HeatCardView } from "@/lib/types/heat";
 import { isLiveTopicId, topicDetailPath } from "@/lib/heat/topic-link";
 import { canLinkTokenDetail, tokenDetailPath } from "@/lib/heat/token-link";
-import { categoryTopicTagLabel } from "@/lib/heat/category-display";
+import { CATEGORY_LABELS } from "@/lib/types/heat";
 import { resolveTopicDisplayCategory } from "@/lib/heat/topic-display-category";
 import { buildCardBadges, parseFeeDisplay } from "@/lib/heat/card-display";
 import { buildHomepageCardCopy } from "@/lib/heat/homepage-card-copy";
@@ -90,7 +90,7 @@ export default function HeatCard({
       <div className="flex min-w-0 items-start justify-between gap-3">
         <div className="flex flex-wrap gap-2">
           <span className="inline-flex rounded-full bg-bg-secondary px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-accent">
-            {categoryTopicTagLabel(displayCategory)}
+            {CATEGORY_LABELS[displayCategory]}
           </span>
           {item.isUpdatedStory ? (
             <span className="inline-flex rounded-full border border-heat/40 bg-heat/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-heat">

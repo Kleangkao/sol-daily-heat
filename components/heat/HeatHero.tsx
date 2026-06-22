@@ -5,6 +5,7 @@ import { USE_SOLANA_GRADIENT_THEME } from "@/lib/theme/background-theme";
 import IslandDaoSponsorsRail from "./IslandDaoSponsorsRail";
 import SolanaSpaceBrand from "./SolanaSpaceBrand";
 import SolanaWordmarkGradient from "./SolanaWordmarkGradient";
+import { HeroLightningEmoji } from "./EmojiAccents";
 import WalletConnectButton from "@/components/wallet/WalletConnectButton";
 
 const WORDMARK_WIDTH = 262;
@@ -64,7 +65,7 @@ export default function HeatHero({ archiveDate }: Props) {
               />
             )}
             <span className="translate-y-[1px] text-[15px] leading-none sm:text-[16px]" aria-hidden>
-              ⚡
+              <HeroLightningEmoji />
             </span>
           </span>
         </h1>

@@ -1,6 +1,7 @@
 "use client";
 
 import { EXPLORE_BAR_CHIPS, type ExploreChipId } from "@/lib/heat/explore-navigation";
+import { DailyHeatTitle } from "@/components/heat/EmojiAccents";
 
 type Props = {
   activeChip: ExploreChipId;
@@ -28,7 +29,7 @@ export default function ExploreBar({ activeChip, onChipClick }: Props) {
                   : "border-border bg-bg-secondary text-text-secondary hover:border-accent/40 hover:text-accent"
               }`}
             >
-              {chip.label}
+              {chip.id === "top-heat" ? <DailyHeatTitle /> : chip.label}
             </button>
           );
         })}

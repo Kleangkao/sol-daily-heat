@@ -34,6 +34,7 @@ import DemoPreviewBanner from "./DemoPreviewBanner";
 import ExploreBar from "./ExploreBar";
 import HeatHero from "./HeatHero";
 import HeatSection from "./HeatSection";
+import { DailyHeatTitle } from "./EmojiAccents";
 import MarketPulse from "./MarketPulse";
 import PastSnapshotsNav from "./PastSnapshotsNav";
 import SolanaSocial from "./SolanaSocial";
@@ -279,7 +280,7 @@ export default function HeatDashboard() {
               <ExploreBar activeChip={activeExploreChip} onChipClick={onExploreChip} />
 
               <HeatSection
-                title={HOT_ON_SOLANA.title}
+                title={<DailyHeatTitle />}
                 sectionId="top-heat"
                 sectionLabel={HOT_ON_SOLANA.shortLabel}
                 topicSections={topicSections}
