@@ -24,11 +24,9 @@ function thumbObjectPositionStyle(card: SolanaSocialCard): CSSProperties | undef
 function SocialImage({
   card,
   variant = "thumb",
-  uncropped = false,
 }: {
   card: SolanaSocialCard;
   variant?: "thumb" | "modal";
-  uncropped?: boolean;
 }) {
   if (variant === "modal") {
     return (
@@ -48,12 +46,8 @@ function SocialImage({
     );
   }
 
-  const imageClass = uncropped
-    ? "h-auto w-full object-contain"
-    : "h-full w-full object-cover";
-
   return (
-    <div className={uncropped ? "film-strip-window film-strip-window-open" : "film-strip-window"}>
+    <div className="film-strip-window">
       <Image
         src={card.imageSrc}
         alt=""
@@ -61,9 +55,9 @@ function SocialImage({
         height={card.imageHeight}
         unoptimized
         loading="eager"
-        className={imageClass}
-        style={uncropped ? undefined : thumbObjectPositionStyle(card)}
-        sizes={uncropped ? "100vw" : "(max-width: 1024px) 45vw, 240px"}
+        className="h-full w-full object-cover"
+        style={thumbObjectPositionStyle(card)}
+        sizes="(max-width: 1024px) 45vw, 240px"
         aria-hidden
       />
     </div>
@@ -219,7 +213,7 @@ export default function SolanaSocial({
 }: {
   headingId?: string;
   compact?: boolean;
-  /** Mobile feed: full section, uncropped photos, no height cap. */
+  /** Mobile feed: full section, no rail height cap. */
   feed?: boolean;
 }) {
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -232,8 +226,6 @@ export default function SolanaSocial({
     : compact
       ? "rail-shell rail-shell-compact"
       : "rail-shell rail-shell-desktop";
-
-  const uncropped = feed;
 
   return (
     <>
@@ -259,7 +251,7 @@ export default function SolanaSocial({
                   className="film-strip-frame focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary"
                   aria-label={`View Solanagram photo ${card.id.replace("social-", "")}`}
                 >
-                  <SocialImage card={card} uncropped={uncropped} />
+                  <SocialImage card={card} />
                 </button>
               ))}
             </div>
