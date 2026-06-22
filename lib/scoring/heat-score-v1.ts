@@ -43,13 +43,12 @@ export function computeHeatScore(input: HeatScoreInput): {
 
   if (input.newestPublishedAt) {
     const ageH = (Date.now() - new Date(input.newestPublishedAt).getTime()) / 3600000;
-    if (ageH < 2) breakdown.recency = 20;
-    else if (ageH < 6) breakdown.recency = 12;
-    else if (ageH < 24) breakdown.recency = 6;
-    else if (ageH < 48) breakdown.recency = 4;
-    else if (ageH < 72) breakdown.recency = 2;
+    if (ageH < 2) breakdown.recency = 24;
+    else if (ageH < 6) breakdown.recency = 16;
+    else if (ageH < 24) breakdown.recency = 12;
+    else if (ageH < 48) breakdown.recency = 6;
+    else if (ageH < 72) breakdown.recency = 3;
     else if (ageH < 168) breakdown.recency = 1;
-    else if (ageH < 720) breakdown.recency = 1;
     else breakdown.recency = 0;
   } else {
     breakdown.recency = 4;

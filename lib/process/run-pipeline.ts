@@ -15,6 +15,7 @@ import { getSummaryProvider } from "./ai-summary";
 import { extractEntitiesFromCluster, upsertTopicTokenLink } from "./link-entities";
 import { repairTokenMintsFromTopicSources } from "./repair-token-mints";
 import { computeHeatScore } from "@/lib/scoring/heat-score-v1";
+import { computeFreshnessBoost } from "@/lib/scoring/freshness-boost";
 import { isStaleRepeat, isUpdatedStoryCarryover } from "@/lib/scoring/decay";
 import {
   hasFreshRawInWindow,
@@ -233,6 +234,10 @@ export async function runPipeline(db: SupabaseClient): Promise<{
       );
       heat_score = Math.min(100, Math.max(0, heat_score));
     }
+
+    score_breakdown_json.freshness_boost = Math.round(
+      computeFreshnessBoost(storyTimestamp.iso) * 10
+    ) / 10;
 
     const isEligibleEditorial = isEligibleEditorialTopic(
       group.items,

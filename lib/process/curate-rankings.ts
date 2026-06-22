@@ -6,6 +6,7 @@ import {
   STATUS_SOURCE_SLUGS,
 } from "@/lib/sources/rss-ingest-policy";
 import { isWithinHours } from "@/lib/scoring/freshness";
+import { computeAdjustedRankScore } from "@/lib/scoring/freshness-boost";
 import { isSevereStatusTitle } from "@/lib/scoring/status-signals";
 import { STATUS_MAX_AGE_HOURS } from "@/lib/scoring/topic-eligibility";
 import {
@@ -67,17 +68,35 @@ const INVESTOR_EDITORIAL_HEAT_MIN = 50;
 const INVESTOR_DEFAULT_HEAT_MIN = 50;
 
 export function compareCandidates(a: CuratedCandidate, b: CuratedCandidate): number {
-  const scoreDiff = b.heat_score - a.heat_score;
+  const adjA = computeAdjustedRankScore(a.heat_score, a.storyAt);
+  const adjB = computeAdjustedRankScore(b.heat_score, b.storyAt);
+  const scoreDiff = adjB - adjA;
   if (scoreDiff !== 0) return scoreDiff;
+
+  const storyDiff = new Date(b.storyAt).getTime() - new Date(a.storyAt).getTime();
+  if (storyDiff !== 0) return storyDiff;
+
+  const heatDiff = b.heat_score - a.heat_score;
+  if (heatDiff !== 0) return heatDiff;
 
   const confDiff = b.confidence_score - a.confidence_score;
   if (confDiff !== 0) return confDiff;
 
-  return new Date(b.storyAt).getTime() - new Date(a.storyAt).getTime();
+  return 0;
 }
 
 function comparePlacement(a: CuratedCandidate, b: CuratedCandidate): number {
-  const diff = b.placementSortScore - a.placementSortScore;
+  const adjA = computeAdjustedRankScore(
+    a.heat_score,
+    a.storyAt,
+    a.placementSortScore - a.heat_score
+  );
+  const adjB = computeAdjustedRankScore(
+    b.heat_score,
+    b.storyAt,
+    b.placementSortScore - b.heat_score
+  );
+  const diff = adjB - adjA;
   if (diff !== 0) return diff;
   return compareCandidates(a, b);
 }

@@ -3,6 +3,7 @@ import type { RankingSection } from "@/lib/types/db";
 import { DASHBOARD_SECTIONS } from "./dashboard-sections";
 import { SECTION_LIMITS } from "@/lib/process/section-limits";
 import { readStoredStoryAt } from "@/lib/heat/story-timestamp";
+import { computeAdjustedRankScore } from "@/lib/scoring/freshness-boost";
 
 type RowForSort = {
   id: string;
@@ -23,7 +24,7 @@ function storyAt(row: RowForSort): string {
 
 /**
  * Assign rank_position 1..n per section for a given day.
- * Sort: heat_score desc → confidence_score desc → story_at desc.
+ * Sort: adjusted score (heat + freshness boost) → story_at desc → heat_score desc → confidence desc.
  * builder_watch keeps rank_position from curation snapshot (status → editorial → GitHub).
  */
 export async function assignRankPositions(
@@ -43,15 +44,20 @@ export async function assignRankPositions(
 
     const limit = SECTION_LIMITS[rankingSection];
     const sorted = (data as RowForSort[]).sort((a, b) => {
-      const scoreDiff = Number(b.heat_score) - Number(a.heat_score);
+      const storyA = storyAt(a);
+      const storyB = storyAt(b);
+      const adjA = computeAdjustedRankScore(Number(a.heat_score), storyA);
+      const adjB = computeAdjustedRankScore(Number(b.heat_score), storyB);
+      const scoreDiff = adjB - adjA;
       if (scoreDiff !== 0) return scoreDiff;
 
-      const confDiff = Number(b.confidence_score) - Number(a.confidence_score);
-      if (confDiff !== 0) return confDiff;
+      const storyDiff = new Date(storyB).getTime() - new Date(storyA).getTime();
+      if (storyDiff !== 0) return storyDiff;
 
-      return (
-        new Date(storyAt(b)).getTime() - new Date(storyAt(a)).getTime()
-      );
+      const heatDiff = Number(b.heat_score) - Number(a.heat_score);
+      if (heatDiff !== 0) return heatDiff;
+
+      return Number(b.confidence_score) - Number(a.confidence_score);
     });
 
     const toRank = sorted.slice(0, limit);
