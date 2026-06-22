@@ -200,10 +200,6 @@ function SpotlightModal({
           ) : null}
           <LinkButtons links={card.links} />
         </div>
-
-        <p className="shrink-0 border-t border-border px-4 py-2.5 text-[10px] text-text-muted sm:px-5 sm:text-[11px]">
-          Demo spotlight · not investment advice · not an endorsement
-        </p>
       </div>
     </div>,
     document.body,
