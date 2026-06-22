@@ -77,7 +77,7 @@ function SocialModal({
   onClose: () => void;
 }) {
   const titleId = useId();
-  const descId = useId();
+  const mentionsId = useId();
   const [mounted, setMounted] = useState(false);
   const isPortrait = card.imageHeight > card.imageWidth;
 
@@ -119,7 +119,7 @@ function SocialModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        aria-describedby={descId}
+        aria-describedby={mentionsId}
         className={`relative z-10 flex max-h-[calc(100vh-48px)] w-full flex-col overflow-hidden rounded-[14px] border border-border bg-bg-card shadow-2xl ${
           isPortrait
             ? "max-w-[min(400px,calc(100vw-24px))]"
@@ -127,15 +127,13 @@ function SocialModal({
         }`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex shrink-0 items-start justify-between gap-3 border-b border-border px-4 py-3 sm:px-5">
-          <div className="min-w-0">
-            <h3 id={titleId} className="leading-none">
-              <SolanaGramWordmark variant="modal" />
-            </h3>
-            <p id={descId} className="mt-0.5 text-[11px] text-text-muted sm:text-[12px]">
-              Community photo
-            </p>
-          </div>
+        <div className="flex min-h-[5.25rem] shrink-0 items-center justify-between gap-3 overflow-visible border-b border-border px-4 pb-3 pt-4 sm:px-5">
+          <h3
+            id={titleId}
+            className="min-w-0 flex-1 overflow-visible leading-none [&_.solanagram-wordmark-shell]:overflow-visible"
+          >
+            <SolanaGramBrand align="start" />
+          </h3>
           <button
             type="button"
             onClick={onClose}
@@ -150,7 +148,7 @@ function SocialModal({
           <SocialImage card={card} variant="modal" />
         </div>
 
-        <div className="shrink-0 px-4 py-3 sm:px-5 sm:pb-4">
+        <div id={mentionsId} className="shrink-0 px-4 py-3 sm:px-5 sm:pb-4">
           <p className="text-[10px] font-semibold uppercase tracking-wide text-text-muted">
             People in this image
           </p>
@@ -181,37 +179,28 @@ function SocialModal({
   );
 }
 
-function SolanaGramWordmark({
-  variant = "rail",
-}: {
-  variant?: "rail" | "modal";
-}) {
-  const shellClass =
-    variant === "modal"
-      ? "solanagram-wordmark-shell solanagram-wordmark-shell-modal"
-      : "solanagram-wordmark-shell solanagram-wordmark-shell-rail";
-  const imageClass =
-    variant === "modal"
-      ? "solanagram-wordmark solanagram-wordmark-modal"
-      : "solanagram-wordmark solanagram-wordmark-rail";
-
+function SolanaGramWordmark() {
   return (
-    <div className={shellClass}>
+    <div className="solanagram-wordmark-shell solanagram-wordmark-shell-rail">
       <Image
         src="/brand/solanagram-wordmark.png"
         alt={SOLANA_GRAM_TITLE}
         width={GRAM_WORDMARK_WIDTH}
         height={GRAM_WORDMARK_HEIGHT}
-        className={imageClass}
+        className="solanagram-wordmark solanagram-wordmark-rail"
         priority
       />
     </div>
   );
 }
 
-function SolanaGramBrand() {
+function SolanaGramBrand({ align = "center" }: { align?: "center" | "start" }) {
   return (
-    <div className="solana-gram-header flex w-full items-center justify-center gap-3 py-0.5">
+    <div
+      className={`solana-gram-header flex w-full items-center gap-3 py-0.5 ${
+        align === "center" ? "justify-center" : "justify-start"
+      }`}
+    >
       {/* TODO: Replace/verify brand font asset before any commercial/public release. */}
       <div className="solana-gram-logo-shell shrink-0 overflow-hidden shadow-sm ring-1 ring-white/10">
         <Image
