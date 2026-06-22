@@ -43,12 +43,12 @@ export const SOLANA_GRAM_CARDS: SolanaSocialCard[] = [
     imageHeight: 575,
     people: [
       { name: "Superteam Brazil", xHandle: "SuperteamBR", xUrl: "https://x.com/SuperteamBR" },
-      { name: "Metaplex", xHandle: "Metaplex", xUrl: "https://x.com/Metaplex" },
       {
         name: "Whale's Friend | Realms",
         xHandle: "Whalesfriend",
         xUrl: "https://x.com/Whalesfriend",
       },
+      { name: "Metaplex", xHandle: "Metaplex", xUrl: "https://x.com/Metaplex" },
       { name: "Takisoul", xHandle: "takisoul", xUrl: "https://x.com/takisoul" },
       { name: "cigarros.sol", xHandle: "cigarrosnft", xUrl: "https://x.com/cigarrosnft" },
     ],
@@ -59,8 +59,8 @@ export const SOLANA_GRAM_CARDS: SolanaSocialCard[] = [
     imageWidth: 923,
     imageHeight: 1280,
     people: [
-      { name: "Qucks", xHandle: "solquicks", xUrl: "https://x.com/solquicks" },
       { name: "Jaspen", xHandle: "thetitanmaker", xUrl: "https://x.com/thetitanmaker" },
+      { name: "Qucks", xHandle: "solquicks", xUrl: "https://x.com/solquicks" },
     ],
   },
   {
@@ -69,12 +69,12 @@ export const SOLANA_GRAM_CARDS: SolanaSocialCard[] = [
     imageWidth: 825,
     imageHeight: 1280,
     people: [
-      { name: "James", xHandle: "noisesang", xUrl: "https://x.com/noisesang" },
       {
         name: "Tony Beeman",
         xHandle: "tonyboyletweets",
         xUrl: "https://x.com/tonyboyletweets",
       },
+      { name: "James", xHandle: "noisesang", xUrl: "https://x.com/noisesang" },
     ],
     thumbObjectPosition: "top",
   },
