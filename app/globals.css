@@ -118,11 +118,8 @@ a {
       z-index: 40;
       padding-top: env(safe-area-inset-top, 0px);
       padding-bottom: 0.25rem;
-      background-color: rgba(4, 22, 22, 0.82);
-      border-bottom-color: rgba(16, 72, 72, 0.42);
-      box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+      background-color: rgba(4, 22, 22, 0.97);
+      border-bottom-color: rgba(16, 72, 72, 0.5);
     }
 
     .explore-bar-shell nav {
@@ -130,8 +127,8 @@ a {
     }
 
     .theme-solana-gradient .explore-bar-shell {
-      background-color: rgba(4, 22, 22, 0.84);
-      border-bottom-color: rgba(20, 241, 149, 0.14);
+      background-color: rgba(4, 22, 22, 0.97);
+      border-bottom-color: rgba(20, 241, 149, 0.16);
     }
   }
 
