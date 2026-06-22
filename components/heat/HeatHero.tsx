@@ -29,7 +29,7 @@ export function HeroHeadRow() {
 
 export default function HeatHero({ archiveDate }: Props) {
   return (
-    <header className="hero-stage relative px-4 pb-4 sm:px-6 sm:pb-5 lg:px-8 lg:pt-10">
+    <header className="hero-stage relative px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-5 sm:px-6 sm:pb-6 lg:px-8 lg:pt-10 lg:pb-5">
       <div className="hero-stage__overlay pointer-events-none absolute inset-0" aria-hidden />
       <div className="relative mx-auto max-w-7xl">
         <div className="pb-2.5 lg:pb-0">

@@ -117,7 +117,7 @@ a {
       top: 0;
       z-index: 40;
       padding-top: env(safe-area-inset-top, 0px);
-      padding-bottom: 0.25rem;
+      padding-bottom: 0.5rem;
       background-color: rgba(4, 22, 22, 0.97);
       border-bottom-color: rgba(16, 72, 72, 0.5);
     }
@@ -129,6 +129,16 @@ a {
     .theme-solana-gradient .explore-bar-shell {
       background-color: rgba(4, 22, 22, 0.97);
       border-bottom-color: rgba(20, 241, 149, 0.16);
+    }
+
+    #top-heat,
+    #new-tokens,
+    #defi,
+    #investor,
+    #gaming-demo,
+    #nft-demo,
+    #ai-demo {
+      scroll-margin-top: calc(env(safe-area-inset-top, 0px) + 4.5rem);
     }
   }
 

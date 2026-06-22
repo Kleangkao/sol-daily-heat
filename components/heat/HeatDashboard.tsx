@@ -268,8 +268,8 @@ export default function HeatDashboard() {
         />
       ) : null}
       {awaitingData ? (
-        <main className="mx-auto max-w-7xl px-4 py-5 sm:px-6 sm:py-8 lg:px-8">
-          <div className="lg:hidden">
+        <main className="mx-auto max-w-7xl px-4 pt-6 pb-5 sm:px-6 sm:py-8 lg:px-8">
+          <div className="mb-3 lg:hidden">
             <ExploreBar key="mobile-explore" {...exploreChipProps} />
           </div>
           <div className="hidden lg:block">
@@ -278,8 +278,8 @@ export default function HeatDashboard() {
           <DashboardMainSkeleton />
         </main>
       ) : dashboard ? (
-        <main className="mx-auto max-w-7xl px-4 py-5 sm:px-6 sm:py-8 lg:px-8">
-          <div className="lg:hidden">
+        <main className="mx-auto max-w-7xl px-4 pt-6 pb-5 sm:px-6 sm:py-8 lg:px-8">
+          <div className="mb-3 lg:hidden">
             <ExploreBar key="mobile-explore" {...exploreChipProps} />
           </div>
           <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-[252px_minmax(0,1fr)_252px]">
