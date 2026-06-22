@@ -1,6 +1,6 @@
-/** Solana Gram v0 — static homepage image cards only (no API / DB). */
+/** Solanagram v0 — static homepage image cards only (no API / DB). */
 
-export const SOLANA_GRAM_TITLE = "Solana Gram";
+export const SOLANA_GRAM_TITLE = "Solanagram";
 
 export type SolanaSocialCard = {
   id: string;

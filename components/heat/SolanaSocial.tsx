@@ -3,18 +3,16 @@
 import Image from "next/image";
 import { useCallback, useEffect, useId, useState } from "react";
 import { createPortal } from "react-dom";
-import { solanaGramFont } from "@/lib/fonts/solana-gram-font";
 import {
   SOLANA_GRAM_CARDS,
   SOLANA_GRAM_TITLE,
   type SolanaSocialCard,
 } from "@/lib/social/solana-social";
 
-const GRAM_LOGO_WIDTH = 320;
-const GRAM_LOGO_HEIGHT = 96;
-
-/** Temporarily hidden while evaluating film-strip visuals. */
-const SHOW_FRAME_LABELS = false;
+const GRAM_LOGO_WIDTH = 1000;
+const GRAM_LOGO_HEIGHT = 1000;
+const GRAM_WORDMARK_WIDTH = 1080;
+const GRAM_WORDMARK_HEIGHT = 522;
 
 function thumbObjectClass(card: SolanaSocialCard) {
   if (card.thumbObjectPosition === "top") {
@@ -54,10 +52,8 @@ function SocialImage({
     ? "h-auto w-full object-contain"
     : `h-full w-full ${thumbObjectClass(card)}`;
 
-  const frameClass = uncropped ? "relative w-full" : "relative aspect-[4/3] w-full";
-
   return (
-    <div className={frameClass}>
+    <div className={uncropped ? "film-strip-window film-strip-window-open" : "film-strip-window"}>
       <Image
         src={card.imageSrc}
         alt=""
@@ -133,11 +129,8 @@ function SocialModal({
       >
         <div className="flex shrink-0 items-start justify-between gap-3 border-b border-border px-4 py-3 sm:px-5">
           <div className="min-w-0">
-            <h3
-              id={titleId}
-              className={`${solanaGramFont.className} text-[17px] font-normal tracking-tight text-text-primary sm:text-[18px]`}
-            >
-              {SOLANA_GRAM_TITLE}
+            <h3 id={titleId} className="leading-none">
+              <SolanaGramWordmark variant="modal" />
             </h3>
             <p id={descId} className="mt-0.5 text-[11px] text-text-muted sm:text-[12px]">
               Community photo
@@ -183,26 +176,50 @@ function SocialModal({
   );
 }
 
+function SolanaGramWordmark({
+  variant = "rail",
+}: {
+  variant?: "rail" | "modal";
+}) {
+  const shellClass =
+    variant === "modal"
+      ? "solanagram-wordmark-shell solanagram-wordmark-shell-modal"
+      : "solanagram-wordmark-shell solanagram-wordmark-shell-rail";
+  const imageClass =
+    variant === "modal"
+      ? "solanagram-wordmark solanagram-wordmark-modal"
+      : "solanagram-wordmark solanagram-wordmark-rail";
+
+  return (
+    <div className={shellClass}>
+      <Image
+        src="/brand/solanagram-wordmark.png"
+        alt={SOLANA_GRAM_TITLE}
+        width={GRAM_WORDMARK_WIDTH}
+        height={GRAM_WORDMARK_HEIGHT}
+        className={imageClass}
+        priority
+      />
+    </div>
+  );
+}
+
 function SolanaGramBrand() {
   return (
     <div className="solana-gram-header flex w-full items-center justify-center gap-3 py-0.5">
       {/* TODO: Replace/verify brand font asset before any commercial/public release. */}
       <div className="solana-gram-logo-shell shrink-0 overflow-hidden shadow-sm ring-1 ring-white/10">
         <Image
-          src="/brand/solana-gram-logo.png"
+          src="/brand/solanagram-logo.png"
           alt=""
           width={GRAM_LOGO_WIDTH}
           height={GRAM_LOGO_HEIGHT}
-          className="h-9 w-9 object-cover sm:h-10 sm:w-10"
+          className="h-10 w-10 object-cover sm:h-11 sm:w-11"
           priority
           aria-hidden
         />
       </div>
-      <span
-        className={`${solanaGramFont.className} shrink-0 whitespace-nowrap text-[15px] leading-none tracking-tight text-text-primary sm:text-[16px]`}
-      >
-        {SOLANA_GRAM_TITLE}
-      </span>
+      <SolanaGramWordmark />
     </div>
   );
 }
@@ -243,30 +260,22 @@ export default function SolanaSocial({
         </div>
 
         <div className={feed ? "rail-body-open" : "scrollbar-hidden rail-body-scroll"}>
-          <div className="film-strip-panel">
-            <div className="film-strip-sprockets" aria-hidden />
-            <div className="film-strip-reel">
+          <div className="film-strip">
+            <div className="film-strip-rail" aria-hidden />
+            <div className="film-strip-track">
               {SOLANA_GRAM_CARDS.map((card) => (
                 <button
                   key={card.id}
                   type="button"
                   onClick={() => setActiveId(card.id)}
-                  className="film-strip-cell focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary"
-                  aria-label={`View Solana Gram photo ${card.id.replace("social-", "")}`}
+                  className="film-strip-frame focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary"
+                  aria-label={`View Solanagram photo ${card.id.replace("social-", "")}`}
                 >
                   <SocialImage card={card} uncropped={uncropped} />
-                  {SHOW_FRAME_LABELS ? (
-                    <span className="sr-only">
-                      {card.people.length === 1
-                        ? card.people[0]
-                        : `${card.people.length} people`}
-                      {" · Tap to view"}
-                    </span>
-                  ) : null}
                 </button>
               ))}
             </div>
-            <div className="film-strip-sprockets" aria-hidden />
+            <div className="film-strip-rail" aria-hidden />
           </div>
         </div>
       </section>
