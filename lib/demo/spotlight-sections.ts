@@ -210,7 +210,7 @@ export const AI_DEMO_SECTION: DemoSpotlightSection = {
   cards: [
     {
       id: "bido",
-      name: "BIDO",
+      name: "Bido",
       categoryLabel: "AI",
       imageSrc: "/ai/bido.jpg",
       imageWidth: 800,
