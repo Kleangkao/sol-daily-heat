@@ -17,14 +17,11 @@ function measureStickyTopOffset(): number {
     return Math.ceil(mobileDock.getBoundingClientRect().height);
   }
 
-  const desktopBar = document.querySelector<HTMLElement>(
-    ".hidden.lg\\:block .explore-bar-shell"
-  );
-  if (desktopBar) {
-    return Math.ceil(desktopBar.getBoundingClientRect().height);
-  }
-
   return 72;
+}
+
+function isMobileViewport(): boolean {
+  return window.matchMedia(MOBILE_MQL).matches;
 }
 
 function pickActiveSectionId(
@@ -118,7 +115,7 @@ export function useExploreScrollSpy({
     const visibleEntries = new Map<string, IntersectionObserverEntry>();
 
     const applyActiveSection = () => {
-      if (pauseRef.current) return;
+      if (pauseRef.current || !isMobileViewport()) return;
 
       const topOffset = measureStickyTopOffset();
       const activationLine = topOffset + 4;
@@ -140,6 +137,8 @@ export function useExploreScrollSpy({
     const connectObserver = () => {
       observer?.disconnect();
       visibleEntries.clear();
+
+      if (!isMobileViewport()) return;
 
       const topOffset = measureStickyTopOffset();
 

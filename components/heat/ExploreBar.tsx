@@ -9,9 +9,15 @@ const CHIP_ROW_USER_SCROLL_PAUSE_MS = 1500;
 type Props = {
   activeChip: ExploreChipId;
   onChipClick: (id: ExploreChipId) => void;
+  /** Mobile topic dock only — auto-center active chip on section change. */
+  autoScrollActiveChip?: boolean;
 };
 
-export default function ExploreBar({ activeChip, onChipClick }: Props) {
+export default function ExploreBar({
+  activeChip,
+  onChipClick,
+  autoScrollActiveChip = false,
+}: Props) {
   const navRef = useRef<HTMLElement>(null);
   const chipUserScrollRef = useRef(false);
   const chipUserScrollTimerRef = useRef<ReturnType<typeof setTimeout>>();
@@ -19,6 +25,8 @@ export default function ExploreBar({ activeChip, onChipClick }: Props) {
   const prevActiveChipRef = useRef(activeChip);
 
   useEffect(() => {
+    if (!autoScrollActiveChip) return;
+
     const nav = navRef.current;
     if (!nav) return;
 
@@ -36,9 +44,11 @@ export default function ExploreBar({ activeChip, onChipClick }: Props) {
       nav.removeEventListener("scroll", onNavScroll);
       if (chipUserScrollTimerRef.current) clearTimeout(chipUserScrollTimerRef.current);
     };
-  }, []);
+  }, [autoScrollActiveChip]);
 
   useEffect(() => {
+    if (!autoScrollActiveChip) return;
+
     const chipChanged = prevActiveChipRef.current !== activeChip;
     prevActiveChipRef.current = activeChip;
     if (!chipChanged) return;
@@ -60,7 +70,7 @@ export default function ExploreBar({ activeChip, onChipClick }: Props) {
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [activeChip]);
+  }, [activeChip, autoScrollActiveChip]);
 
   return (
     <div className="explore-bar-shell -mx-4 border-b border-border/70 px-4 sm:-mx-6 sm:px-6 lg:sticky lg:top-0 lg:z-30 lg:mx-0 lg:border-b lg:bg-bg-primary/95 lg:px-0 lg:pb-2 lg:pt-[max(0.25rem,env(safe-area-inset-top,0px))] lg:backdrop-blur-md">

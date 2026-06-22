@@ -228,9 +228,14 @@ export default function HeatDashboard() {
     onChipClick: onExploreChip,
   };
 
+  const mobileExploreChipProps = {
+    ...exploreChipProps,
+    autoScrollActiveChip: true,
+  };
+
   const mobileTopicDock = (
     <div className="mobile-topic-dock mx-auto max-w-7xl px-4 sm:px-6 lg:hidden">
-      <ExploreBar key="mobile-explore" {...exploreChipProps} />
+      <ExploreBar key="mobile-explore" {...mobileExploreChipProps} />
     </div>
   );
 
