@@ -408,6 +408,20 @@ export default function TopicDetailContent({ topic }: Props) {
               </p>
             ))}
           </div>
+          {brief.primarySourceLink ? (
+            <p className="mt-3 text-[13px] leading-snug">
+              <span className="text-text-muted">{brief.primarySourceLink.sourceLabel}</span>
+              <span className="text-text-muted"> · </span>
+              <a
+                href={brief.primarySourceLink.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium text-accent underline-offset-2 hover:underline"
+              >
+                {brief.primarySourceLink.cta}
+              </a>
+            </p>
+          ) : null}
           {!metricEvidence && brief.watchNext.length > 0 ? (
             <div className="mt-4">
               <p className="text-[11px] font-semibold uppercase tracking-wide text-text-muted">

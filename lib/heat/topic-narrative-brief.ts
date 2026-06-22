@@ -2,7 +2,11 @@ import { stripEmDash } from "@/lib/heat/copy-format";
 import type { TopicDetailView } from "@/lib/types/topic-detail";
 import { isGenericRiskNote } from "@/lib/heat/risk-note";
 import { resolveTopicEvidenceDepth } from "@/lib/heat/topic-evidence-depth";
-import { sourcePublicationParagraphs } from "@/lib/heat/source-presented-copy";
+import {
+  resolveTopicPrimarySourceLink,
+  sourceDetailBriefParagraphs,
+  type TopicPrimarySourceLink,
+} from "@/lib/heat/source-presented-copy";
 import { filterSpecificWatchNext } from "@/lib/heat/generic-watch-next";
 import {
   buildReaderDisplayCopy,
@@ -18,11 +22,12 @@ import {
 
 export type TopicNarrativeBrief = {
   mode: "signal_brief" | "narrative_brief";
-  heading: "Signal brief" | "Publication";
+  heading: "Signal brief" | "Source brief";
   paragraphs: string[];
   watchNext: string[];
   caution?: string;
   confidenceNote?: string;
+  primarySourceLink?: TopicPrimarySourceLink;
 };
 
 function isSignalBriefKind(kind: ReaderSignalKind): boolean {
@@ -111,7 +116,7 @@ function defaultEditorialWatchNext(topic: TopicDetailView): string[] {
 }
 
 function narrativeParagraphs(topic: TopicDetailView): string[] {
-  return sourcePublicationParagraphs(topic);
+  return sourceDetailBriefParagraphs(topic);
 }
 
 function buildConfidenceNote(topic: TopicDetailView): string | undefined {
@@ -188,10 +193,11 @@ export function buildTopicNarrativeBrief(topic: TopicDetailView): TopicNarrative
 
   return {
     mode: signalBrief ? "signal_brief" : "narrative_brief",
-    heading: signalBrief ? "Signal brief" : "Publication",
+    heading: signalBrief ? "Signal brief" : "Source brief",
     paragraphs: paragraphs.map(stripEmDash),
     watchNext: filterSpecificWatchNext(uniqueBullets(watchNext)).map(stripEmDash),
     caution: caution ? stripEmDash(caution) : undefined,
     confidenceNote: confidenceNote ? stripEmDash(confidenceNote) : undefined,
+    primarySourceLink: signalBrief ? undefined : resolveTopicPrimarySourceLink(topic),
   };
 }

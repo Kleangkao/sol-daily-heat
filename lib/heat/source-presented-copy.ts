@@ -1,4 +1,10 @@
-import { excerptForCard, stripEmDash } from "@/lib/heat/copy-format";
+import {
+  CARD_EXCERPT_MAX,
+  DETAIL_EXCERPT_MAX,
+  excerptForCard,
+  excerptForDetail,
+  stripEmDash,
+} from "@/lib/heat/copy-format";
 import { uniqueSnippets } from "@/lib/heat/unique-snippets";
 import { normalizeCopyText } from "@/lib/heat/topic-copy-layers";
 import type { ReaderCopyInput } from "@/lib/heat/reader-signal-copy";
@@ -106,8 +112,89 @@ export function sourcePublicationParagraphs(topic: TopicDetailView): string[] {
   });
 }
 
+export type TopicPrimarySourceLink = {
+  url: string;
+  sourceLabel: string;
+  cta: "Read full article →" | "Open primary source →";
+};
+
+function articleSourceCta(
+  topic: TopicDetailView,
+  linkLabel?: string
+): TopicPrimarySourceLink["cta"] {
+  const itemTypes = topic.timeline.map((entry) => entry.itemType);
+  if (itemTypes.some((t) => t === "news" || t === "manual")) {
+    return "Read full article →";
+  }
+  if (linkLabel && /article|blog|news|medium|floor|release/i.test(linkLabel)) {
+    return "Read full article →";
+  }
+  return "Open primary source →";
+}
+
+/** Primary outbound link for the source brief (presentation only). */
+export function resolveTopicPrimarySourceLink(
+  topic: TopicDetailView
+): TopicPrimarySourceLink | undefined {
+  const links = topic.evidence?.sourceLinks ?? [];
+  if (links.length > 0) {
+    const preferred =
+      links.find((link) => /article|blog|news/i.test(link.label)) ?? links[0];
+    return {
+      url: preferred.url,
+      sourceLabel: preferred.label,
+      cta: articleSourceCta(topic, preferred.label),
+    };
+  }
+
+  const timelineEntry =
+    topic.timeline.find((entry) => entry.isPrimary && entry.url) ??
+    topic.timeline.find((entry) => entry.url);
+  if (!timelineEntry?.url) return undefined;
+
+  return {
+    url: timelineEntry.url,
+    sourceLabel: timelineEntry.sourceName,
+    cta: articleSourceCta(
+      topic,
+      timelineEntry.itemType === "news" ? "Article" : timelineEntry.sourceName
+    ),
+  };
+}
+
+/**
+ * Concise source brief for topic detail — excerpted like homepage cards,
+ * up to two paragraphs for distinct multi-source editorial snippets.
+ */
+export function sourceDetailBriefParagraphs(topic: TopicDetailView): string[] {
+  const candidates = buildPublicationParagraphs({
+    title: topic.title,
+    summary: topic.summary,
+    whatHappened: topic.evidence?.whatHappened,
+    sourceSnippets: topic.sourceSnippets,
+    evidenceItems: topic.evidence?.evidenceItems,
+  });
+
+  if (candidates.length === 0) {
+    return [stripEmDash(excerptForDetail(topic.title.trim()))];
+  }
+
+  const paragraphCount = candidates.length >= 2 ? 2 : 1;
+  const maxLen =
+    paragraphCount === 2
+      ? Math.floor(DETAIL_EXCERPT_MAX / 2)
+      : DETAIL_EXCERPT_MAX;
+
+  return candidates
+    .slice(0, paragraphCount)
+    .map((paragraph) => stripEmDash(excerptForDetail(paragraph, maxLen)));
+}
+
 /** Card body: short excerpt from source text (presentation only). */
-export function buildSourceCardExcerpt(input: ReaderCopyInput, maxLen = 168): string | null {
+export function buildSourceCardExcerpt(
+  input: ReaderCopyInput,
+  maxLen = CARD_EXCERPT_MAX
+): string | null {
   const text = pickSourcePublicationText(
     input.summary,
     input.title,
@@ -125,7 +212,7 @@ export function sourcePublicationFromTopic(topic: TopicDetailView): string {
   return sourcePublicationParagraphs(topic).join("\n\n");
 }
 
-/** Card excerpt is expected to be a prefix of the full publication on detail. */
+/** Card excerpt is expected to be a prefix of the detail source brief / full source text. */
 export function isSourceExcerptOverlap(card: string, publication: string): boolean {
   const a = normalizeCopyText(card).replace(/…$/, "");
   const b = normalizeCopyText(publication);
