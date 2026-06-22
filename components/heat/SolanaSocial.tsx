@@ -1,14 +1,17 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useId, useState } from "react";
+import { useCallback, useEffect, useId, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
+import { solanaGramFont } from "@/lib/fonts/solana-gram-font";
 import {
-  SOLANA_SOCIAL_CARDS,
-  SOLANA_SOCIAL_SUBTITLE,
-  SOLANA_SOCIAL_TITLE,
+  SOLANA_GRAM_CARDS,
+  SOLANA_GRAM_TITLE,
   type SolanaSocialCard,
 } from "@/lib/social/solana-social";
+
+const GRAM_LOGO_WIDTH = 320;
+const GRAM_LOGO_HEIGHT = 96;
 
 function thumbObjectClass(card: SolanaSocialCard) {
   if (card.thumbObjectPosition === "top") {
@@ -44,14 +47,14 @@ function SocialImage({
     );
   }
 
+  const imageClass = uncropped
+    ? "h-auto w-full object-contain"
+    : `h-full w-full ${thumbObjectClass(card)}`;
+
+  const frameClass = uncropped ? "relative w-full" : "relative aspect-[4/3] w-full";
+
   return (
-    <div
-      className={
-        uncropped
-          ? "relative w-full overflow-hidden rounded-[8px] border border-border/80 bg-bg-secondary/50"
-          : "relative aspect-[4/3] w-full overflow-hidden rounded-[8px] border border-border/80 bg-bg-secondary"
-      }
-    >
+    <div className={frameClass}>
       <Image
         src={card.imageSrc}
         alt=""
@@ -59,14 +62,24 @@ function SocialImage({
         height={card.imageHeight}
         unoptimized
         loading="eager"
-        className={
-          uncropped
-            ? "h-auto w-full object-contain"
-            : `h-full w-full ${thumbObjectClass(card)}`
-        }
+        className={imageClass}
         sizes={uncropped ? "100vw" : "(max-width: 1024px) 45vw, 240px"}
         aria-hidden
       />
+    </div>
+  );
+}
+
+function FilmStripFrame({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  return (
+    <div className="film-strip-frame">
+      <div className="film-strip-sprockets" aria-hidden />
+      <div className="film-strip-window">{children}</div>
+      <div className="film-strip-sprockets" aria-hidden />
     </div>
   );
 }
@@ -133,9 +146,9 @@ function SocialModal({
           <div className="min-w-0">
             <h3
               id={titleId}
-              className="font-heading text-[17px] font-bold uppercase text-text-primary sm:text-[18px]"
+              className={`${solanaGramFont.className} text-[17px] font-normal tracking-tight text-text-primary sm:text-[18px]`}
             >
-              {SOLANA_SOCIAL_TITLE}
+              {SOLANA_GRAM_TITLE}
             </h3>
             <p id={descId} className="mt-0.5 text-[11px] text-text-muted sm:text-[12px]">
               Community photo
@@ -199,14 +212,18 @@ function SocialCard({
     <button
       type="button"
       onClick={onOpen}
-      className="w-full overflow-hidden rounded-[10px] border border-border bg-bg-card/60 text-left transition-colors hover:border-accent/40 hover:bg-bg-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary"
+      className="film-strip-card text-left transition-transform duration-200 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary"
     >
-      <SocialImage card={card} uncropped={uncropped} />
-      <div className="px-2 pb-2 pt-1.5">
+      <FilmStripFrame>
+        <SocialImage card={card} uncropped={uncropped} />
+      </FilmStripFrame>
+      <div className="film-strip-caption">
         <p className="truncate text-[11px] font-semibold text-text-primary lg:text-[12px]">
           {peopleLabel}
         </p>
-        <p className={`mt-0.5 text-[10px] text-text-muted ${showTapHint ? "block" : "hidden lg:block"}`}>
+        <p
+          className={`mt-0.5 text-[10px] text-text-muted ${showTapHint ? "block" : "hidden lg:block"}`}
+        >
           Tap to view
         </p>
       </div>
@@ -214,8 +231,30 @@ function SocialCard({
   );
 }
 
+function SolanaGramBrand() {
+  return (
+    <div className="flex min-w-0 items-center gap-2">
+      {/* TODO: Replace/verify brand font asset before any commercial/public release. */}
+      <Image
+        src="/brand/solana-gram-logo.png"
+        alt=""
+        width={GRAM_LOGO_WIDTH}
+        height={GRAM_LOGO_HEIGHT}
+        className="h-7 w-auto max-w-[42%] shrink-0 object-contain object-left sm:h-8"
+        priority
+        aria-hidden
+      />
+      <span
+        className={`${solanaGramFont.className} truncate text-[15px] leading-none tracking-tight text-text-primary sm:text-[16px]`}
+      >
+        {SOLANA_GRAM_TITLE}
+      </span>
+    </div>
+  );
+}
+
 export default function SolanaSocial({
-  headingId = "solana-social-heading",
+  headingId = "solana-gram-heading",
   compact = false,
   feed = false,
 }: {
@@ -225,7 +264,7 @@ export default function SolanaSocial({
   feed?: boolean;
 }) {
   const [activeId, setActiveId] = useState<string | null>(null);
-  const active = SOLANA_SOCIAL_CARDS.find((c) => c.id === activeId) ?? null;
+  const active = SOLANA_GRAM_CARDS.find((c) => c.id === activeId) ?? null;
 
   const close = useCallback(() => setActiveId(null), []);
 
@@ -242,22 +281,16 @@ export default function SolanaSocial({
         className={`${shellClass} rounded-[12px] border border-border bg-bg-secondary/30 p-2.5 sm:p-3`}
       >
         <div className="rail-shell-header shrink-0">
-          <h2
-            id={headingId}
-            className="editorial-pipe font-heading text-[13px] font-bold uppercase tracking-tight text-text-primary lg:text-[14px]"
-          >
-            {SOLANA_SOCIAL_TITLE}
+          <h2 id={headingId} className="min-w-0">
+            <SolanaGramBrand />
           </h2>
-          <p className="mt-0.5 text-[10px] text-text-muted lg:mt-1 lg:text-[11px]">
-            {SOLANA_SOCIAL_SUBTITLE}
-          </p>
         </div>
 
         <div className={feed ? "rail-body-open" : "scrollbar-hidden rail-body-scroll"}>
           <div
             className={`grid gap-3 ${feed ? "grid-cols-1" : compact ? "grid-cols-1" : "grid-cols-2 lg:grid-cols-1"}`}
           >
-            {SOLANA_SOCIAL_CARDS.map((card) => (
+            {SOLANA_GRAM_CARDS.map((card) => (
               <SocialCard
                 key={card.id}
                 card={card}

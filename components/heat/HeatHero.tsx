@@ -1,8 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { formatSnapshotArchiveHeading } from "@/lib/heat/snapshot-date";
+import { USE_SOLANA_GRADIENT_THEME } from "@/lib/theme/background-theme";
 import IslandDaoSponsorsRail from "./IslandDaoSponsorsRail";
 import SolanaSpaceBrand from "./SolanaSpaceBrand";
+import SolanaWordmarkGradient from "./SolanaWordmarkGradient";
 import WalletConnectButton from "@/components/wallet/WalletConnectButton";
 
 const WORDMARK_WIDTH = 262;
@@ -34,19 +36,36 @@ export default function HeatHero({ archiveDate }: Props) {
         </div>
 
         <h1 className="mt-4 max-w-3xl sm:mt-6 lg:mt-8">
-          <span className="sr-only">What&apos;s Hot on Solana</span>
+          <span className="sr-only">What&apos;s Hot on Solana ⚡</span>
           <span className="inline-flex flex-wrap items-end gap-x-2" aria-hidden>
             <span className="translate-y-[2px] text-[16px] font-semibold uppercase leading-none tracking-[0.12em] text-text-primary sm:translate-y-[2px] sm:text-[17px]">
               What&apos;s Hot on
             </span>
-            <Image
-              src="/brand/solana-wordmark.svg"
-              alt=""
-              width={WORDMARK_WIDTH}
-              height={WORDMARK_HEIGHT}
-              className="h-[13px] w-auto shrink-0 sm:h-[14px]"
-              priority
-            />
+            {USE_SOLANA_GRADIENT_THEME ? (
+              <>
+                <Image
+                  src="/brand/solana-wordmark.svg"
+                  alt=""
+                  width={WORDMARK_WIDTH}
+                  height={WORDMARK_HEIGHT}
+                  className="h-[13px] w-auto shrink-0 lg:hidden sm:h-[14px]"
+                  priority
+                />
+                <SolanaWordmarkGradient className="hidden h-[13px] w-auto shrink-0 lg:block sm:h-[14px]" />
+              </>
+            ) : (
+              <Image
+                src="/brand/solana-wordmark.svg"
+                alt=""
+                width={WORDMARK_WIDTH}
+                height={WORDMARK_HEIGHT}
+                className="h-[13px] w-auto shrink-0 sm:h-[14px]"
+                priority
+              />
+            )}
+            <span className="translate-y-[1px] text-[15px] leading-none sm:text-[16px]" aria-hidden>
+              ⚡
+            </span>
           </span>
         </h1>
 

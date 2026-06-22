@@ -6,10 +6,10 @@ export const PRODUCT_TAGLINE =
   "Daily heat, standout signals, and curated ecosystem activity — not every headline, not every launch.";
 
 export const HOT_ON_SOLANA = {
-  title: "Hot on Solana",
-  shortLabel: "Hot",
-  exploreLabel: "Hot on Solana",
-  rankingSectionLabel: "Hot on Solana Today",
+  title: "Solana Daily Heat 🔥",
+  shortLabel: "Daily Heat",
+  exploreLabel: "Solana Daily Heat 🔥",
+  rankingSectionLabel: "Solana Daily Heat 🔥",
   description:
     "Highest-confidence heat scores for the UTC snapshot — important signals and standout ecosystem activity, rule-ranked and deduplicated.",
   pulseBadge: "Mentioned in Hot on Solana",

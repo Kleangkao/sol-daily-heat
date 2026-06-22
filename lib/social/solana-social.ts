@@ -1,7 +1,6 @@
-/** Solana Social v0 — static homepage image cards only (no API / DB). */
+/** Solana Gram v0 — static homepage image cards only (no API / DB). */
 
-export const SOLANA_SOCIAL_TITLE = "Solana Social";
-export const SOLANA_SOCIAL_SUBTITLE = "What's happening in the Solana world";
+export const SOLANA_GRAM_TITLE = "Solana Gram";
 
 export type SolanaSocialCard = {
   id: string;
@@ -14,7 +13,7 @@ export type SolanaSocialCard = {
 };
 
 /** Image files: resource for pic/1.jpg … 5.jpg */
-export const SOLANA_SOCIAL_CARDS: SolanaSocialCard[] = [
+export const SOLANA_GRAM_CARDS: SolanaSocialCard[] = [
   {
     id: "social-1",
     imageSrc: "/social/1.jpg",

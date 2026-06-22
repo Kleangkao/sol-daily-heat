@@ -1,6 +1,6 @@
 import type { DashboardSectionDomId } from "@/lib/heat/section-collapse";
-import { CATEGORY_LABELS } from "@/lib/types/heat";
 import type { TopicCategory } from "@/lib/types/db";
+import { categoryTopicTagLabel } from "@/lib/heat/category-display";
 import {
   AI_DEMO_SECTION,
   GAMING_DEMO_SECTION,
@@ -73,13 +73,13 @@ export type ExploreChipAction =
 export const EXPLORE_CHIPS: { id: ExploreChipId; label: string }[] = [
   { id: "top-heat", label: HOT_ON_SOLANA.exploreLabel },
   { id: "new-tokens", label: NEW_AND_TRENDING.exploreLabel },
-  { id: "defi", label: CATEGORY_LABELS.defi },
-  { id: "meme", label: CATEGORY_LABELS.meme },
-  { id: "infra", label: CATEGORY_LABELS.infra },
-  { id: "gaming", label: CATEGORY_LABELS.gaming },
-  { id: "nft", label: CATEGORY_LABELS.nft },
-  { id: "ai", label: CATEGORY_LABELS.ai },
-  { id: "regulatory", label: CATEGORY_LABELS.regulatory },
+  { id: "defi", label: categoryTopicTagLabel("defi") },
+  { id: "meme", label: categoryTopicTagLabel("meme") },
+  { id: "infra", label: categoryTopicTagLabel("infra") },
+  { id: "gaming", label: categoryTopicTagLabel("gaming") },
+  { id: "nft", label: categoryTopicTagLabel("nft") },
+  { id: "ai", label: categoryTopicTagLabel("ai") },
+  { id: "regulatory", label: categoryTopicTagLabel("regulatory") },
   { id: "builder", label: "Builder" },
   { id: "creator", label: CREATOR_SPACE.exploreLabel },
   { id: "investor", label: "Investor" },
