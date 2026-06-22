@@ -185,21 +185,21 @@ function SocialModal({
 
 function SolanaGramBrand() {
   return (
-    <div className="flex w-full flex-col items-center justify-center gap-1.5 py-0.5 text-center">
+    <div className="solana-gram-header flex w-full items-center justify-center gap-3 py-0.5">
       {/* TODO: Replace/verify brand font asset before any commercial/public release. */}
-      <div className="solana-gram-logo-shell overflow-hidden rounded-[16px] shadow-sm ring-1 ring-white/10">
+      <div className="solana-gram-logo-shell shrink-0 overflow-hidden shadow-sm ring-1 ring-white/10">
         <Image
           src="/brand/solana-gram-logo.png"
           alt=""
           width={GRAM_LOGO_WIDTH}
           height={GRAM_LOGO_HEIGHT}
-          className="h-8 w-auto max-w-[min(140px,72%)] object-contain rounded-[14px] sm:h-9"
+          className="h-9 w-9 object-cover sm:h-10 sm:w-10"
           priority
           aria-hidden
         />
       </div>
       <span
-        className={`${solanaGramFont.className} text-[15px] leading-none tracking-tight text-text-primary sm:text-[16px]`}
+        className={`${solanaGramFont.className} shrink-0 whitespace-nowrap text-[15px] leading-none tracking-tight text-text-primary sm:text-[16px]`}
       >
         {SOLANA_GRAM_TITLE}
       </span>

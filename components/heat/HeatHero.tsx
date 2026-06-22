@@ -64,7 +64,7 @@ export default function HeatHero({ archiveDate }: Props) {
                 priority
               />
             )}
-            <span className="translate-y-[1px] text-[15px] leading-none sm:text-[16px]" aria-hidden>
+            <span className="inline-flex items-center" aria-hidden>
               <HeroLightningEmoji />
             </span>
           </span>
