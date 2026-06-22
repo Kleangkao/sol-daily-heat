@@ -7,15 +7,17 @@ export default function HomePageLoadingFallback() {
   return (
     <div className="min-h-screen">
       <HeatHero />
-      <div className="mobile-topic-dock mx-auto max-w-7xl px-4 sm:px-6 lg:hidden">
-        <ExploreBarSkeleton />
-      </div>
-      <main className="mx-auto max-w-7xl px-4 pt-4 pb-5 sm:px-6 sm:py-8 lg:px-8">
-        <div className="hidden lg:block">
+      <div className="mobile-page-shell">
+        <div className="mobile-topic-dock mx-auto max-w-7xl px-4 sm:px-6 lg:hidden">
           <ExploreBarSkeleton />
         </div>
-        <DashboardMainSkeleton />
-      </main>
+        <main className="mx-auto max-w-7xl px-4 pt-4 pb-5 sm:px-6 sm:py-8 lg:px-8">
+          <div className="hidden lg:block">
+            <ExploreBarSkeleton />
+          </div>
+          <DashboardMainSkeleton />
+        </main>
+      </div>
     </div>
   );
 }

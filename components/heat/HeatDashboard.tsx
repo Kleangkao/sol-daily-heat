@@ -273,16 +273,17 @@ export default function HeatDashboard() {
           snapshotDate={dashboard.date}
         />
       ) : null}
-      {mobileTopicDock}
-      {awaitingData ? (
-        <main className="mx-auto max-w-7xl px-4 pt-4 pb-5 sm:px-6 sm:py-8 lg:px-8">
-          <div className="hidden lg:block">
-            <ExploreBar key="desktop-explore" {...exploreChipProps} />
-          </div>
-          <DashboardMainSkeleton />
-        </main>
-      ) : dashboard ? (
-        <main className="mx-auto max-w-7xl px-4 pt-4 pb-5 sm:px-6 sm:py-8 lg:px-8">
+      <div className="mobile-page-shell">
+        {mobileTopicDock}
+        {awaitingData ? (
+          <main className="mx-auto max-w-7xl px-4 pt-4 pb-5 sm:px-6 sm:py-8 lg:px-8">
+            <div className="hidden lg:block">
+              <ExploreBar key="desktop-explore" {...exploreChipProps} />
+            </div>
+            <DashboardMainSkeleton />
+          </main>
+        ) : dashboard ? (
+          <main className="mx-auto max-w-7xl px-4 pt-4 pb-5 sm:px-6 sm:py-8 lg:px-8">
           <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-[252px_minmax(0,1fr)_252px]">
             <aside className="hidden lg:block">
               <div className="sticky top-4">
@@ -382,7 +383,8 @@ export default function HeatDashboard() {
             </aside>
           </div>
         </main>
-      ) : null}
+        ) : null}
+      </div>
     </div>
   );
 }

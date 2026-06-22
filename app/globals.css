@@ -112,28 +112,37 @@ a {
   }
 
   @media (max-width: 1023px) {
-    .mobile-topic-dock {
+    .mobile-page-shell {
       position: relative;
-      z-index: 40;
     }
 
-    .explore-bar-shell {
+    .mobile-topic-dock {
       position: sticky;
       top: 0;
       z-index: 40;
       padding-top: env(safe-area-inset-top, 0px);
       padding-bottom: 0.5rem;
       background-color: rgba(4, 22, 22, 0.97);
-      border-bottom-color: rgba(16, 72, 72, 0.5);
+      border-bottom: 1px solid rgba(16, 72, 72, 0.5);
+    }
+
+    .mobile-topic-dock .explore-bar-shell {
+      position: static;
+      top: auto;
+      z-index: auto;
+      padding-top: 0;
+      padding-bottom: 0;
+      background-color: transparent;
+      border-bottom: 0;
+    }
+
+    .theme-solana-gradient .mobile-topic-dock {
+      background-color: rgba(4, 22, 22, 0.97);
+      border-bottom-color: rgba(20, 241, 149, 0.16);
     }
 
     .explore-bar-shell nav {
       padding-bottom: 0;
-    }
-
-    .theme-solana-gradient .explore-bar-shell {
-      background-color: rgba(4, 22, 22, 0.97);
-      border-bottom-color: rgba(20, 241, 149, 0.16);
     }
 
     #top-heat,
