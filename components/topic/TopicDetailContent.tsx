@@ -18,6 +18,7 @@ import {
 import { classifyReaderSignal } from "@/lib/heat/reader-signal-copy";
 import { buildHeatScoreContext } from "@/lib/heat/heat-score-context";
 import { buildHeatDrivers } from "@/lib/heat/heat-score-drivers";
+import { buildTopicHeatRationale } from "@/lib/heat/topic-heat-rationale";
 import { resolveProtocolDisplayRoles } from "@/lib/heat/protocol-display-roles";
 import {
   buildTopicMetricEvidence,
@@ -213,6 +214,7 @@ export default function TopicDetailContent({ topic }: Props) {
     category: displayCategory,
     uniqueSourceCount: topic.uniqueSourceCount,
   });
+  const heatRationale = buildTopicHeatRationale(topic);
   const rankedLine = formatSectionRanks(topic.sectionAppearancesToday);
   const appearsIn = formatAppearsIn(topic.sectionAppearancesToday);
   const hasSourceLinks = (topic.evidence?.sourceLinks.length ?? 0) > 0;
@@ -433,6 +435,19 @@ export default function TopicDetailContent({ topic }: Props) {
             <p className="mt-4 text-[12px] leading-relaxed text-amber-200/90">{brief.caution}</p>
           ) : null}
         </section>
+
+        {heatRationale.length > 0 ? (
+          <section className="mt-6 rounded-[10px] border border-border bg-bg-card p-5">
+            <h2 className="font-heading text-[18px] font-bold uppercase tracking-wide text-text-primary">
+              Why this is hot
+            </h2>
+            <ul className="mt-3 list-disc space-y-2 pl-5 text-[14px] leading-relaxed text-text-secondary">
+              {heatRationale.map((bullet, i) => (
+                <li key={`why-hot-${i}`}>{bullet}</li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
 
         {metricEvidence ? (
           <details className="group mt-6 rounded-[10px] border border-border bg-bg-card">
