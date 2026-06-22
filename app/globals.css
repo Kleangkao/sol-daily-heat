@@ -112,6 +112,11 @@ a {
   }
 
   @media (max-width: 1023px) {
+    .mobile-topic-dock {
+      position: relative;
+      z-index: 40;
+    }
+
     .explore-bar-shell {
       position: sticky;
       top: 0;
