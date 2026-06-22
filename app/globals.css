@@ -112,22 +112,22 @@ a {
   }
 
   @media (max-width: 1023px) {
-    :root {
-      --mobile-head-block: 5.875rem;
-    }
-
-    @media (min-width: 640px) {
-      :root {
-        --mobile-head-block: 6.25rem;
-      }
-    }
-
-    .explore-bar-shell {
+    .mobile-heat-sticky {
       position: sticky;
-      top: calc(var(--mobile-head-block) + env(safe-area-inset-top, 0px));
-      z-index: 40;
-      padding-top: 0.75rem;
+      top: 0;
+      z-index: 50;
+    }
+
+    .mobile-heat-sticky .explore-bar-shell {
+      position: static;
+      top: auto;
+      z-index: auto;
+      margin-top: -0.125rem;
+      padding-top: 0;
       padding-bottom: 0.625rem;
+      border-bottom: 0;
+      background: transparent;
+      backdrop-filter: none;
     }
   }
 

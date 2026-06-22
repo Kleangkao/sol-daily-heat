@@ -4,7 +4,7 @@ export default function ExploreBarSkeleton() {
 
   return (
     <div
-      className="explore-bar-shell sticky -mx-4 border-b border-border/70 bg-bg-primary/95 px-4 backdrop-blur-md sm:-mx-6 sm:px-6 lg:top-0 lg:z-30 lg:mx-0 lg:px-0 lg:pb-2 lg:pt-[max(0.25rem,env(safe-area-inset-top,0px))]"
+      className="explore-bar-shell -mx-4 border-b border-border/70 px-4 sm:-mx-6 sm:px-6 lg:sticky lg:top-0 lg:z-30 lg:mx-0 lg:border-b lg:bg-bg-primary/95 lg:px-0 lg:pb-2 lg:pt-[max(0.25rem,env(safe-area-inset-top,0px))] lg:backdrop-blur-md"
       aria-hidden
     >
       <div className="flex gap-2 overflow-hidden pb-0.5">

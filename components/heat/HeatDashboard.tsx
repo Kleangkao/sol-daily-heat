@@ -253,9 +253,15 @@ export default function HeatDashboard() {
           ? "Demo mock data"
           : "";
 
+  const exploreBar = (
+    <ExploreBar activeChip={activeExploreChip} onChipClick={onExploreChip} />
+  );
+
+  const mobileExploreBar = <div className="lg:hidden">{exploreBar}</div>;
+
   return (
     <div className="min-h-screen">
-      <HeatHero archiveDate={archiveDate} />
+      <HeatHero archiveDate={archiveDate} mobileStickySlot={mobileExploreBar} />
       {dashboard && dashboard.dataSource && dashboard.dataSource !== "live" ? (
         <DemoPreviewBanner
           dataSource={dashboard.dataSource}
@@ -264,7 +270,7 @@ export default function HeatDashboard() {
       ) : null}
       {awaitingData ? (
         <main className="mx-auto max-w-7xl px-4 py-5 sm:px-6 sm:py-8 lg:px-8">
-          <ExploreBar activeChip={activeExploreChip} onChipClick={onExploreChip} />
+          <div className="hidden lg:block">{exploreBar}</div>
           <DashboardMainSkeleton />
         </main>
       ) : dashboard ? (
@@ -277,7 +283,7 @@ export default function HeatDashboard() {
             </aside>
 
             <div className="min-w-0">
-              <ExploreBar activeChip={activeExploreChip} onChipClick={onExploreChip} />
+              <div className="hidden lg:block">{exploreBar}</div>
 
               <HeatSection
                 title={<DailyHeatTitle />}

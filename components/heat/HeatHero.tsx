@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { formatSnapshotArchiveHeading } from "@/lib/heat/snapshot-date";
 import { USE_SOLANA_GRADIENT_THEME } from "@/lib/theme/background-theme";
 import IslandDaoSponsorsRail from "./IslandDaoSponsorsRail";
@@ -14,6 +15,8 @@ const WORDMARK_HEIGHT = 40;
 type Props = {
   /** Set when viewing ?date= archive (not latest). */
   archiveDate?: string;
+  /** Mobile-only slot rendered inside the sticky head stack (e.g. ExploreBar). */
+  mobileStickySlot?: ReactNode;
 };
 
 function HeroHeadRow() {
@@ -27,13 +30,16 @@ function HeroHeadRow() {
   );
 }
 
-export default function HeatHero({ archiveDate }: Props) {
+export default function HeatHero({ archiveDate, mobileStickySlot }: Props) {
   return (
     <header className="hero-stage relative px-4 pb-4 sm:px-6 sm:pb-5 lg:px-8 lg:pt-10">
       <div className="hero-stage__overlay pointer-events-none absolute inset-0" aria-hidden />
       <div className="relative mx-auto max-w-7xl">
-        <div className="mobile-head-lock sticky top-0 z-50 -mx-4 border-b border-border/60 bg-bg-primary/95 px-4 pb-2.5 pt-[max(0.5rem,env(safe-area-inset-top,0px))] backdrop-blur-md sm:-mx-6 sm:px-6 lg:static lg:mx-0 lg:border-b-0 lg:bg-transparent lg:px-0 lg:pb-0 lg:pt-0 lg:backdrop-blur-none">
-          <HeroHeadRow />
+        <div className="mobile-heat-sticky -mx-4 border-b border-border/60 bg-bg-primary/95 px-4 pt-[max(0.5rem,env(safe-area-inset-top,0px))] backdrop-blur-md sm:-mx-6 sm:px-6 lg:static lg:mx-0 lg:border-b-0 lg:bg-transparent lg:px-0 lg:pt-0 lg:backdrop-blur-none">
+          <div className="pb-2.5 lg:pb-0">
+            <HeroHeadRow />
+          </div>
+          {mobileStickySlot}
         </div>
 
         <h1 className="mt-4 max-w-3xl sm:mt-6 lg:mt-8">
