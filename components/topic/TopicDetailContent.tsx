@@ -5,8 +5,6 @@ import type { EvidenceItem, EvidenceKind } from "@/lib/types/evidence";
 import { CATEGORY_LABELS } from "@/lib/types/heat";
 import { canLinkTokenDetail, tokenDetailPath } from "@/lib/heat/token-link";
 import HeatScoreBadge from "@/components/heat/HeatScoreBadge";
-import ScoreBreakdown from "@/components/heat/ScoreBreakdown";
-import { explainScoreBreakdown } from "@/lib/heat/score-breakdown-explainer";
 import { buildTopicNarrativeBrief } from "@/lib/heat/topic-narrative-brief";
 import {
   resolveTopicTimelineEntries,
@@ -142,9 +140,6 @@ export default function TopicDetailContent({ topic }: Props) {
   const mixedMetrics = buildTopicMixedMetrics(topic);
   const sectionCount = topic.sectionAppearancesToday.length;
   const personaInput = personaInputFromTopic(topic);
-  const scoreRows = explainScoreBreakdown(topic.scoreBreakdown, {
-    uniqueSourceCount: topic.uniqueSourceCount,
-  });
   const evidenceGroups = groupEvidence(topic.evidence);
   const displayOrder: DisplayEvidenceKind[] = [
     "fact",
@@ -697,70 +692,6 @@ export default function TopicDetailContent({ topic }: Props) {
               </ol>
         </section>
         ) : null}
-
-        <details className="mt-6 rounded-[10px] border border-border bg-bg-card group">
-          <summary className="cursor-pointer list-none px-5 py-4 text-[13px] font-semibold text-text-secondary transition-colors hover:text-accent [&::-webkit-details-marker]:hidden">
-            <span className="text-accent group-open:text-text-primary">
-              How this heat score was calculated
-            </span>
-            <span className="ml-2 text-[11px] font-normal text-text-muted">
-              (scoring details)
-            </span>
-          </summary>
-          <div className="border-t border-border px-5 py-4">
-            <h2 className="font-heading text-[16px] font-bold uppercase tracking-wide text-text-primary">
-              Scoring details
-            </h2>
-            <p className="mt-1 text-[13px] text-text-secondary">
-              {topic.heatScore != null ? (
-                <>
-                  Scanner heat {topic.heatScore} for {topic.rankingDate}. Last refreshed{" "}
-                  {formatDetailDateTime(topic.lastUpdatedAt)}. Components only appear when they
-                  affected the score.
-                </>
-              ) : (
-                <>
-                  No published heat ranking for {topic.rankingDate}.
-                  {topic.confidence > 0 ? (
-                    <span className="mt-1 block text-[12px] text-text-muted">
-                      Cluster confidence (not heat): {topic.confidence.toFixed(2)}
-                    </span>
-                  ) : null}
-                </>
-              )}
-            </p>
-            {topic.heatScore != null ? (
-              <ScoreBreakdown
-                breakdown={topic.scoreBreakdown as Record<string, number>}
-                score={topic.heatScore}
-                inline
-              />
-            ) : null}
-            {scoreRows.length > 0 ? (
-              <ul className="mt-4 space-y-3">
-                {scoreRows.map((row) => (
-                  <li
-                    key={row.key}
-                    className="rounded-[8px] border border-border/50 bg-bg-secondary/40 px-3 py-2.5"
-                  >
-                    <div className="flex items-center justify-between gap-2 text-[13px]">
-                      <span className="font-semibold text-text-primary">{row.label}</span>
-                      <span className="font-mono text-text-primary">
-                        {row.points > 0 ? "+" : ""}
-                        {row.points}
-                      </span>
-                    </div>
-                    <p className="mt-1 text-[12px] leading-relaxed text-text-secondary">
-                      {row.explanation}
-                    </p>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="mt-3 text-[12px] text-text-muted">No score components stored.</p>
-            )}
-          </div>
-        </details>
 
         <footer className="mt-10 border-t border-border py-6 text-center text-[12px] text-text-muted">
           <Link href="/" className="text-accent hover:underline">
