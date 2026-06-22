@@ -143,14 +143,15 @@ a {
   }
 
   .film-strip {
-    --film-rail-w: 1.05rem;
+    --film-rail-w: 1.2rem;
     --film-body: #f3efe6;
     --film-body-edge: rgba(0, 0, 0, 0.09);
-    --film-hole-h: 6px;
+    --film-hole-color: var(--deep-900);
+    --film-hole-h: 8px;
     --film-hole-w: 5px;
-    --film-hole-pitch-y: 13px;
+    --film-hole-pitch-y: 11px;
     --film-hole-pitch-x: 11px;
-    --film-frame-pad-x: 0.4rem;
+    --film-frame-pad-x: 0.38rem;
     --film-frame-pad-y: 0.35rem;
     --film-bridge-h: 15px;
     display: flex;
@@ -168,28 +169,21 @@ a {
 
   .film-strip-rail {
     flex: 0 0 var(--film-rail-w);
-    background: var(--film-body);
+    background-color: var(--film-body);
+    background-image: repeating-linear-gradient(
+      180deg,
+      var(--film-body) 0,
+      var(--film-body) calc((var(--film-hole-pitch-y) - var(--film-hole-h)) / 2),
+      var(--film-hole-color) calc((var(--film-hole-pitch-y) - var(--film-hole-h)) / 2),
+      var(--film-hole-color)
+        calc((var(--film-hole-pitch-y) - var(--film-hole-h)) / 2 + var(--film-hole-h)),
+      var(--film-body) calc((var(--film-hole-pitch-y) - var(--film-hole-h)) / 2 + var(--film-hole-h)),
+      var(--film-body) var(--film-hole-pitch-y)
+    );
+    background-size: 84% var(--film-hole-pitch-y);
+    background-position: center top;
+    background-repeat: repeat-y;
     box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35);
-    -webkit-mask-image: repeating-linear-gradient(
-      180deg,
-      #000 0,
-      #000 calc(var(--film-hole-pitch-y) - var(--film-hole-h)),
-      transparent calc(var(--film-hole-pitch-y) - var(--film-hole-h)),
-      transparent var(--film-hole-pitch-y)
-    );
-    mask-image: repeating-linear-gradient(
-      180deg,
-      #000 0,
-      #000 calc(var(--film-hole-pitch-y) - var(--film-hole-h)),
-      transparent calc(var(--film-hole-pitch-y) - var(--film-hole-h)),
-      transparent var(--film-hole-pitch-y)
-    );
-    -webkit-mask-size: 72% var(--film-hole-pitch-y);
-    mask-size: 72% var(--film-hole-pitch-y);
-    -webkit-mask-position: center top;
-    mask-position: center top;
-    -webkit-mask-repeat: repeat-y;
-    mask-repeat: repeat-y;
   }
 
   .film-strip-rail:first-of-type {
