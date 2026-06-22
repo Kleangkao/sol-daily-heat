@@ -12,7 +12,7 @@ export default function HomePageLoadingFallback() {
           <ExploreBarSkeleton />
         </div>
         <main className="mx-auto max-w-7xl px-4 pt-4 pb-5 sm:px-6 sm:py-8 lg:px-8">
-          <div className="hidden lg:block">
+          <div className="desktop-topic-dock hidden lg:block">
             <ExploreBarSkeleton />
           </div>
           <DashboardMainSkeleton />

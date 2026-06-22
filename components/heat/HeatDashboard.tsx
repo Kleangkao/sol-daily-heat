@@ -239,6 +239,12 @@ export default function HeatDashboard() {
     </div>
   );
 
+  const desktopTopicDock = (
+    <div className="desktop-topic-dock hidden lg:block">
+      <ExploreBar key="desktop-explore" {...exploreChipProps} />
+    </div>
+  );
+
   return (
     <div className="min-h-screen">
       <HeatHero archiveDate={archiveDate} />
@@ -252,9 +258,7 @@ export default function HeatDashboard() {
         {mobileTopicDock}
         {awaitingData ? (
           <main className="mx-auto max-w-7xl px-4 pt-4 pb-5 sm:px-6 sm:py-8 lg:px-8">
-            <div className="hidden lg:block">
-              <ExploreBar key="desktop-explore" {...exploreChipProps} />
-            </div>
+            {desktopTopicDock}
             <DashboardMainSkeleton />
           </main>
         ) : dashboard ? (
@@ -267,9 +271,7 @@ export default function HeatDashboard() {
             </aside>
 
             <div className="min-w-0">
-              <div className="hidden lg:block">
-            <ExploreBar key="desktop-explore" {...exploreChipProps} />
-          </div>
+              {desktopTopicDock}
 
               <HeatSection
                 title={<DailyHeatTitle />}

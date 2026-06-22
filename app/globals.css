@@ -156,6 +156,34 @@ a {
     }
   }
 
+  @media (min-width: 1024px) {
+    .desktop-topic-dock {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      padding-top: max(0.25rem, env(safe-area-inset-top, 0px));
+      padding-bottom: 0.5rem;
+      background-color: rgba(4, 22, 22, 0.97);
+      border-bottom: 1px solid rgba(16, 72, 72, 0.5);
+    }
+
+    .desktop-topic-dock .explore-bar-shell {
+      position: static;
+      top: auto;
+      z-index: auto;
+      padding-top: 0;
+      padding-bottom: 0;
+      background-color: transparent;
+      border-bottom: 0;
+      backdrop-filter: none;
+    }
+
+    .theme-solana-gradient .desktop-topic-dock {
+      background-color: rgba(4, 22, 22, 0.97);
+      border-bottom-color: rgba(20, 241, 149, 0.16);
+    }
+  }
+
   .rail-shell-header {
     flex-shrink: 0;
   }
