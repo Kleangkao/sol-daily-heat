@@ -45,7 +45,7 @@ export function SolanaWalletProvider({ children }: { children: ReactNode }) {
   const [address, setAddress] = useState<string | null>(null);
   const [walletId, setWalletId] = useState<BrowserWalletId | null>(null);
   const [connecting, setConnecting] = useState(false);
-  const [reconnecting, setReconnecting] = useState(true);
+  const [reconnecting, setReconnecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -53,11 +53,14 @@ export function SolanaWalletProvider({ children }: { children: ReactNode }) {
     let cancelled = false;
 
     async function restoreWallet() {
+      const savedId = getSavedBrowserWalletId();
+      if (!savedId) {
+        setReconnecting(false);
+        return;
+      }
+
       setReconnecting(true);
       try {
-        const savedId = getSavedBrowserWalletId();
-        if (!savedId) return;
-
         const restored = await tryAutoConnectBrowserWallet(savedId);
         if (cancelled) return;
 
