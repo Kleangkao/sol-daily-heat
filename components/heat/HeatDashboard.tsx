@@ -13,8 +13,6 @@ import {
 import {
   deriveActiveExploreChip,
   DEMO_TOPIC_SECTION_IDS,
-  EXPLORE_SCROLL_SECTION_IDS,
-  exploreChipForSectionElementId,
   resolveExploreChipAction,
   type ExploreChipId,
 } from "@/lib/heat/explore-navigation";
@@ -41,6 +39,7 @@ import SolanaSocial from "./SolanaSocial";
 import DemoSpotlightSection from "./DemoSpotlightSection";
 import { HOMEPAGE_DEMO_SECTIONS } from "@/lib/demo/spotlight-sections";
 import { useSectionOpenState } from "./useSectionOpenState";
+import { useExploreScrollSpy, useScrollSpyControls } from "./useExploreScrollSpy";
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
@@ -62,6 +61,7 @@ export default function HeatDashboard() {
   );
   const { open: sectionOpen, toggleSection, navigateToSection, navigateToSections } =
     useSectionOpenState();
+  const { pauseRef, pauseScrollSpy } = useScrollSpyControls();
 
   useEffect(() => {
     const locationHash = window.location.hash;
@@ -94,43 +94,12 @@ export default function HeatDashboard() {
   const awaitingData = data == null && (isLoading || isValidating);
   const dashboard = data ?? null;
 
-  useEffect(() => {
-    if (!dashboard) return;
-
-    const visible = new Map<string, number>();
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            visible.set(entry.target.id, entry.intersectionRatio);
-          } else {
-            visible.delete(entry.target.id);
-          }
-        }
-
-        if (visible.size === 0) return;
-
-        const bestId = Array.from(visible.entries()).sort((a, b) => b[1] - a[1])[0]?.[0];
-        if (!bestId) return;
-
-        const chip = exploreChipForSectionElementId(bestId, categoryFilter);
-        if (chip) setActiveExploreChip(chip);
-      },
-      {
-        root: null,
-        rootMargin: "-30% 0px -45% 0px",
-        threshold: [0, 0.15, 0.35, 0.55],
-      }
-    );
-
-    for (const id of EXPLORE_SCROLL_SECTION_IDS) {
-      const el = document.getElementById(id);
-      if (el) observer.observe(el);
-    }
-
-    return () => observer.disconnect();
-  }, [dashboard, categoryFilter]);
+  useExploreScrollSpy({
+    enabled: dashboard != null,
+    categoryFilter,
+    setActiveExploreChip,
+    pauseRef,
+  });
 
   const syncUrl = useCallback(
     (nextDate: string | undefined, nextCategory: TopicCategory | null) => {
@@ -162,6 +131,7 @@ export default function HeatDashboard() {
 
   const onExploreChip = useCallback(
     (chipId: ExploreChipId) => {
+      pauseScrollSpy();
       setActiveExploreChip(chipId);
       const action = resolveExploreChipAction(chipId);
 
@@ -197,7 +167,7 @@ export default function HeatDashboard() {
           break;
       }
     },
-    [date, syncUrl, navigateToSection, navigateToSections]
+    [date, syncUrl, navigateToSection, navigateToSections, pauseScrollSpy]
   );
 
   const archiveDate =
