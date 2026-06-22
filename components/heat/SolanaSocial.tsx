@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useId, useState } from "react";
+import { useCallback, useEffect, useId, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
 import {
   SOLANA_GRAM_CARDS,
@@ -14,11 +14,11 @@ const GRAM_LOGO_HEIGHT = 1000;
 const GRAM_WORDMARK_WIDTH = 1080;
 const GRAM_WORDMARK_HEIGHT = 522;
 
-function thumbObjectClass(card: SolanaSocialCard) {
-  if (card.thumbObjectPosition === "top") {
-    return "object-cover object-center lg:object-top";
-  }
-  return "object-cover object-center";
+function thumbObjectPositionStyle(card: SolanaSocialCard): CSSProperties | undefined {
+  const pos = card.thumbObjectPosition ?? "center";
+  if (pos === "center") return undefined;
+  if (pos === "top") return { objectPosition: "center top" };
+  return { objectPosition: pos };
 }
 
 function SocialImage({
@@ -50,7 +50,7 @@ function SocialImage({
 
   const imageClass = uncropped
     ? "h-auto w-full object-contain"
-    : `h-full w-full ${thumbObjectClass(card)}`;
+    : "h-full w-full object-cover";
 
   return (
     <div className={uncropped ? "film-strip-window film-strip-window-open" : "film-strip-window"}>
@@ -62,6 +62,7 @@ function SocialImage({
         unoptimized
         loading="eager"
         className={imageClass}
+        style={uncropped ? undefined : thumbObjectPositionStyle(card)}
         sizes={uncropped ? "100vw" : "(max-width: 1024px) 45vw, 240px"}
         aria-hidden
       />
@@ -144,15 +145,12 @@ function SocialModal({
           </button>
         </div>
 
-        <div className="shrink-0 px-4 py-3 sm:px-5">
+        <div className="shrink-0 px-4 pb-1.5 pt-1.5 sm:px-5">
           <SocialImage card={card} variant="modal" />
         </div>
 
-        <div id={mentionsId} className="shrink-0 px-4 py-3 sm:px-5 sm:pb-4">
-          <p className="text-[10px] font-semibold uppercase tracking-wide text-text-muted">
-            People in this image
-          </p>
-          <p className="mt-2 text-[13px] leading-relaxed text-text-primary">
+        <div id={mentionsId} className="shrink-0 px-4 pb-1.5 pt-1.5 sm:px-5 sm:pb-2">
+          <p className="text-[15px] leading-relaxed text-text-primary">
             {card.people.map((person, index) => (
               <span key={person.xHandle}>
                 {index > 0 ? " " : null}
@@ -169,10 +167,6 @@ function SocialModal({
             ))}
           </p>
         </div>
-
-        <p className="shrink-0 border-t border-border px-4 py-2.5 text-[10px] text-text-muted sm:px-5 sm:text-[11px]">
-          Static preview · not investment advice · not an endorsement
-        </p>
       </div>
     </div>,
     document.body,

@@ -15,8 +15,8 @@ export type SolanaSocialCard = {
   imageWidth: number;
   imageHeight: number;
   people: SolanaSocialPerson[];
-  /** Desktop thumbnail crop anchor (object-position). */
-  thumbObjectPosition?: "top" | "center";
+  /** Film-strip crop anchor (`top`, `center`, or any CSS object-position value). */
+  thumbObjectPosition?: "top" | "center" | (string & {});
 };
 
 /** Image files: resource for pic/0.jpg … 5.jpg */
@@ -94,5 +94,6 @@ export const SOLANA_GRAM_CARDS: SolanaSocialCard[] = [
       { name: "Valid", xHandle: "validotxyz", xUrl: "https://x.com/validotxyz" },
       { name: "Frame Tailor", xHandle: "Frame_tailor_", xUrl: "https://x.com/Frame_tailor_" },
     ],
+    thumbObjectPosition: "top",
   },
 ];
