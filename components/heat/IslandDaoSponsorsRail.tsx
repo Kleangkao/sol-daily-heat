@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { ISLANDDAO_FEATURED, type IslandDaoFeatured } from "@/lib/islanddao/sponsors";
 
 function FeaturedCard({ partner }: { partner: IslandDaoFeatured }) {
@@ -56,6 +56,12 @@ function FeaturedRow({
 }
 
 export default function IslandDaoSponsorsRail() {
+  const [marqueeLoopReady, setMarqueeLoopReady] = useState(false);
+
+  useEffect(() => {
+    setMarqueeLoopReady(true);
+  }, []);
+
   useEffect(() => {
     const resumeMarquee = () => {
       if (document.visibilityState !== "visible") return;
@@ -77,7 +83,10 @@ export default function IslandDaoSponsorsRail() {
         Happening at IslandDAO, Koh Samui
       </p>
 
-      <div className="featured-marquee-clip relative mt-2.5 min-h-[76px] w-full max-w-full overflow-hidden py-1">
+      <div
+        className="featured-marquee-clip relative mt-2.5 min-h-[76px] w-full max-w-full overflow-hidden py-1"
+        style={{ overflow: "hidden" }}
+      >
         <div
           className="featured-marquee-fade pointer-events-none absolute inset-y-0 left-0 z-10 w-8 sm:w-10"
           aria-hidden
@@ -87,9 +96,14 @@ export default function IslandDaoSponsorsRail() {
           aria-hidden
         />
 
-        <div className="featured-marquee-track flex w-max flex-nowrap items-center gap-3">
+        <div
+          className="featured-marquee-track flex w-max flex-nowrap items-center gap-3"
+          style={{ display: "flex", width: "max-content", flexWrap: "nowrap" }}
+        >
           <FeaturedRow partners={ISLANDDAO_FEATURED} />
-          <FeaturedRow partners={ISLANDDAO_FEATURED} ariaHidden />
+          {marqueeLoopReady ? (
+            <FeaturedRow partners={ISLANDDAO_FEATURED} ariaHidden />
+          ) : null}
         </div>
       </div>
     </section>
