@@ -170,6 +170,8 @@ a {
   }
 
   .film-strip-rail {
+    position: relative;
+    z-index: 2;
     flex: 0 0 var(--film-rail-w);
     background-color: var(--film-body);
     background-image: repeating-linear-gradient(
@@ -244,8 +246,8 @@ a {
     content: "";
     position: absolute;
     top: calc(-1 * var(--film-bridge-h));
-    left: calc(-1 * (var(--film-frame-pad-x) + var(--film-rail-w)));
-    right: calc(-1 * (var(--film-frame-pad-x) + var(--film-rail-w)));
+    left: calc(-1 * var(--film-frame-pad-x));
+    right: calc(-1 * var(--film-frame-pad-x));
     height: var(--film-bridge-h);
     background: var(--film-body);
     box-shadow:
@@ -268,7 +270,7 @@ a {
     -webkit-mask-repeat: repeat-x;
     mask-repeat: repeat-x;
     pointer-events: none;
-    z-index: 1;
+    z-index: 0;
   }
 
   .film-strip-window {
