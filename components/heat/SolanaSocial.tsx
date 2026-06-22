@@ -150,32 +150,26 @@ function SocialModal({
           <SocialImage card={card} variant="modal" />
         </div>
 
-        <div className="scrollbar-hidden min-h-0 flex-1 overflow-y-auto overscroll-y-contain px-4 py-3 sm:px-5">
+        <div className="shrink-0 px-4 py-3 sm:px-5 sm:pb-4">
           <p className="text-[10px] font-semibold uppercase tracking-wide text-text-muted">
             People in this image
           </p>
-          <ul className="mt-2.5 space-y-2">
-            {card.people.map((person) => (
-              <li
-                key={person.name}
-                className="rounded-[8px] border border-border/80 bg-bg-secondary/40 px-3 py-2"
-              >
-                <p className="text-[13px] font-semibold text-text-primary">{person.name}</p>
-                {person.xUrl ? (
-                  <a
-                    href={person.xUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-0.5 inline-block text-[11px] font-medium text-accent hover:text-accent-hover"
-                  >
-                    X profile
-                  </a>
-                ) : (
-                  <p className="mt-0.5 text-[11px] text-text-muted">X coming soon</p>
-                )}
-              </li>
+          <p className="mt-2 text-[13px] leading-relaxed text-text-primary">
+            {card.people.map((person, index) => (
+              <span key={person.xHandle}>
+                {index > 0 ? " " : null}
+                <a
+                  href={person.xUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-medium text-accent hover:text-accent-hover"
+                  aria-label={`Open @${person.xHandle} on X`}
+                >
+                  @{person.xHandle}
+                </a>
+              </span>
             ))}
-          </ul>
+          </p>
         </div>
 
         <p className="shrink-0 border-t border-border px-4 py-2.5 text-[10px] text-text-muted sm:px-5 sm:text-[11px]">
