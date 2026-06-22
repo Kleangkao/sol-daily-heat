@@ -32,7 +32,7 @@ export default function HeatHero({ archiveDate }: Props) {
     <header className="hero-stage relative px-4 pb-4 sm:px-6 sm:pb-5 lg:px-8 lg:pt-10">
       <div className="hero-stage__overlay pointer-events-none absolute inset-0" aria-hidden />
       <div className="relative mx-auto max-w-7xl">
-        <div className="hidden lg:block">
+        <div className="pb-2.5 lg:pb-0">
           <HeroHeadRow />
         </div>
 

@@ -32,11 +32,10 @@ import { sectionItemsMetricHeavy } from "@/lib/heat/card-display";
 import DashboardMainSkeleton from "./DashboardMainSkeleton";
 import DemoPreviewBanner from "./DemoPreviewBanner";
 import ExploreBar from "./ExploreBar";
-import HeatHero, { HeroHeadRow } from "./HeatHero";
+import HeatHero from "./HeatHero";
 import HeatSection from "./HeatSection";
 import { DailyHeatTitle } from "./EmojiAccents";
 import MarketPulse from "./MarketPulse";
-import MobileHeatStickyShell from "./MobileHeatStickyShell";
 import PastSnapshotsNav from "./PastSnapshotsNav";
 import SolanaSocial from "./SolanaSocial";
 import DemoSpotlightSection from "./DemoSpotlightSection";
@@ -261,10 +260,6 @@ export default function HeatDashboard() {
 
   return (
     <div className="min-h-screen">
-      <MobileHeatStickyShell>
-        <HeroHeadRow />
-        <ExploreBar key="mobile-explore" {...exploreChipProps} />
-      </MobileHeatStickyShell>
       <HeatHero archiveDate={archiveDate} />
       {dashboard && dashboard.dataSource && dashboard.dataSource !== "live" ? (
         <DemoPreviewBanner
@@ -274,6 +269,9 @@ export default function HeatDashboard() {
       ) : null}
       {awaitingData ? (
         <main className="mx-auto max-w-7xl px-4 py-5 sm:px-6 sm:py-8 lg:px-8">
+          <div className="lg:hidden">
+            <ExploreBar key="mobile-explore" {...exploreChipProps} />
+          </div>
           <div className="hidden lg:block">
             <ExploreBar key="desktop-explore" {...exploreChipProps} />
           </div>
@@ -281,6 +279,9 @@ export default function HeatDashboard() {
         </main>
       ) : dashboard ? (
         <main className="mx-auto max-w-7xl px-4 py-5 sm:px-6 sm:py-8 lg:px-8">
+          <div className="lg:hidden">
+            <ExploreBar key="mobile-explore" {...exploreChipProps} />
+          </div>
           <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-[252px_minmax(0,1fr)_252px]">
             <aside className="hidden lg:block">
               <div className="sticky top-4">
